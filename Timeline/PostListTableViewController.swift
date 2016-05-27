@@ -15,9 +15,7 @@ class PostListTableViewController: UITableViewController, NSFetchedResultsContro
         super.viewDidLoad()
         
         PostController.sharedController.fetchedResultsController.delegate = self
-        
-        tableView.rowHeight = UITableViewAutomaticDimension
-        tableView.estimatedRowHeight = 200
+
     }
     
     // MARK: - Table view data source

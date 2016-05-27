@@ -11,7 +11,7 @@ import UIKit
 class PostTableViewCell: UITableViewCell {
     
     @IBOutlet weak var postImageView: UIImageView!
-    @IBOutlet weak var postImageViewHeightConstraint: NSLayoutConstraint!
+//    @IBOutlet weak var postImageViewHeightConstraint: NSLayoutConstraint!
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -30,7 +30,9 @@ class PostTableViewCell: UITableViewCell {
             let imageWidth : CGFloat = self.contentView.frame.size.width
             let imageHeight: CGFloat = image.size.height / image.size.width * imageWidth
             
-            postImageViewHeightConstraint.constant = imageHeight
+            let constraintConstant = imageHeight < 300 ? imageHeight : 300
+            
+//            postImageViewHeightConstraint.constant = constraintConstant
         }
     }
 }

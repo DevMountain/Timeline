@@ -11,6 +11,7 @@ import UIKit
 class PhotoSelectViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
 
     @IBOutlet weak var addPhotoButton: UIButton!
+    @IBOutlet weak var imageView: UIImageView!
     
     var delegate: PhotoSelectViewControllerDelegate?
     
@@ -50,17 +51,29 @@ class PhotoSelectViewController: UIViewController, UIImagePickerControllerDelega
         
         if let image = info[UIImagePickerControllerOriginalImage] as? UIImage {
             
+            let size = image.sizeForMaxHeight(400)
+            
+            let resizedImage = image.copyImageToSize(size)
+            
             delegate?.photoSelectViewControllerSelected(image)
             addPhotoButton.setTitle("", forState: .Normal)
-            addPhotoButton.setBackgroundImage(image, forState: .Normal)
+            imageView.image = image
         }
     }
+}
+
+protocol PhotoSelectViewControllerDelegate: class {
     
-    func convertImageToSize(image: UIImage, size: CGSize) -> UIImage {
+    func photoSelectViewControllerSelected(image: UIImage)
+}
+
+extension UIImage {
+    
+    func copyImageToSize(size: CGSize) -> UIImage {
         
         UIGraphicsBeginImageContext(size);
         
-        image.drawInRect(CGRectMake(0, 0, size.width, size.height))
+        self.drawInRect(CGRectMake(0, 0, size.width, size.height))
         
         let resizedImage = UIGraphicsGetImageFromCurrentImageContext()
         
@@ -68,9 +81,12 @@ class PhotoSelectViewController: UIViewController, UIImagePickerControllerDelega
         
         return resizedImage
     }
-}
-
-protocol PhotoSelectViewControllerDelegate {
     
-    func photoSelectViewControllerSelected(image: UIImage)
+    func sizeForMaxHeight(targetHeight: CGFloat) -> CGSize {
+        
+        let scaleFactor = targetHeight / self.size.height
+        let targetWidth = self.size.width * scaleFactor
+        
+        return CGSize(width: targetWidth, height: targetHeight)
+    }
 }
