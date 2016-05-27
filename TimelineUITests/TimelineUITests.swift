@@ -2,7 +2,7 @@
 //  TimelineUITests.swift
 //  TimelineUITests
 //
-//  Created by Caleb Hicks on 5/27/16.
+//  Created by Caleb Hicks on 5/24/16.
 //  Copyright © 2016 DevMountain. All rights reserved.
 //
 

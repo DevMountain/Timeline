@@ -2,7 +2,7 @@
 //  AppDelegate.swift
 //  Timeline
 //
-//  Created by Caleb Hicks on 5/27/16.
+//  Created by Caleb Hicks on 5/24/16.
 //  Copyright © 2016 DevMountain. All rights reserved.
 //
 
@@ -16,6 +16,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         // Override point for customization after application launch.
+        
         return true
     }
 
