@@ -21,18 +21,5 @@ class PostTableViewCell: UITableViewCell {
     func updateWithPost(post: Post) {
         
         postImageView.image = post.photo
-        updateHeightConstraintForImage(post.photo)
-    }
-    
-    func updateHeightConstraintForImage(image: UIImage?) {
-        
-        if let image = image {
-            let imageWidth : CGFloat = self.contentView.frame.size.width
-            let imageHeight: CGFloat = image.size.height / image.size.width * imageWidth
-            
-            let constraintConstant = imageHeight < 300 ? imageHeight : 300
-            
-//            postImageViewHeightConstraint.constant = constraintConstant
-        }
     }
 }

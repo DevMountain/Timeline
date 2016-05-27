@@ -15,7 +15,6 @@ class PostListTableViewController: UITableViewController, NSFetchedResultsContro
         super.viewDidLoad()
         
         PostController.sharedController.fetchedResultsController.delegate = self
-
     }
     
     // MARK: - Table view data source
