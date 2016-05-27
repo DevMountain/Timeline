@@ -28,6 +28,7 @@ class SearchTableViewController: UITableViewController, UISearchResultsUpdating 
     }
     
     override func viewDidAppear(animated: Bool) {
+        
         posts = PostController.sharedController.fetchedResultsController.fetchedObjects as? [Post]
     }
     
@@ -45,7 +46,6 @@ class SearchTableViewController: UITableViewController, UISearchResultsUpdating 
             let post = posts?[indexPath.row] else { return UITableViewCell() }
         
         cell.updateWithPost(post)
-        cell.textLabel?.text = "\(post.added)"
         
         return cell
     }

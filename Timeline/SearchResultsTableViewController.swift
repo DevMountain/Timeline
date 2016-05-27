@@ -19,14 +19,10 @@ class SearchResultsTableViewController: UITableViewController {
     }
     
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCellWithIdentifier("resultCell", forIndexPath: indexPath)
+        guard let cell = tableView.dequeueReusableCellWithIdentifier("resultCell", forIndexPath: indexPath) as? PostTableViewCell,
+            let result = resultsArray[indexPath.row] as? Post else { return UITableViewCell() }
         
-        if let result = resultsArray[indexPath.row] as? Post {
-            
-            cell.textLabel?.text = "post created on: \(result.added)"
-        } else {
-            cell.textLabel?.text = "not working"
-        }
+        cell.updateWithPost(result)
         
         return cell
     }

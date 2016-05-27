@@ -57,7 +57,9 @@ extension Post: SearchableRecord {
 
         if let comments = self.comments?.array as? [Comment] {
             
-            return comments.flatMap({ $0.text }).filter({ $0.containsString(searchTerm) }).count > 0
+            let matchingCommentTerms = comments.flatMap({ $0.text?.lowercaseString }).filter({ $0.containsString(searchTerm) })
+            
+            return matchingCommentTerms.count > 0
         } else {
             return false
         }
