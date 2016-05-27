@@ -21,7 +21,8 @@ class AddPostTableViewController: UITableViewController {
     
     @IBAction func addPostTapped(sender: AnyObject) {
         
-        if let image = image, let caption = captionTextField.text {
+        if let image = image,
+            let caption = captionTextField.text {
             
             PostController.sharedController.createPost(image, caption: caption, completion: {
                 
