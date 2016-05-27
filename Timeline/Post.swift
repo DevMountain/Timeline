@@ -14,7 +14,6 @@ import CoreData
 class Post: NSManagedObject {
 
 //    @NSManaged var added: NSDate?
-//    @NSManaged var caption: String?
 //    @NSManaged var photoData: NSData?
 //    @NSManaged var comments: NSOrderedSet?
 
@@ -25,8 +24,13 @@ class Post: NSManagedObject {
         self.init(entity: entity, insertIntoManagedObjectContext: context)
         
         self.photoData = photo
-        self.caption = caption
         self.added = added
+        
+        if !caption.isEmpty {
+            
+            let comment = Comment(post: self, text: caption)
+            comment.post = self
+        }
     }
     
     var photo: UIImage? {
@@ -36,5 +40,26 @@ class Post: NSManagedObject {
         return UIImage(data: photoData)
     }
     
+    var hashtags: [String] {
+        
+        if let comments = self.comments?.array as? [Comment] {
+            
+            return comments.flatMap({$0.text}).joinWithSeparator(" ").componentsSeparatedByString(" ").filter({$0.characters.first == "#"})
+        } else {
+            return []
+        }
+    }
+}
 
+extension Post: SearchableRecord {
+    
+    func matchesSearchTerm(searchTerm: String) -> Bool {
+
+        if let comments = self.comments?.array as? [Comment] {
+            
+            return comments.flatMap({ $0.text }).filter({ $0.containsString(searchTerm) }).count > 0
+        } else {
+            return false
+        }
+    }
 }

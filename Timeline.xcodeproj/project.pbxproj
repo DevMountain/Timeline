@@ -22,6 +22,8 @@
 		68658B601CF8AC4B0016C5CD /* Comment+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68658B5C1CF8AC4B0016C5CD /* Comment+CoreDataProperties.swift */; };
 		68658B611CF8AC4B0016C5CD /* Comment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68658B5D1CF8AC4B0016C5CD /* Comment.swift */; };
 		68658B661CF8B8730016C5CD /* PostTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68658B651CF8B8730016C5CD /* PostTableViewCell.swift */; };
+		68658B681CF8F3280016C5CD /* SearchResultsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68658B671CF8F3280016C5CD /* SearchResultsTableViewController.swift */; };
+		68658B6A1CF8F3820016C5CD /* SearchableRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68658B691CF8F3820016C5CD /* SearchableRecord.swift */; };
 		68AA93211CF689F30006A751 /* PostListTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68AA93201CF689F30006A751 /* PostListTableViewController.swift */; };
 		68AA93231CF68A020006A751 /* PostDetailTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68AA93221CF68A020006A751 /* PostDetailTableViewController.swift */; };
 		68AA93251CF68A1A0006A751 /* AddPostTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68AA93241CF68A1A0006A751 /* AddPostTableViewController.swift */; };
@@ -70,6 +72,8 @@
 		68658B5C1CF8AC4B0016C5CD /* Comment+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Comment+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		68658B5D1CF8AC4B0016C5CD /* Comment.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Comment.swift; sourceTree = "<group>"; };
 		68658B651CF8B8730016C5CD /* PostTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PostTableViewCell.swift; sourceTree = "<group>"; };
+		68658B671CF8F3280016C5CD /* SearchResultsTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchResultsTableViewController.swift; sourceTree = "<group>"; };
+		68658B691CF8F3820016C5CD /* SearchableRecord.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchableRecord.swift; sourceTree = "<group>"; };
 		68AA93201CF689F30006A751 /* PostListTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PostListTableViewController.swift; sourceTree = "<group>"; };
 		68AA93221CF68A020006A751 /* PostDetailTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PostDetailTableViewController.swift; sourceTree = "<group>"; };
 		68AA93241CF68A1A0006A751 /* AddPostTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddPostTableViewController.swift; sourceTree = "<group>"; };
@@ -131,6 +135,7 @@
 				682FA4D61CF5427500B81932 /* AppDelegate.swift */,
 				6857CAA21CF5F08E0072C237 /* Timeline.entitlements */,
 				68658B621CF8AC5D0016C5CD /* Core Data */,
+				68658B6B1CF8F3EB0016C5CD /* Protocols */,
 				68658B631CF8AC7F0016C5CD /* View Controllers */,
 				68658B641CF8AC960016C5CD /* Controllers and Helpers */,
 				682FA4DD1CF5427500B81932 /* Assets.xcassets */,
@@ -180,6 +185,7 @@
 				68AA93221CF68A020006A751 /* PostDetailTableViewController.swift */,
 				68AA93241CF68A1A0006A751 /* AddPostTableViewController.swift */,
 				68AA93261CF68A2C0006A751 /* SearchTableViewController.swift */,
+				68658B671CF8F3280016C5CD /* SearchResultsTableViewController.swift */,
 				68AA93281CF68A3C0006A751 /* AccountSetupTableViewController.swift */,
 				68AA932A1CF68ECD0006A751 /* PhotoSelectViewController.swift */,
 			);
@@ -192,6 +198,14 @@
 				6857CAA01CF5F00F0072C237 /* PostController.swift */,
 			);
 			name = "Controllers and Helpers";
+			sourceTree = "<group>";
+		};
+		68658B6B1CF8F3EB0016C5CD /* Protocols */ = {
+			isa = PBXGroup;
+			children = (
+				68658B691CF8F3820016C5CD /* SearchableRecord.swift */,
+			);
+			name = Protocols;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -331,6 +345,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				68658B681CF8F3280016C5CD /* SearchResultsTableViewController.swift in Sources */,
 				68AA932B1CF68ECD0006A751 /* PhotoSelectViewController.swift in Sources */,
 				68AA93231CF68A020006A751 /* PostDetailTableViewController.swift in Sources */,
 				68658B661CF8B8730016C5CD /* PostTableViewCell.swift in Sources */,
@@ -346,6 +361,7 @@
 				68AA93271CF68A2C0006A751 /* SearchTableViewController.swift in Sources */,
 				68AA93251CF68A1A0006A751 /* AddPostTableViewController.swift in Sources */,
 				68658B591CF8A9E30016C5CD /* Model.xcdatamodeld in Sources */,
+				68658B6A1CF8F3820016C5CD /* SearchableRecord.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
