@@ -41,7 +41,7 @@ class PostController {
         
         let _ = Post(photo: data, caption: caption)
         
-        saveAllChanges()
+        save()
         
         if let completion = completion {
             completion()
@@ -52,7 +52,7 @@ class PostController {
         
         let _ = Comment(post: post, text: text)
         
-        saveAllChanges()
+        save()
         
         if let completion = completion {
             completion(success: true)
@@ -61,29 +61,33 @@ class PostController {
     
     func fullSync() {
         
-        if let lastSyncedObject = fetchedResultsController.fetchedObjects?.first as? Post,
-            let lastSyncDate = lastSyncedObject.added {
-            
-            cloudKitManager.fetchRecentRecords("Post", fromDate: lastSyncDate, toDate: NSDate(), completion: { (records, error) in
-
-                guard let records = records else { print("No fetched records to create."); return }
-                
-                for record in records {
-                    
-                    let newPost = Post(record: record)
-                }
-            })
-        }
-    }
-    
-    func saveAllChanges() {
-    
+        // push any local records that aren't in cloudkit
+        
         let insertedObjects = Array(Stack.sharedStack.managedObjectContext.insertedObjects)
         
         cloudKitManager.saveAllChanges(insertedObjects) { (records) in
             
             print(records)
         }
+        
+        // fetch new records that aren't in the local store
+        
+        let lastSyncDate = (fetchedResultsController.fetchedObjects?.first as? Post)?.added ?? NSDate(timeIntervalSince1970: 0)
+        
+        cloudKitManager.fetchRecentRecords("Post", fromDate: lastSyncDate, toDate: NSDate(), completion: { (records, error) in
+            
+            guard let records = records else { print("No fetched records to create."); return }
+            
+            for record in records {
+                
+                let newPost = Post(record: record)
+                self.save()
+            }
+        })
+        
+    }
+    
+    func save() {
         
         do {
             try Stack.sharedStack.managedObjectContext.save()

@@ -196,12 +196,14 @@ class CloudKitManager {
         
         var fetchedRecords: [CKRecord] = []
         
-        let startDatePredicate = NSPredicate(format: "%K >= %@", argumentArray: [CreationDate, fromDate])
-        let endDatePredicate = NSPredicate(format: "%K =< %@", argumentArray: [CreationDate, toDate])
+        let startDatePredicate = NSPredicate(format: "%K > %@", argumentArray: [CreationDate, fromDate])
+        let endDatePredicate = NSPredicate(format: "%K < %@", argumentArray: [CreationDate, toDate])
         let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [startDatePredicate, endDatePredicate])
         
         let query = CKQuery(recordType: recordType, predicate: predicate)
         let queryOperation = CKQueryOperation(query: query)
+        
+        queryOperation.qualityOfService = .UserInteractive
         
         queryOperation.recordFetchedBlock = { (fetchedRecord) -> Void in
             
@@ -295,10 +297,6 @@ class CloudKitManager {
                 completion(records: savedRecords)
             }
         }
-        
-        // modify records from managed objects
-        
-        // delete records
     }
     
     func saveRecord(record: CKRecord, completion: ((record: CKRecord?, error: NSError?) -> Void)?) {
