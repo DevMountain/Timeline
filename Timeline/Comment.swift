@@ -14,6 +14,9 @@ class Comment: NSManagedObject {
     
 //    @NSManaged var added: NSDate?
 //    @NSManaged var text: String?
+//    @NSManaged var lastUpdate: NSDate?
+//    @NSManaged var recordName: String?
+//    @NSManaged var recordType: String?
 //    @NSManaged var post: Post?
 
     convenience init(post: Post, text: String, added: NSDate = NSDate(), context: NSManagedObjectContext = Stack.sharedStack.managedObjectContext) {

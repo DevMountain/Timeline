@@ -192,15 +192,12 @@ class CloudKitManager {
     //
     //    }
     
-    func fetchRecentRecords(recordType: String, timeInterval: NSTimeInterval, completion: ((records: [CKRecord]?, error: NSError?) -> Void)?) {
-        
-        let now = NSDate()
-        let startDate = NSDate(timeIntervalSinceNow: -timeInterval)
+    func fetchRecentRecords(recordType: String, fromDate: NSDate, toDate: NSDate, completion: ((records: [CKRecord]?, error: NSError?) -> Void)?) {
         
         var fetchedRecords: [CKRecord] = []
         
-        let startDatePredicate = NSPredicate(format: "%K >= %@", argumentArray: [CreationDate, startDate])
-        let endDatePredicate = NSPredicate(format: "%K <= %@", argumentArray: [CreationDate, now])
+        let startDatePredicate = NSPredicate(format: "%K >= %@", argumentArray: [CreationDate, fromDate])
+        let endDatePredicate = NSPredicate(format: "%K =< %@", argumentArray: [CreationDate, toDate])
         let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [startDatePredicate, endDatePredicate])
         
         let query = CKQuery(recordType: recordType, predicate: predicate)
@@ -263,13 +260,40 @@ class CloudKitManager {
     
     // MARK: - Save and Modify
     
-    func saveAllChanges(insertedObjects: [CloudKitManagedObject]) {
+    func saveAllChanges(insertedObjects: [NSManagedObject], completion: ((records: [CKRecord]?) -> Void)?) {
         
         // create records for new objects
         
+        var savedRecords: [CKRecord] = []
+
+        let group = dispatch_group_create()
+        
         for object in insertedObjects {
             
+            dispatch_group_enter(group)
             
+            guard let cloudKitManagedObject = object as? CloudKitManagedObject,
+                let record = cloudKitManagedObject.cloudKitRecord else { fatalError("Unable to access record to save CloudKitManagedObject") }
+            
+            saveRecord(record, completion: { (savedRecord, error) in
+                
+                if let error = error {
+                    print("Error saving object. Error: \(error.description)")
+                }
+                
+                if let savedRecord = savedRecord {
+                    savedRecords.append(savedRecord)
+                }
+                
+                dispatch_group_leave(group)
+            })
+        }
+        
+        dispatch_group_notify(group, dispatch_get_main_queue()) { 
+            
+            if let completion = completion {
+                completion(records: savedRecords)
+            }
         }
         
         // modify records from managed objects

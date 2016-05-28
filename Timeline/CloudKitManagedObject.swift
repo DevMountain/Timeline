@@ -10,43 +10,41 @@ import Foundation
 import CoreData
 import CloudKit
 
-@objc protocol CloudKitRecordIDObject {
-    
-    var recordID: NSData? { get set }
-}
-
-extension CloudKitRecordIDObject {
-    
-    func cloudKitRecordID() -> CKRecordID? {
-        
-        guard let recordID = recordID else { return nil }
-        
-        return NSKeyedUnarchiver.unarchiveObjectWithData(recordID) as? CKRecordID
-    }
-}
-
-@objc protocol CloudKitManagedObject: CloudKitRecordIDObject {
+@objc protocol CloudKitManagedObject {
     
     var added: NSDate? { get set }
-    var lastUpdate: NSDate? { get set }
-    var recordName: String? { get set }
+    var recordData: NSData? { get set }
+    var recordName: String { get set }
     var recordType: String { get }
-    func managedObjectToRecord(record: CKRecord?) -> CKRecord
+    var cloudKitRecord: CKRecord? { get }
+    
     func updateWithRecord(record: CKRecord)
 }
 
 extension CloudKitManagedObject {
     
-    func cloudKitRecord(record: CKRecord?) -> CKRecord {
-        
-        if let record = record {
-            return record
-        }
-        
+    
+    var cloudKitRecordID: CKRecordID? {
+        guard let record = cloudKitRecord else { return nil }
+        return record.recordID
+    }
+    
+    var cloudKitRecordName: String? {
+        guard let recordName = cloudKitRecordID?.recordName else { return nil }
+        return recordName
+    }
+    
+    var isSynced: Bool {
+        return cloudKitRecord != nil
+    }
+    
+    var creatorRecord: CKRecordID? {
+        guard let record = cloudKitRecord else { return nil }
+        return record.creatorUserRecordID
+    }
+    
+    func nameForManagedObject() -> String {
         let uuid = NSUUID()
-        let recordName = recordType + "." + uuid.UUIDString
-        let recordID = CKRecordID(recordName: recordName)
-        
-        return CKRecord(recordType: recordType, recordID: recordID)
+        return "\(self.recordType)_\(uuid.UUIDString)"
     }
 }

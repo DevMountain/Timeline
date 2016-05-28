@@ -14,6 +14,7 @@ class PostController {
     static let sharedController = PostController()
     
     let fetchedResultsController: NSFetchedResultsController
+    let cloudKitManager: CloudKitManager
     
     init() {
         
@@ -28,6 +29,10 @@ class PostController {
         } catch let error as NSError {
             print("Unable to perform fetch request: \(error.localizedDescription)")
         }
+        
+        self.cloudKitManager = CloudKitManager()
+        
+        fullSync()
     }
     
     func createPost(image: UIImage, caption: String, completion: (() -> Void)?) {
@@ -54,12 +59,36 @@ class PostController {
         }
     }
     
+    func fullSync() {
+        
+        if let lastSyncedObject = fetchedResultsController.fetchedObjects?.first as? Post,
+            let lastSyncDate = lastSyncedObject.added {
+            
+            cloudKitManager.fetchRecentRecords("Post", fromDate: lastSyncDate, toDate: NSDate(), completion: { (records, error) in
+
+                guard let records = records else { print("No fetched records to create."); return }
+                
+                for record in records {
+                    
+                    let newPost = Post(record: record)
+                }
+            })
+        }
+    }
+    
     func saveAllChanges() {
     
+        let insertedObjects = Array(Stack.sharedStack.managedObjectContext.insertedObjects)
+        
+        cloudKitManager.saveAllChanges(insertedObjects) { (records) in
+            
+            print(records)
+        }
+        
         do {
             try Stack.sharedStack.managedObjectContext.save()
         } catch {
-            print("Error saving Managed Object Context. Items not saved.")
+            print("Error saving Managed Object Context. Error: \(error)")
         }
     }
 }
