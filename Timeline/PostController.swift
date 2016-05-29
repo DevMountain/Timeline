@@ -67,7 +67,7 @@ class PostController {
         
         cloudKitManager.saveAllChanges(insertedObjects) { (records) in
             
-            print(records)
+            print("saved records: \(records)")
         }
         
         // fetch new records that aren't in the local store
@@ -88,6 +88,8 @@ class PostController {
     }
     
     func save() {
+        
+        fullSync()
         
         do {
             try Stack.sharedStack.managedObjectContext.save()
