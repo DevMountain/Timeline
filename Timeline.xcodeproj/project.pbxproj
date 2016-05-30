@@ -119,8 +119,9 @@
 		682FA4CA1CF5427500B81932 = {
 			isa = PBXGroup;
 			children = (
-				6857CAA31CF5F0B30072C237 /* CloudKit.framework */,
-				682FA4D51CF5427500B81932 /* Timeline */,
+				682FA4D51CF5427500B81932 /* Sources */,
+				9D6CD0241CFC8F580002C64B /* Resources */,
+				9D6CD0231CFC8F470002C64B /* Frameworks */,
 				682FA4EA1CF5427500B81932 /* TimelineTests */,
 				682FA4F51CF5427500B81932 /* TimelineUITests */,
 				682FA4D41CF5427500B81932 /* Products */,
@@ -137,18 +138,18 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		682FA4D51CF5427500B81932 /* Timeline */ = {
+		682FA4D51CF5427500B81932 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
 				682FA4D61CF5427500B81932 /* AppDelegate.swift */,
-				6857CAA21CF5F08E0072C237 /* Timeline.entitlements */,
-				68658B621CF8AC5D0016C5CD /* Core Data */,
-				68658B6B1CF8F3EB0016C5CD /* Protocols */,
+				9D6CD0261CFC8FC70002C64B /* Model */,
+				9D6CD0281CFC902C0002C64B /* Model Controllers */,
+				9D6CD0271CFC8FDD0002C64B /* Views */,
 				68658B631CF8AC7F0016C5CD /* View Controllers */,
-				68658B641CF8AC960016C5CD /* Controllers and Helpers */,
-				682FA4DD1CF5427500B81932 /* Assets.xcassets */,
-				682FA4E21CF5427500B81932 /* Info.plist */,
+				68658B641CF8AC960016C5CD /* Other Controllers */,
+				68658B6B1CF8F3EB0016C5CD /* Protocols */,
 			);
+			name = Sources;
 			path = Timeline;
 			sourceTree = "<group>";
 		};
@@ -173,12 +174,11 @@
 		68658B621CF8AC5D0016C5CD /* Core Data */ = {
 			isa = PBXGroup;
 			children = (
+				68658B551CF8A9B50016C5CD /* Stack.swift */,
 				68658B5A1CF8AC4B0016C5CD /* Post+CoreDataProperties.swift */,
 				68658B5B1CF8AC4B0016C5CD /* Post.swift */,
 				68658B5C1CF8AC4B0016C5CD /* Comment+CoreDataProperties.swift */,
 				68658B5D1CF8AC4B0016C5CD /* Comment.swift */,
-				68658B551CF8A9B50016C5CD /* Stack.swift */,
-				68658B571CF8A9E30016C5CD /* Model.xcdatamodeld */,
 			);
 			name = "Core Data";
 			sourceTree = "<group>";
@@ -186,10 +186,7 @@
 		68658B631CF8AC7F0016C5CD /* View Controllers */ = {
 			isa = PBXGroup;
 			children = (
-				682FA4DF1CF5427500B81932 /* LaunchScreen.storyboard */,
-				682FA4DA1CF5427500B81932 /* Main.storyboard */,
 				68AA93201CF689F30006A751 /* PostListTableViewController.swift */,
-				68658B651CF8B8730016C5CD /* PostTableViewCell.swift */,
 				68AA93221CF68A020006A751 /* PostDetailTableViewController.swift */,
 				68AA93241CF68A1A0006A751 /* AddPostTableViewController.swift */,
 				68AA93261CF68A2C0006A751 /* SearchTableViewController.swift */,
@@ -200,15 +197,12 @@
 			name = "View Controllers";
 			sourceTree = "<group>";
 		};
-		68658B641CF8AC960016C5CD /* Controllers and Helpers */ = {
+		68658B641CF8AC960016C5CD /* Other Controllers */ = {
 			isa = PBXGroup;
 			children = (
 				68402B561CF93CB000EECEF3 /* CloudKitManager.swift */,
-				68402B5C1CFC197B00EECEF3 /* User.swift */,
-				68402B5A1CFC195E00EECEF3 /* UserController.swift */,
-				6857CAA01CF5F00F0072C237 /* PostController.swift */,
 			);
-			name = "Controllers and Helpers";
+			name = "Other Controllers";
 			sourceTree = "<group>";
 		};
 		68658B6B1CF8F3EB0016C5CD /* Protocols */ = {
@@ -218,6 +212,62 @@
 				68402B581CFA048700EECEF3 /* CloudKitManagedObject.swift */,
 			);
 			name = Protocols;
+			sourceTree = "<group>";
+		};
+		9D6CD0231CFC8F470002C64B /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				6857CAA31CF5F0B30072C237 /* CloudKit.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		9D6CD0241CFC8F580002C64B /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				9D6CD0251CFC8F6E0002C64B /* Storyboards */,
+				68658B571CF8A9E30016C5CD /* Model.xcdatamodeld */,
+				6857CAA21CF5F08E0072C237 /* Timeline.entitlements */,
+				682FA4DD1CF5427500B81932 /* Assets.xcassets */,
+				682FA4E21CF5427500B81932 /* Info.plist */,
+			);
+			name = Resources;
+			path = Timeline;
+			sourceTree = "<group>";
+		};
+		9D6CD0251CFC8F6E0002C64B /* Storyboards */ = {
+			isa = PBXGroup;
+			children = (
+				682FA4DF1CF5427500B81932 /* LaunchScreen.storyboard */,
+				682FA4DA1CF5427500B81932 /* Main.storyboard */,
+			);
+			name = Storyboards;
+			sourceTree = "<group>";
+		};
+		9D6CD0261CFC8FC70002C64B /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				68402B5C1CFC197B00EECEF3 /* User.swift */,
+				68658B621CF8AC5D0016C5CD /* Core Data */,
+			);
+			name = Model;
+			sourceTree = "<group>";
+		};
+		9D6CD0271CFC8FDD0002C64B /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				68658B651CF8B8730016C5CD /* PostTableViewCell.swift */,
+			);
+			name = Views;
+			sourceTree = "<group>";
+		};
+		9D6CD0281CFC902C0002C64B /* Model Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				68402B5A1CFC195E00EECEF3 /* UserController.swift */,
+				6857CAA01CF5F00F0072C237 /* PostController.swift */,
+			);
+			name = "Model Controllers";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
