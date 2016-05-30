@@ -80,14 +80,14 @@ class PostController {
         
         // push any local records that aren't in cloudkit
         
-        pushChangesToCloudKit { (success) in
-            
+//        pushChangesToCloudKit { (success) in
+        
             self.fetchChangesFromCloudKit({ (succes) in
                 
                 print("sync finished")
                 NSUserDefaults.standardUserDefaults().setObject(NSDate(), forKey: "lastSync")
             })
-        }
+//        }
         
     }
     
@@ -152,11 +152,14 @@ class PostController {
                 
                 for record in records {
                     
-                    let matchingObject = self.postWithName(record.recordID.recordName)
-                    matchingObject?.updateWithRecord(record)
-                    self.saveContext(false)
+                    if let matchingObject = self.postWithName(record.recordID.recordName) {
+                        matchingObject.updateWithRecord(record)
+                        self.saveContext(false)
+                    }
                 }
             }
+            
+            NSUserDefaults.standardUserDefaults().setObject(NSDate(), forKey: "lastSync")
             
             if let completion = completion {
                 completion(success: true)
