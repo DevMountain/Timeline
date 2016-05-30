@@ -47,6 +47,7 @@ class PostDetailTableViewController: UITableViewController {
             let comment = comments[indexPath.row] as? Comment {
             
             cell.textLabel?.text = comment.text
+            cell.detailTextLabel?.text = comment.recordName
         }
         
         return cell
@@ -97,9 +98,11 @@ class PostDetailTableViewController: UITableViewController {
     
     func presentActivityViewController() {
         
-        guard let post = post else { return }
+        guard let photo = post?.photo,
+            let comment = post?.comments?.firstObject as? Comment,
+            let text = comment.text else { return }
         
-        let activityViewController = UIActivityViewController(activityItems: [post], applicationActivities: nil)
+        let activityViewController = UIActivityViewController(activityItems: [photo, text], applicationActivities: nil)
         
         presentViewController(activityViewController, animated: true, completion: nil)
     }
