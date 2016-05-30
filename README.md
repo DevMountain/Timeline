@@ -63,6 +63,8 @@ Implement a layered tab bar based view hierarchy. The app will have a Timeline t
     * note: You will implement this scene in Part 2 when setting up the `UISearchController` on the Search scene
 8. Add a `UITableViewController` User Setup scene, embed it into a `UINavigationController`, and add a modal presentation segue to it from the `UITabBarController` scene. Assign an identifier.
     * note: This segue can be called manually, and this scene will be used when a new user has not been set up with a 'Display Name' or 'Profile Image'
+https://cloud.githubusercontent.com/assets/11533065/15654867/e3b009f0-2654-11e6-835d-26e695377c8d.png
+https://cloud.githubusercontent.com/assets/11533065/15654870/e3b1d582-2654-11e6-8431-02cdf7d0d856.png
 
 ### Implement Model
 
@@ -162,6 +164,7 @@ Use the table view's header view to display the photo and a toolbar that allows 
 5. Add an IBAction for the 'Comment' button. Implement the IBAction by presenting a `UIAlertController` with a text field, a Cancel action, and an 'OK' action. Implement the 'OK' action to initialize a new `Comment` via the `PostController` and reload the table view to display it.
     * note: Do not create a new `Comment` if the user has not added text.
 6. Add an IBAction for the 'Share' and 'Follow' buttons. You will implement these two actions in a future step in the project.
+https://cloud.githubusercontent.com/assets/11533065/15654868/e3b154ae-2654-11e6-9fd3-34925a22e3d3.png
 
 #### Add Post Scene
 
@@ -181,6 +184,7 @@ Until you implement the `UIImagePickerController`, you will use a staged static 
     * note: It is important to remove the title text so that the user no longer sees that a button is there, but do not remove the entire button, that way the user can tap again to select a different image.
 6. Add an IBAction to the 'Add Post' `UIButton` that checks for an `image` and `caption`. If there is an `image` and a `caption`, use the `PostController` to create a new `Post` and dismiss the view controller. If either the image or a caption is missing, present an alert directing the user to check their information and try again.
 7. Add a 'Cancel' `UIBarButtonItem` as the left bar button item. Implement the IBAction to dismiss the view.
+https://cloud.githubusercontent.com/assets/11533065/15654869/e3b18cda-2654-11e6-95a1-40f51bdbd3ce.png
 
 #### Account Setup Scene
 
