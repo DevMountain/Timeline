@@ -43,6 +43,8 @@ class PostController {
         
         saveContext()
         
+        // TODO: Push new posts to CloudKit one by one, instead of altogether in a 'post changes' type of function
+        
         if let completion = completion {
             completion()
         }
@@ -53,6 +55,8 @@ class PostController {
         let _ = Comment(post: post, text: text)
         
         saveContext()
+        
+        // TODO: Push new comments to CloudKit one by one, instead of altogether in a 'post changes' type of function
         
         if let completion = completion {
             completion(success: true)
