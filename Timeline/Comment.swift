@@ -85,13 +85,7 @@ class Comment: NSManagedObject, CloudKitManagedObject {
     
     func updateWithRecord(record: CKRecord) {
         
-        guard let added = record.creationDate,
-            let text = record[textKey] as? String else { fatalError("Unable to update CloudKitManagedObject \(self.cloudKitRecordName) with CKRecord") }
-        
-        self.added = added
-        self.text = text
         self.recordData = NSKeyedArchiver.archivedDataWithRootObject(record)
-        self.recordName = record.recordID.recordName
     }
 
 }

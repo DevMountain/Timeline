@@ -108,13 +108,7 @@ class Post: NSManagedObject, CloudKitManagedObject {
     
     func updateWithRecord(record: CKRecord) {
         
-        guard let added = record.creationDate,
-            let photoData = record[photoDataKey] as? CKAsset else { fatalError("Unable to update CloudKitManagedObject \(self.cloudKitRecordName) with CKRecord") }
-        
-        self.added = added
-        self.photoData = NSData(contentsOfURL: photoData.fileURL)
         self.recordData = NSKeyedArchiver.archivedDataWithRootObject(record)
-        self.recordName = record.recordID.recordName
     }
 }
 
