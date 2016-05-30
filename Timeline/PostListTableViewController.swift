@@ -53,6 +53,12 @@ class PostListTableViewController: UITableViewController, NSFetchedResultsContro
         }
     }
     
+    @IBAction func refreshControlActivated(sender: UIRefreshControl) {
+        
+        PostController.sharedController.fullSync()
+        sender.endRefreshing()
+    }
+    
     // MARK: - NSFetchedResultsControllerDelegate
     
     func controllerWillChangeContent(controller: NSFetchedResultsController) {
