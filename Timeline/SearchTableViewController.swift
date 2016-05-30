@@ -1,20 +1,20 @@
 /*
-//
-//  SearchTableViewController.swift
-//  Timeline
-//
-//  Created by Caleb Hicks on 5/25/16.
-//  Copyright © 2016 DevMountain. All rights reserved.
-//
-//  Abstract: Lists latest public results from CloudKit. Filters by caption, hashtag, or username when user searches. Objects are loaded into a Managed Object Context, but are discarded after the search session has finished.
-//  Alternative: Only displays users to follow. If user taps another use to follow, it loads a PostList with that user's posts.
-*/
+ //
+ //  SearchTableViewController.swift
+ //  Timeline
+ //
+ //  Created by Caleb Hicks on 5/25/16.
+ //  Copyright © 2016 DevMountain. All rights reserved.
+ //
+ //  Abstract: Lists latest public results from CloudKit. Filters by caption, hashtag, or username when user searches. Objects are loaded into a Managed Object Context, but are discarded after the search session has finished.
+ //  Alternative: Only displays users to follow. If user taps another use to follow, it loads a PostList with that user's posts.
+ */
 
 
 import UIKit
 
 class SearchTableViewController: UITableViewController, UISearchResultsUpdating {
-
+    
     var searchController: UISearchController?
     
     var posts: [Post]?
@@ -58,7 +58,7 @@ class SearchTableViewController: UITableViewController, UISearchResultsUpdating 
         
         searchController = UISearchController(searchResultsController: resultsController)
         searchController?.searchResultsUpdater = self
-        searchController?.searchBar.sizeToFit()
+//        searchController?.searchBar.sizeToFit()
         searchController?.hidesNavigationBarDuringPresentation = false
         tableView.tableHeaderView = searchController?.searchBar
         
@@ -67,9 +67,8 @@ class SearchTableViewController: UITableViewController, UISearchResultsUpdating 
     
     func updateSearchResultsForSearchController(searchController: UISearchController) {
         
-        let searchTerm = searchController.searchBar.text!.lowercaseString
-        
         if let resultsViewController = searchController.searchResultsController as? SearchResultsTableViewController,
+            let searchTerm = searchController.searchBar.text?.lowercaseString,
             let posts = posts {
             
             resultsViewController.resultsArray = posts.filter({$0.matchesSearchTerm(searchTerm)})
@@ -81,6 +80,29 @@ class SearchTableViewController: UITableViewController, UISearchResultsUpdating 
     
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         
+        // segue from self
         
+        if let detailViewController = segue.destinationViewController as? PostDetailTableViewController,
+            let sender = sender as? PostTableViewCell,
+            let selectedIndexPath = tableView.indexPathForCell(sender),
+            let posts = posts {
+            
+            let post = posts[selectedIndexPath.row]
+            
+            detailViewController.post = post
+        }
+        
+        // segue from search results
+        
+        if let detailViewController = segue.destinationViewController as? PostDetailTableViewController,
+            let sender = sender as? PostTableViewCell,
+            let selectedIndexPath = (searchController?.searchResultsController as? SearchResultsTableViewController)?.tableView.indexPathForCell(sender),
+            let searchTerm = searchController?.searchBar.text?.lowercaseString,
+            let posts = posts?.filter({ $0.matchesSearchTerm(searchTerm) }) {
+            
+            let post = posts[selectedIndexPath.row]
+            
+            detailViewController.post = post
+        }
     }
 }
