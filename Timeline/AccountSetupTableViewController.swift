@@ -24,9 +24,9 @@ class AccountSetupTableViewController: UITableViewController {
         
         if let image = image, let text = displayNameField.text {
             
-//            UserController.updateCurrentUser(text, image: image, completion: {
-//                self.dismissViewControllerAnimated(true, completion: nil)
-//            })
+            UserController.sharedController.updateUser(text, profileImage: image)
+            
+            self.dismissViewControllerAnimated(true, completion: nil)
         } else {
             
             let alertController = UIAlertController(title: "Missing Profile Information", message: "Check your display name and profile image and try again.", preferredStyle: .Alert)

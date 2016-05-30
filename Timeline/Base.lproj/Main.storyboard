@@ -44,6 +44,7 @@
                             <outlet property="delegate" destination="gK2-fp-nri" id="c6h-V6-eQr"/>
                         </connections>
                     </tableView>
+                    <tabBarItem key="tabBarItem" title="Item" id="khd-gn-aXP"/>
                     <navigationItem key="navigationItem" title="Timeline" id="deT-A6-ZRe">
                         <barButtonItem key="rightBarButtonItem" systemItem="add" id="yNp-Op-9FN">
                             <connections>
@@ -464,7 +465,7 @@
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                     </tabBar>
                     <connections>
-                        <segue destination="vL8-g2-3E9" kind="show" id="wve-ZM-TJO"/>
+                        <segue destination="vL8-g2-3E9" kind="show" identifier="toAccountSetup" id="wve-ZM-TJO"/>
                         <segue destination="Wjq-MM-JzB" kind="relationship" relationship="viewControllers" id="E5y-yK-Pal"/>
                         <segue destination="9Ev-jm-rGT" kind="relationship" relationship="viewControllers" id="Vxz-em-zfc"/>
                     </connections>
@@ -596,7 +597,7 @@
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>
-        <segue reference="4zP-9A-n47"/>
+        <segue reference="EvV-aO-22l"/>
         <segue reference="asj-Eb-Atf"/>
     </inferredMetricsTieBreakers>
 </document>

@@ -15,6 +15,11 @@ class PostListTableViewController: UITableViewController, NSFetchedResultsContro
         super.viewDidLoad()
         
         PostController.sharedController.fetchedResultsController.delegate = self
+        
+        if UserController.sharedController.currentUser == nil {
+            
+            self.tabBarController?.performSegueWithIdentifier("toAccountSetup", sender: self)
+        }
     }
     
     // MARK: - Table view data source
