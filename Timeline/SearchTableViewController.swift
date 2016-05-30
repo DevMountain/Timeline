@@ -58,7 +58,7 @@ class SearchTableViewController: UITableViewController, UISearchResultsUpdating 
         
         searchController = UISearchController(searchResultsController: resultsController)
         searchController?.searchResultsUpdater = self
-//        searchController?.searchBar.sizeToFit()
+        searchController?.searchBar.sizeToFit()
         searchController?.hidesNavigationBarDuringPresentation = false
         tableView.tableHeaderView = searchController?.searchBar
         
