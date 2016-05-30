@@ -67,6 +67,8 @@ class PostController {
         let predicate = NSPredicate(format: "recordName == %@", argumentArray: [name])
         fetchRequest.predicate = predicate
         
+        // TODO: Sometimes this works... sometimes it doesn't
+        
         let result = (try? Stack.sharedStack.managedObjectContext.executeFetchRequest(fetchRequest) as? [Post]) ?? nil
         
         return result?.first
