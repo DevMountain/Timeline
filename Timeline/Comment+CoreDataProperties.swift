@@ -17,7 +17,7 @@ extension Comment {
     @NSManaged var added: NSDate?
     @NSManaged var text: String?
     @NSManaged var recordData: NSData?
-    @NSManaged var recordName: String?
+    @NSManaged var recordName: String
     @NSManaged var post: Post?
 
 }

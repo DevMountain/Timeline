@@ -35,6 +35,18 @@ extension CloudKitManagedObject {
     }
     
     var isSynced: Bool {
+        
+        // TODO: Fix this for using to check if the object is synced
+        
+        if let cloudKitRecord = cloudKitRecord {
+            
+            return true
+            
+        } else {
+            
+            return false
+        }
+        
         return cloudKitRecord != nil
     }
     
@@ -45,6 +57,11 @@ extension CloudKitManagedObject {
     
     func nameForManagedObject() -> String {
         let uuid = NSUUID()
-        return "\(self.recordType)_\(uuid.UUIDString)"
+        
+        let name = "\(self.recordType)-\(uuid.UUIDString)"
+        
+        print("generated name for managed object: \(name)")
+        
+        return name
     }
 }

@@ -81,7 +81,9 @@ class Post: NSManagedObject, CloudKitManagedObject {
             return NSKeyedUnarchiver.unarchiveObjectWithData(recordData) as? CKRecord
         } else {
             
-            let record = CKRecord(recordType: recordType)
+            let recordID = CKRecordID(recordName: self.recordName)
+            
+            let record = CKRecord(recordType: recordType, recordID: recordID)
             record[addedKey] = added
             record[photoDataKey] = CKAsset(fileURL: self.temporaryPhotoURL)
             

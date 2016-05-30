@@ -277,7 +277,7 @@ class CloudKitManager {
             guard let cloudKitManagedObject = object as? CloudKitManagedObject,
                 let record = cloudKitManagedObject.cloudKitRecord else { fatalError("Unable to access record to save CloudKitManagedObject") }
             
-            saveRecord(record, completion: { (savedRecord, error) in
+            modifyRecord(record, completion: { (savedRecord, error) in
                 
                 if let error = error {
                     print("Error saving object. Error: \(error.description)")
@@ -289,6 +289,19 @@ class CloudKitManager {
                 
                 dispatch_group_leave(group)
             })
+            
+//            saveRecord(record, completion: { (savedRecord, error) in
+//                
+//                if let error = error {
+//                    print("Error saving object. Error: \(error.description)")
+//                }
+//                
+//                if let savedRecord = savedRecord {
+//                    savedRecords.append(savedRecord)
+//                }
+//                
+//                dispatch_group_leave(group)
+//            })
         }
         
         dispatch_group_notify(group, dispatch_get_main_queue()) { 
@@ -314,7 +327,7 @@ class CloudKitManager {
         let operation = CKModifyRecordsOperation(recordsToSave: [record], recordIDsToDelete: nil)
         operation.savePolicy = .IfServerRecordUnchanged
         operation.queuePriority = .High
-        operation.qualityOfService = .UserInitiated
+        operation.qualityOfService = .UserInteractive
         
         operation.perRecordProgressBlock = { (record, progress) -> Void in
             
@@ -360,6 +373,8 @@ class CloudKitManager {
                 }
             }
         }
+        
+        publicDatabase.addOperation(operation)
     }
     
     
