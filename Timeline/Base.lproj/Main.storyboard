@@ -408,7 +408,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="iCa-FA-REP" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2934" y="1978"/>
+            <point key="canvasLocation" x="2824" y="1824"/>
         </scene>
         <!--Search-->
         <scene sceneID="bap-Hr-Hqu">
@@ -439,6 +439,7 @@
                                 </tableViewCellContentView>
                                 <connections>
                                     <outlet property="postImageView" destination="sdv-KA-Kkk" id="coX-Bd-hiN"/>
+                                    <segue destination="e8t-4a-dJD" kind="show" identifier="toPostDetail" id="4zP-9A-n47"/>
                                 </connections>
                             </tableViewCell>
                         </prototypes>
@@ -595,6 +596,7 @@
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>
+        <segue reference="4zP-9A-n47"/>
         <segue reference="asj-Eb-Atf"/>
     </inferredMetricsTieBreakers>
 </document>
