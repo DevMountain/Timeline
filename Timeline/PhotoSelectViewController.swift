@@ -13,7 +13,7 @@ class PhotoSelectViewController: UIViewController, UIImagePickerControllerDelega
     @IBOutlet weak var addPhotoButton: UIButton!
     @IBOutlet weak var imageView: UIImageView!
     
-    var delegate: PhotoSelectViewControllerDelegate?
+    weak var delegate: PhotoSelectViewControllerDelegate?
     
     override func viewDidLoad() {
         super.viewDidLoad()
