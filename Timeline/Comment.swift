@@ -87,5 +87,12 @@ class Comment: NSManagedObject, CloudKitManagedObject {
         
         self.recordData = NSKeyedArchiver.archivedDataWithRootObject(record)
     }
+}
 
+extension Comment: SearchableRecord {
+    
+    func matchesSearchTerm(searchTerm: String) -> Bool {
+        
+        return text?.containsString(searchTerm) ?? false
+    }
 }

@@ -4,7 +4,7 @@
 
 Timeline is a simple photo sharing service. Students will bring in many concepts that they have learned, and add complex data modeling, Image Picker, Collection Views, NSURLSession, Firebase, and protocol-oriented programming to make a Capstone Level project spanning many days and concepts.
 
-Most concepts will be covered during class, others are introduced during the project. Not every instruction will outline each line of code to write, but lead the student to the solution.
+Most concepts will be covered during class, others are introduced during the project. Not every instruction will outline each line of code to write, but lead the student to the solution. 
 
 Students who complete this project independently are able to:
 
@@ -16,11 +16,11 @@ Students who complete this project independently are able to:
 * implement a related data model architecture
 * use staged data to prototype features
 
-#### Part Two - Container Views, Apple View Controllers, Search Controller
+#### Part Two - Search Controller, Container Views, Apple View Controllers
 
-* use container views to implement similar functionality in multiple view controllers
-* use the image picker controller and activity controller
 * implement search using the system search controller
+* use the image picker controller and activity controller
+* use container views to implement similar functionality in multiple view controllers
 
 #### Part Three - Basic CloudKit: CloudKitManager, CloudKitManagedObject, Manual Sync, Cloud Image Search
 
@@ -63,8 +63,6 @@ Implement a layered tab bar based view hierarchy. The app will have a Timeline t
     * note: You will implement this scene in Part 2 when setting up the `UISearchController` on the Search scene
 8. Add a `UITableViewController` User Setup scene, embed it into a `UINavigationController`, and add a modal presentation segue to it from the `UITabBarController` scene. Assign an identifier.
     * note: This segue can be called manually, and this scene will be used when a new user has not been set up with a 'Display Name' or 'Profile Image'
-https://cloud.githubusercontent.com/assets/11533065/15654867/e3b009f0-2654-11e6-835d-26e695377c8d.png
-https://cloud.githubusercontent.com/assets/11533065/15654870/e3b1d582-2654-11e6-8431-02cdf7d0d856.png
 
 ### Implement Model
 
@@ -164,7 +162,6 @@ Use the table view's header view to display the photo and a toolbar that allows 
 5. Add an IBAction for the 'Comment' button. Implement the IBAction by presenting a `UIAlertController` with a text field, a Cancel action, and an 'OK' action. Implement the 'OK' action to initialize a new `Comment` via the `PostController` and reload the table view to display it.
     * note: Do not create a new `Comment` if the user has not added text.
 6. Add an IBAction for the 'Share' and 'Follow' buttons. You will implement these two actions in a future step in the project.
-https://cloud.githubusercontent.com/assets/11533065/15654868/e3b154ae-2654-11e6-9fd3-34925a22e3d3.png
 
 #### Add Post Scene
 
@@ -184,7 +181,6 @@ Until you implement the `UIImagePickerController`, you will use a staged static 
     * note: It is important to remove the title text so that the user no longer sees that a button is there, but do not remove the entire button, that way the user can tap again to select a different image.
 6. Add an IBAction to the 'Add Post' `UIButton` that checks for an `image` and `caption`. If there is an `image` and a `caption`, use the `PostController` to create a new `Post` and dismiss the view controller. If either the image or a caption is missing, present an alert directing the user to check their information and try again.
 7. Add a 'Cancel' `UIBarButtonItem` as the left bar button item. Implement the IBAction to dismiss the view.
-https://cloud.githubusercontent.com/assets/11533065/15654869/e3b18cda-2654-11e6-95a1-40f51bdbd3ce.png
 
 #### Account Setup Scene
 
@@ -207,7 +203,7 @@ Until you implement the `UIImagePickerController`, you will use a staged static 
 
 #### A Note on Code Repetition
 
-Consider the similarities between the 'Add Post' scene and the 'Account Setup' scene. The amount of repetition should give you pause. `Don't repeat yourself` (DRY) is a common refrain among software developers.
+Consider the similarities between the 'Add Post' scene and the 'Account Setup' scene. The amount of repetition should give you pause. `Don't repeat yourself` (DRY) is a shared value among skilled software developers.
 
 Avoiding repetition is an important way to become a better developer and maintain sanity when building larger applciations.
 
@@ -231,3 +227,107 @@ Use the app and polish any rough edges. Check table view cell selection. Check t
 
 * Review the README instructions and solution code for clarity and functionality, submit a GitHub pull request with suggested changes.
 * Provide feedback on the expectations for Part One to a mentor or instructor.
+
+## Part Two - Search Controller, Container Views, Apple View Controllers
+
+* implement search using the system search controller
+* use the image picker controller and activity controller
+* use container views to implement similar functionality in multiple view controllers
+
+Add and implement search functionality to the search view. Implement the Image Picker Controller on the Account Setup scene and Add Post scene. Decrease the amount of repeated code by refactoring the similar functionality in the Account Setup and Add Post scenes into a child view controller that is used in both classes.
+
+### Search Controller
+
+#### Update the Model
+
+Add a `SearchableRecord` protocol that requires a `matchesSearchTerm` function. Update the `Post` and `Comment` objects to conform to the protocol.
+
+1. Add a new `SearchableRecord.swift` file.
+2. Define a `SearchableRecord` protocol with a required `matchesSearchTerm` function that takes a `searchTerm` parameter as a `String` and returns a `Bool`.
+    * note: Because this protocol will be used on `NSManagedObject`s, add the `@objc` keyword to the protocol.
+
+Consider how each model object will match to a specific search term. What searchable text is there on a `Comment`? What searchable text is there on a `Post`?
+
+3. Update the `Comment` class to conform to the `SearchableRecord` protocol. Return `true` if `text` contains the search term, otherwise return `false`.
+4. Update the `Post` class to conform to the `SearchableRecord` protocol. Return `true` if any of the `Post` `comments` match, otherwise return `false`.
+
+Use a Playground to test your `SearchableRecord` and `matchesSearchTerm` functionality and understand what you are implementing.
+
+_Note: Not final. Expect the Search API and instructions to change._
+
+#### Build Search Scene
+
+Implement the Search Table View Controller and the Search Results Table View Controller. You will use the same cell that you built in the Timeline scene. Use the same  `PostTableViewCell` you built for the Timeline scene.
+
+Search controllers typically have two views: a list view, and a search result view that displays the filtered results. You must create a 'search results view' that is overlayed on top of your list view when the search bar is actively editing, and then your main list view handles a `SearchResultsUpdating` protocol function that updates the results view.
+
+Understanding Search Controllers requires you to understand that the main view controller can (and must) implement methods that handle what is being displayed on another view controller. The results controller must also implement a way to communicate back to the main list view controller to notify it of events. This two way relationship with communication happening in both directions.
+
+##### Search Results Controller
+
+1. Create a `SearchResultsTableViewController` subclass of `UITableViewController` and assign it to the scene in Interface Builder.
+2. Add a `resultsArray` property that contains a list of `SearchableRecords`
+3. Implement the `UITableViewDatasource` functions to display the search results.   
+    * note: For now you will only display `Post` objects as a result of a search. Use the `PostTableViewCell` to do so.
+
+##### Search Scene
+
+1. Implement the scene in Interface Builder by updating the prototype cell with an image view that fills the cell. Use the Timeline scene's cell as the blueprint for constraints, views, height, etc.
+2. Assign the cell to your `PostTableViewCell` class.
+    * note: As of Xcode 7, you must set up the views for the cell for each separate table view in the Storyboard, but you can assign multiple views to the same class, and have outlets or actions triggered from multiple instances.
+3. Add a `posts` array as a property on the `SearchTableViewController`.
+    * note: You will populate this array with remote search results. 
+4. Update the `viewDidLoad` function to set the `posts` array to a copy of the `fetchedObjects` from the Fetched Results Controller.
+    * note: To build prototype search functionality for this scene, you will use the local posts as the initial datasource. 
+5. Implement the `UITableViewDataSource` functions using the `posts` array.
+6. Add a function `setUpSearchController` that captures the `resultsController` from the Storyboard, instantiates the `UISearchController`, sets the `searchResultsUpdater` to self, and adds the `searchController`'s `searchBar` as the table's header view.
+7. Implement the `UISearchResultsUpdating` protocol `updateSearchResultsforSearchController` function. The function should capture the `resultsViewController` and the search text from the `searchController`'s `searchBar`, filter the local `posts` array for posts that match, assign the filtered results to the `resultsViewController`'s `resultsArray`, and reload the `resultsViewController`'s `tableView`.
+    * note: Consider the communication that is happening here between two separate view controllers. Be sure that you understand this relationship.
+
+##### Segue to Post Detail View
+
+Remember that even though the tableviews are displaying similar cells and model objects, you are working with separate view controllers with separate cells and instances of table views. 
+
+The segue from a `Post` should take the user to the Post Detail scene, regardless of whether that is from the Search Scene or the Search Results scene.
+
+To do so, implement the `UITableViewDelegate` `didSelectRow` function on the Search Results scene to manually call the `toPostDetail` segue _from the Search scene_.
+
+1. Implement a segue on the Search Scene to check for the segue identifier, capture the detail view controller, index path, selected post, and assign the selected post to the detail view controller.
+    * note: Should be similar to the segue used on the Timeline scene
+2. Adopt the `UITableViewDelegate` on the Search Results scene and add the `didSelectRowAtIndexPath` function. Implement the function by capturing the sending cell and telling the Search Result scene's `presentingViewController` to `performSegueWithIdentifier` and send the selected cell so that the Search scene can get the selected `Post`.
+    * note: Every view controller class has an optional `presentingViewController` reference to the view controller that presented it. In this case, the presenting view controller of the Search Results scene is the Search scene. So this step will manually call the `performSegueWithIdentifier` on the Search scene.
+3. Update the `prepareForSegue` function on the Search Scene to capture and segue to the Post Detail scene with the correct post. Try to do so without looking at the solution code.
+    * note: You must check if the `tableView` can get an `indexPath` for the sender. If it can, that means that the cell was from the Search scene's `tableView`. If it can't, that means the cell is from the Search Result scene's `tableView` and that the user tapped a search result. If that is the case, capture the `Post` from the `resultsArray` on the `searchResultscontroller`.
+    * note: You can access the `searchResultsController` by calling `(searchController.searchResultsController as? SearchResultsTableViewController)`
+
+Try to work through the Search segue without looking at the solution code. Understanding this pattern will solidify your understanding of many object-oriented programming patterns.
+
+
+### Image Picker Controller
+
+#### Add Post Scene
+
+Implement the Image Picker Controller in place of the prototype functionality you built previously.
+
+1. Update the 'Select Image' IBAction to present a `UIImagePickerController`. Give the user the option to select from their Photo Library or from the device's camera if their device has one. 
+2. Implement the `UIImagePickerControllerDelegate` function to capture the selected image and assign it to the image view.
+
+#### Account Setup Scene
+
+Implement the Image Picker Controller in place of the prototype functionality you built previously.
+
+1. Update the 'Select Image' IBAction to present a `UIImagePickerController`. Give the user the option to select from their Photo Library or from the device's camera if their device has one. 
+2. Implement the `UIImagePickerControllerDelegate` function to capture the selected image and assign it to the image view.
+
+
+### Reduce Code Repetition
+
+Refactor the photo selection functionality from the Account Setup and Add Post scenes into a child view controller. 
+
+
+
+
+### Black Diamonds:
+
+* Some apps will save photos taken or processed in their app in a custom Album in the user's Camera Roll. Add this feature.
+* 
