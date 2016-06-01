@@ -199,7 +199,6 @@ Until you implement the `UIImagePickerController`, you will use a staged static 
 5. Add an IBAction to the 'Select Image' `UIButton` that assigns a static image to the image view (add a sample image to the Assets.xcassets that you can use for prototyping this feature), and removes the title text from the button.
     * note: It is important to remove the title text so that the user no longer sees that a button is there, but do not remove the entire button, that way the user can tap again to select a different image.
 6. Add an IBAction to the 'Submit Changes' `UIButton` that checks for an `image` and `displayName`. If there is an `image` and a `displayName`, use the `UserController` to update the current user. If either the image or a caption is missing, present an alert directing the user to check their information and try again.
-7. Add a 'Dismiss' `UIBarButtonItem` as the left bar button item. Implement the IBAction to dismiss the view.
 
 #### A Note on Code Repetition
 
