@@ -34,20 +34,16 @@ extension CloudKitManagedObject {
         return recordName
     }
     
+    var cloudKitReference: CKReference? {
+        
+        guard let record = cloudKitRecord else { return nil }
+        
+        return CKReference(record: record, action: .None)
+    }
+    
     var isSynced: Bool {
         
-        // TODO: Fix this for using to check if the object is synced
-        
-        if let cloudKitRecord = cloudKitRecord {
-            
-            return true
-            
-        } else {
-            
-            return false
-        }
-        
-        return cloudKitRecord != nil
+        return recordData != nil
     }
     
     var creatorRecord: CKRecordID? {

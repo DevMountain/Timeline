@@ -20,26 +20,14 @@ class CloudKitManager {
     
     private let CreatorUserRecordIDKey = "creatorUserRecordID"
     private let LastModifiedUserRecordIDKey = "creatorUserRecordID"
-    private let CreationDate = "creationDate"
-    private let modificationDate = "modificationDate"
+    private let CreationDateKey = "creationDate"
+    private let ModificationDateKey = "modificationDate"
     
     let publicDatabase = CKContainer.defaultContainer().publicCloudDatabase
     
     init() {
         
-        // call accountStatusWithCompletionHandler
-        
-        CKContainer.defaultContainer().accountStatusWithCompletionHandler() {
-            (accountStatus:CKAccountStatus, error:NSError?) -> Void in
-            
-            switch accountStatus {
-            case .Available:
-                print("CloudKit available. Initializing full sync.")
-                return
-            default:
-                self.handleCloudKitUnavailable(accountStatus, error: error)
-            }
-        }
+        checkCloudKitAvailability()
     }
     
     // MARK: - User Info Discovery
@@ -50,7 +38,6 @@ class CloudKitManager {
             
             if let error = error,
                 let completion = completion {
-                
                 completion(record: nil, error: error)
             }
             
@@ -58,7 +45,6 @@ class CloudKitManager {
                 let completion = completion {
                 
                 self.fetchRecordWithID(recordID, completion: { (record, error) in
-                    
                     completion(record: record, error: error)
                 })
             }
@@ -77,7 +63,6 @@ class CloudKitManager {
                 
                 completion(firstName: userInfo.displayContact?.givenName, lastName: userInfo.displayContact?.familyName)
             } else if let completion = completion {
-                
                 completion(firstName: nil, lastName: nil)
             }
         }
@@ -102,58 +87,35 @@ class CloudKitManager {
     
     // MARK: - Fetch Records
     
-    func fetchMyRecords(completion: ((records: [CKRecord], error: NSError?) -> Void)?) {
+    func fetchRecordWithID(recordID: CKRecordID, completion: ((record: CKRecord?, error: NSError?) -> Void)?) {
         
-        fetchLoggedInUserRecord { (record, error) in
+        publicDatabase.fetchRecordWithID(recordID) { (record, error) in
             
-            if let record = record {
-                
-                var fetchedRecords: [CKRecord] = []
-                
-                let predicate = NSPredicate(format: "%K == %@", argumentArray: ["creatorUserRecordID", record.recordID])
-                let recordType = RecordTypes.post.rawValue // Fetch only posts, we do not need comments
-                let query = CKQuery(recordType: recordType, predicate: predicate)
-                let queryOperation = CKQueryOperation(query: query)
-                
-                queryOperation.recordFetchedBlock = { (fetchedRecord) -> Void in
-                    
-                    fetchedRecords.append(fetchedRecord)
-                }
-                
-                queryOperation.queryCompletionBlock = { (queryCursor, error) -> Void in
-                    
-                    if let queryCursor = queryCursor {
-                        // there are more results, go fetch them
-                        
-                        let continuedQueryOperation = CKQueryOperation(cursor: queryCursor)
-                        continuedQueryOperation.recordFetchedBlock = queryOperation.recordFetchedBlock
-                        continuedQueryOperation.queryCompletionBlock = queryOperation.queryCompletionBlock
-                        
-                        self.publicDatabase.addOperation(continuedQueryOperation)
-                    }
-                    
-                    if let completion = completion {
-                        
-                        completion(records: fetchedRecords, error: error)
-                    }
-                }
-                
-                self.publicDatabase.addOperation(queryOperation)
+            if let completion = completion {
+                completion(record: record, error: error)
             }
         }
     }
     
-    func fetchRecordsWithType(type: String, completion: ((records: [CKRecord]?, error: NSError?) -> Void)?) {
+    func fetchRecordsWithType(type: String, predicate: NSPredicate = NSPredicate(value: true), recordFetchedBlock: ((record: CKRecord) -> Void)?, completion: ((records: [CKRecord]?, error: NSError?) -> Void)?) {
+        
+        //    func fetchRecordsWithType(type: String, predicate: NSPredicate = NSPredicate(value: true), resultsLimit: Int = CKQueryOperationMaximumResults, recordFetchedBlock: ((record: CKRecord) -> Void)?, completion: ((records: [CKRecord]?, cursor: CKQueryCursor?, error: NSError?) -> Void)?) {
         
         var fetchedRecords: [CKRecord] = []
         
-        let predicate = NSPredicate(value: true)
+        let predicate = predicate
+        
+//        let predicate = NSPredicate(value: true)
         let query = CKQuery(recordType: type, predicate: predicate)
         let queryOperation = CKQueryOperation(query: query)
         
         queryOperation.recordFetchedBlock = { (fetchedRecord) -> Void in
             
             fetchedRecords.append(fetchedRecord)
+            
+            if let recordFetchedBlock = recordFetchedBlock {
+                recordFetchedBlock(record: fetchedRecord)
+            }
         }
         
         queryOperation.queryCompletionBlock = { (queryCursor, error) -> Void in
@@ -169,7 +131,6 @@ class CloudKitManager {
             }
             
             if let completion = completion {
-                
                 completion(records: fetchedRecords, error: error)
             }
         }
@@ -177,58 +138,41 @@ class CloudKitManager {
         self.publicDatabase.addOperation(queryOperation)
     }
     
-    func fetchRecordWithID(recordID: CKRecordID, completion: ((record: CKRecord?, error: NSError?) -> Void)?) {
+    func fetchCurrentUserRecords(type: String, completion: ((records: [CKRecord]?, error: NSError?) -> Void)?) {
         
-        publicDatabase.fetchRecordWithID(recordID) { (record, error) in
+        fetchLoggedInUserRecord { (record, error) in
             
-            if let completion = completion {
+            if let record = record {
                 
-                completion(record: record, error: error)
+                let predicate = NSPredicate(format: "%K == %@", argumentArray: ["creatorUserRecordID", record.recordID])
+                
+                self.fetchRecordsWithType(type, predicate: predicate, recordFetchedBlock: nil, completion: { (records, error) in
+                    
+                    if let completion = completion {
+                        completion(records: records, error: error)
+                    }
+                })
             }
         }
     }
     
-    //    func fetchRecordsNearLocation(location: CLLocation, completion: ((records: [CKRecord]?, error: NSError?) -> Void)?) {
-    //
-    //    }
+    func fetchRecordsNearLocation(type: String, location: CLLocation, completion: ((records: [CKRecord]?, error: NSError?) -> Void)?) {
+
+    }
     
-    func fetchRecentRecords(recordType: String, fromDate: NSDate, toDate: NSDate, completion: ((records: [CKRecord]?, error: NSError?) -> Void)?) {
+    func fetchRecordsFromDateRange(type: String, recordType: String, fromDate: NSDate, toDate: NSDate, completion: ((records: [CKRecord]?, error: NSError?) -> Void)?) {
         
-        var fetchedRecords: [CKRecord] = []
-        
-        let startDatePredicate = NSPredicate(format: "%K > %@", argumentArray: [CreationDate, fromDate])
-        let endDatePredicate = NSPredicate(format: "%K < %@", argumentArray: [CreationDate, toDate])
+        let startDatePredicate = NSPredicate(format: "%K > %@", argumentArray: [CreationDateKey, fromDate])
+        let endDatePredicate = NSPredicate(format: "%K < %@", argumentArray: [CreationDateKey, toDate])
         let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [startDatePredicate, endDatePredicate])
         
-        let query = CKQuery(recordType: recordType, predicate: predicate)
-        let queryOperation = CKQueryOperation(query: query)
         
-        queryOperation.qualityOfService = .UserInteractive
-        
-        queryOperation.recordFetchedBlock = { (fetchedRecord) -> Void in
-            
-            fetchedRecords.append(fetchedRecord)
-        }
-        
-        queryOperation.queryCompletionBlock = { (queryCursor, error) -> Void in
-            
-            if let queryCursor = queryCursor {
-                // there are more results, go fetch them
-                
-                let continuedQueryOperation = CKQueryOperation(cursor: queryCursor)
-                continuedQueryOperation.recordFetchedBlock = queryOperation.recordFetchedBlock
-                continuedQueryOperation.queryCompletionBlock = queryOperation.queryCompletionBlock
-                
-                self.publicDatabase.addOperation(continuedQueryOperation)
-            }
+        self.fetchRecordsWithType(type, predicate: predicate, recordFetchedBlock: nil) { (records, error) in
             
             if let completion = completion {
-                
-                completion(records: fetchedRecords, error: error)
+                completion(records: records, error: error)
             }
         }
-        
-        self.publicDatabase.addOperation(queryOperation)
     }
     
     // MARK: - Delete
@@ -238,7 +182,6 @@ class CloudKitManager {
         publicDatabase.deleteRecordWithID(recordID) { (recordID, error) in
             
             if let completion = completion {
-                
                 completion(recordID: recordID, error: error)
             }
         }
@@ -262,52 +205,12 @@ class CloudKitManager {
     
     // MARK: - Save and Modify
     
-    func saveAllChanges(insertedObjects: [NSManagedObject], completion: ((records: [CKRecord]?) -> Void)?) {
+    func saveRecords(records: [CKRecord], perRecordCompletion: ((record: CKRecord?, error: NSError?) -> Void)?, completion: ((records: [CKRecord]?, error: NSError?) -> Void)?) {
         
-        // create records for new objects
-        
-        var savedRecords: [CKRecord] = []
-
-        let group = dispatch_group_create()
-        
-        for object in insertedObjects {
-            
-            dispatch_group_enter(group)
-            
-            guard let cloudKitManagedObject = object as? CloudKitManagedObject,
-                let record = cloudKitManagedObject.cloudKitRecord else { fatalError("Unable to access record to save CloudKitManagedObject") }
-            
-            modifyRecord(record, completion: { (savedRecord, error) in
-                
-                if let error = error {
-                    print("Error saving object. Error: \(error.description)")
-                }
-                
-                if let savedRecord = savedRecord {
-                    savedRecords.append(savedRecord)
-                }
-                
-                dispatch_group_leave(group)
-            })
-            
-//            saveRecord(record, completion: { (savedRecord, error) in
-//                
-//                if let error = error {
-//                    print("Error saving object. Error: \(error.description)")
-//                }
-//                
-//                if let savedRecord = savedRecord {
-//                    savedRecords.append(savedRecord)
-//                }
-//                
-//                dispatch_group_leave(group)
-//            })
-        }
-        
-        dispatch_group_notify(group, dispatch_get_main_queue()) { 
+        modifyRecords(records, perRecordCompletion: perRecordCompletion) { (records, error) in
             
             if let completion = completion {
-                completion(records: savedRecords)
+                completion(records: records, error: error)
             }
         }
     }
@@ -322,55 +225,24 @@ class CloudKitManager {
         }
     }
     
-    func modifyRecord(record: CKRecord, completion: ((record: CKRecord?, error: NSError?) -> Void)?) {
+    func modifyRecords(records: [CKRecord], perRecordCompletion: ((record: CKRecord?, error: NSError?) -> Void)?, completion: ((records: [CKRecord]?, error: NSError?) -> Void)?) {
         
-        let operation = CKModifyRecordsOperation(recordsToSave: [record], recordIDsToDelete: nil)
-        operation.savePolicy = .IfServerRecordUnchanged
+        let operation = CKModifyRecordsOperation(recordsToSave: records, recordIDsToDelete: nil)
+        operation.savePolicy = .ChangedKeys
         operation.queuePriority = .High
         operation.qualityOfService = .UserInteractive
         
-        operation.perRecordProgressBlock = { (record, progress) -> Void in
-            
-            print("modified record: \(record) \n percent: \(progress)")
-        }
-        
         operation.perRecordCompletionBlock = { (record, error) -> Void in
             
-            if error != nil {
-                
-                if error?.code == CKErrorCode.ServerRecordChanged.rawValue {
-                    // conflict
-                    
-                    let fetchedOriginalRecord = error?.userInfo[CKRecordChangedErrorAncestorRecordKey] // the record last time client pulled it
-                    let fetchedServerRecord = error?.userInfo[CKRecordChangedErrorServerRecordKey] // the current record on the server
-                    let fetchedClientRecord = error?.userInfo[CKRecordChangedErrorClientRecordKey] // the original record, with the changes you attempted to save
-                    
-                    guard let _ = fetchedOriginalRecord as? CKRecord,
-                        let serverRecord = fetchedServerRecord as? CKRecord,
-                        let clientRecord = fetchedClientRecord as? CKRecord else { fatalError("Error CKModifyRecordsOperation, can't obtain ancestor, server, or client record to resolve server conflict") }
-                    
-                    for key in clientRecord.allKeys() {
-                        
-                        serverRecord[key] = clientRecord[key]
-                    }
-                    
-                    self.publicDatabase.saveRecord(serverRecord, completionHandler: { (savedRecord, error) in
-                        
-                        if let completion = completion {
-                            completion(record: savedRecord, error: error)
-                        }
-                    })
-                } else {
-                    
-                    if let completion = completion {
-                        completion(record: record, error: error)
-                    }
-                }
-            } else {
-                
-                if let completion = completion {
-                    completion(record: record, error: error)
-                }
+            if let perRecordCompletion = perRecordCompletion {
+                perRecordCompletion(record: record, error: error)
+            }
+        }
+        
+        operation.modifyRecordsCompletionBlock = { (records, recordIDs, error) -> Void in
+            
+            if let completion = completion {
+                completion(records: records, error: error)
             }
         }
         
@@ -400,6 +272,21 @@ class CloudKitManager {
     }
     
     // MARK: - CloudKit Availability
+    
+    func checkCloudKitAvailability() {
+        
+        CKContainer.defaultContainer().accountStatusWithCompletionHandler() {
+            (accountStatus:CKAccountStatus, error:NSError?) -> Void in
+            
+            switch accountStatus {
+            case .Available:
+                print("CloudKit available. Initializing full sync.")
+                return
+            default:
+                self.handleCloudKitUnavailable(accountStatus, error: error)
+            }
+        }
+    }
     
     func handleCloudKitUnavailable(accountStatus: CKAccountStatus, error:NSError?) {
         
