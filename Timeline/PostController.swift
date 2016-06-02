@@ -39,27 +39,53 @@ class PostController {
         
         guard let data = UIImageJPEGRepresentation(image, 0.8) else { return }
         
-        let _ = Post(photo: data, caption: caption)
+        let post = Post(photo: data, caption: caption)
         
         saveContext()
         
-        // TODO: Push new posts to CloudKit one by one, instead of altogether in a 'post changes' type of function
-        
-        if let completion = completion {
-            completion()
+        if let postRecord = post.cloudKitRecord {
+            
+            if let completion = completion {
+                completion()
+            }
+            
+            cloudKitManager.saveRecord(postRecord) { (record, error) in
+                
+                if let record = record {
+                    post.updateWithRecord(record)
+                    
+                    
+                }
+            }
         }
     }
     
     func addCommentToPost(text: String, post: Post, completion: ((success: Bool) -> Void)?) {
         
-        let _ = Comment(post: post, text: text)
+        let comment = Comment(post: post, text: text)
         
         saveContext()
         
-        // TODO: Push new comments to CloudKit one by one, instead of altogether in a 'post changes' type of function
-        
-        if let completion = completion {
-            completion(success: true)
+        if let commentRecord = comment.cloudKitRecord {
+            cloudKitManager.saveRecord(commentRecord, completion: { (record, error) in
+                
+                if let record = record {
+                    comment.updateWithRecord(record)
+                    
+                    if let completion = completion {
+                        completion(success: true)
+                    }
+                } else {
+                    if let completion = completion {
+                        completion(success: false)
+                    }
+                }
+            })
+        } else {
+            
+            if let completion = completion {
+                completion(success: false)
+            }
         }
     }
     
@@ -80,102 +106,201 @@ class PostController {
     
     // MARK: - Sync Code
     
-    func fullSync() {
+    func syncedRecords(type: String) -> [CloudKitManagedObject] {
         
-        // push any local records that aren't in cloudkit
+        let fetchRequest = NSFetchRequest(entityName: type)
+        let predicate = NSPredicate(format: "recordData != nil")
         
-//        pushChangesToCloudKit { (success) in
+        fetchRequest.predicate = predicate
         
-            self.fetchChangesFromCloudKit({ (succes) in
-                
-                print("sync finished")
-                NSUserDefaults.standardUserDefaults().setObject(NSDate(), forKey: "lastSync")
-            })
-//        }
+        let results = (try? Stack.sharedStack.managedObjectContext.executeFetchRequest(fetchRequest)) as? [CloudKitManagedObject] ?? []
         
+        return results
     }
     
-    func fetchChangesFromCloudKit(completion: (succes: Bool) -> Void) {
+    func unsyncedRecords(type: String) -> [CloudKitManagedObject] {
         
-        let lastSyncDate = NSUserDefaults.standardUserDefaults().objectForKey("lastSync") as? NSDate ?? NSDate(timeIntervalSince1970: 0.0)
+        let fetchRequest = NSFetchRequest(entityName: type)
+        let predicate = NSPredicate(format: "recordData == nil")
+        
+        fetchRequest.predicate = predicate
+        
+        let results = (try? Stack.sharedStack.managedObjectContext.executeFetchRequest(fetchRequest)) as? [CloudKitManagedObject] ?? []
+        
+        return results
+    }
+    
+    func fullSync() {
+        
+        pushChangesToCloudKit { (success) in
+            
+            self.fetchChangesFromCloudKit(nil)
+        }
+    }
+    
+    func fetchChangesFromCloudKit(completion: ((succes: Bool) -> Void)?) {
         
         let group = dispatch_group_create()
         
-        dispatch_group_enter(group)
-
-        self.cloudKitManager.fetchRecentRecords("Post", fromDate: lastSyncDate, toDate: NSDate(), completion: { (records, error) in
-            
-            guard let records = records else { print("No fetched Post records to create."); return }
-            
-            for record in records {
-                
-                let newPost = Post(record: record)
-                self.saveContext()
-    
-                print("Fetched record: \(record) and initialized post: \(newPost)")
-            }
-            
-            dispatch_group_leave(group)
-        })
+        // fetch recordids for all post objects
+        // create predicate
+        // fetch objects with predicate
+        // save each object
         
         dispatch_group_enter(group)
         
-        self.cloudKitManager.fetchRecentRecords("Comment", fromDate: lastSyncDate, toDate: NSDate(), completion: { (records, error) in
-            
-            guard let records = records else { print("No fetched Comment records to create."); return }
-            
-            for commentRecord in records {
-                
-                let newComment = Comment(record: commentRecord)
-                self.saveContext()
-                
-                print("Fetched record: \(commentRecord) and initialized comment: \(newComment)")
-            }
-            
-            dispatch_group_leave(group)
-        })
+        let postReferencesToExclude = syncedRecords("Post").flatMap({ $0.cloudKitReference })
+        var postPredicate = NSPredicate(format: "NOT(recordID IN %@)", argumentArray: [postReferencesToExclude])
+        // postReferencesToExclude must be sent in an array, otherwise predicate is looking for a token for each postReference
         
-        dispatch_group_notify(group, dispatch_get_main_queue()) { 
-            
-            // TODO: Address unpaired comments
-            
-            completion(succes: true)
+        if postReferencesToExclude.isEmpty {
+            postPredicate = NSPredicate(value: true)
         }
-
+        
+        cloudKitManager.fetchRecordsWithType("Post", predicate: postPredicate, recordFetchedBlock: { (record) in
+            
+            let _ = Post(record: record)
+            self.saveContext()
+            
+        }) { (records, error) in
+            
+            if error != nil {
+                print("All Post records fetched and added.")
+            }
+            
+            dispatch_group_leave(group)
+        }
+        
+        
+        // fetch recordids for all comment objects
+        // create predicate
+        // fetch objects with predicate
+        // save each object
+        
+        dispatch_group_enter(group)
+        
+        let commentReferencesToExclude = syncedRecords("Comment").flatMap({ $0.cloudKitReference })
+        var commentPredicate = NSPredicate(format: "NOT(recordID IN %@)", argumentArray: [commentReferencesToExclude])
+        // commentReferencesToExclude must be sent in an array, otherwise predicate is looking for a token for each commentReference
+        
+        if commentReferencesToExclude.isEmpty {
+            commentPredicate = NSPredicate(value: true)
+        }
+        
+        cloudKitManager.fetchRecordsWithType("Comment", predicate: commentPredicate, recordFetchedBlock: { (record) in
+            
+            let _ = Comment(record: record)
+            self.saveContext()
+            
+        }) { (records, error) in
+            
+            if error != nil {
+                print("All Comment records fetched and added.")
+            }
+            
+            dispatch_group_leave(group)
+        }
+        
+        dispatch_group_notify(group, dispatch_get_main_queue()) {
+            
+            if let completion = completion {
+                completion(succes: true)
+            }
+        }
+        
+    }
+    
+    func fetchNewRecordsFromCloudKit(type: String, completion: () -> Void) {
+        
+        
+        let referencesToExclude = syncedRecords(type).flatMap({ $0.cloudKitReference })
+        var predicate = NSPredicate(format: "NOT(recordID IN %@)", argumentArray: [referencesToExclude])
+        // commentReferencesToExclude must be sent in an array, otherwise predicate is looking for a token for each commentReference
+        
+        if referencesToExclude.isEmpty {
+            predicate = NSPredicate(value: true)
+        }
+        
+        cloudKitManager.fetchRecordsWithType(type, predicate: predicate, recordFetchedBlock: { (record) in
+            
+            switch type {
+                
+            case "Post":
+                let _ = Post(record: record)
+                
+            case "Comment":
+                let _ = Comment(record: record)
+                
+            default:
+                return
+            }
+            
+            self.saveContext()
+            
+        }) { (records, error) in
+            
+            if error != nil {
+                print("All Comment records fetched and added.")
+            }
+        }
     }
     
     func pushChangesToCloudKit(completion: ((success: Bool) -> Void)?) {
         
-        let insertedObjects = Array(Stack.sharedStack.managedObjectContext.insertedObjects)
+        let group = dispatch_group_create()
         
-        cloudKitManager.saveAllChanges(insertedObjects) { (records) in
+        // fetch all local post objects
+        // filter by isSynced = false
+        // map records
+        // save records
+        
+        for post in unsyncedRecords("Post") {
             
-            print("changes pushed to cloudkit")
+            dispatch_group_enter(group)
             
-            if let records = records {
+            guard let record = post.cloudKitRecord else { return }
+            
+            cloudKitManager.saveRecord(record, completion: { (record, error) in
                 
-                for record in records {
-                    
-                    if let matchingObject = self.postWithName(record.recordID.recordName) {
-                        matchingObject.updateWithRecord(record)
-                        self.saveContext(false)
-                    }
+                if let record = record {
+                    post.updateWithRecord(record)
                 }
-            }
+                
+                dispatch_group_leave(group)
+            })
+        }
+        
+        // fetch all local comment objects
+        // filter by isSynced = false
+        // map records
+        // save records
+        
+        for comment in unsyncedRecords("Comment") {
             
-            NSUserDefaults.standardUserDefaults().setObject(NSDate(), forKey: "lastSync")
+            dispatch_group_enter(group)
+            
+            guard let record = comment.cloudKitRecord else { return }
+            
+            cloudKitManager.saveRecord(record, completion: { (record, error) in
+                
+                if let record = record {
+                    comment.updateWithRecord(record)
+                }
+                
+                dispatch_group_leave(group)
+            })
+        }
+        
+        dispatch_group_notify(group, dispatch_get_main_queue()) {
             
             if let completion = completion {
                 completion(success: true)
             }
         }
+        
     }
     
-    func saveContext(pushChanges: Bool = true) {
-        
-        if pushChanges {
-            pushChangesToCloudKit(nil)
-        }
+    func saveContext() {
         
         do {
             try Stack.sharedStack.managedObjectContext.save()
