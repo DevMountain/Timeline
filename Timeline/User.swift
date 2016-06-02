@@ -28,7 +28,7 @@ struct User {
         
         let userDictionary = [
             displayNameKey: self.displayName,
-            profileImagePath: self.profileImagePath
+            profileImageKey: self.profileImagePath
         ]
         
         return userDictionary
