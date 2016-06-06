@@ -160,10 +160,7 @@ class PostDetailTableViewController: UITableViewController, NSFetchedResultsCont
             guard let commentText = alertController.textFields?.first?.text,
                 let post = self.post else { return }
             
-            PostController.sharedController.addCommentToPost(commentText, post: post, completion: { (success) in
-                
-                self.tableView.reloadData()
-            })
+            PostController.sharedController.addCommentToPost(commentText, post: post, completion:nil)
         }
         alertController.addAction(addCommentAction)
         
