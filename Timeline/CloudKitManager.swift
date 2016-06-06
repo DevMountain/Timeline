@@ -13,17 +13,13 @@ import CloudKit
 
 class CloudKitManager {
     
-    enum RecordTypes: String {
-        case post = "Post"
-        case comment = "Comment"
-    }
-    
     private let CreatorUserRecordIDKey = "creatorUserRecordID"
     private let LastModifiedUserRecordIDKey = "creatorUserRecordID"
     private let CreationDateKey = "creationDate"
     private let ModificationDateKey = "modificationDate"
     
     let publicDatabase = CKContainer.defaultContainer().publicCloudDatabase
+    let privateDatabase = CKContainer.defaultContainer().privateCloudDatabase
     
     init() {
         
@@ -99,13 +95,9 @@ class CloudKitManager {
     
     func fetchRecordsWithType(type: String, predicate: NSPredicate = NSPredicate(value: true), recordFetchedBlock: ((record: CKRecord) -> Void)?, completion: ((records: [CKRecord]?, error: NSError?) -> Void)?) {
         
-        //    func fetchRecordsWithType(type: String, predicate: NSPredicate = NSPredicate(value: true), resultsLimit: Int = CKQueryOperationMaximumResults, recordFetchedBlock: ((record: CKRecord) -> Void)?, completion: ((records: [CKRecord]?, cursor: CKQueryCursor?, error: NSError?) -> Void)?) {
-        
         var fetchedRecords: [CKRecord] = []
         
         let predicate = predicate
-        
-//        let predicate = NSPredicate(value: true)
         let query = CKQuery(recordType: type, predicate: predicate)
         let queryOperation = CKQueryOperation(query: query)
         
@@ -128,10 +120,10 @@ class CloudKitManager {
                 continuedQueryOperation.queryCompletionBlock = queryOperation.queryCompletionBlock
                 
                 self.publicDatabase.addOperation(continuedQueryOperation)
-            }
-            
-            if let completion = completion {
-                completion(records: fetchedRecords, error: error)
+            } else {
+                if let completion = completion {
+                    completion(records: fetchedRecords, error: error)
+                }
             }
         }
         
@@ -157,7 +149,7 @@ class CloudKitManager {
     }
     
     func fetchRecordsNearLocation(type: String, location: CLLocation, completion: ((records: [CKRecord]?, error: NSError?) -> Void)?) {
-
+        
     }
     
     func fetchRecordsFromDateRange(type: String, recordType: String, fromDate: NSDate, toDate: NSDate, completion: ((records: [CKRecord]?, error: NSError?) -> Void)?) {
@@ -174,6 +166,7 @@ class CloudKitManager {
             }
         }
     }
+    
     
     // MARK: - Delete
     
@@ -202,6 +195,7 @@ class CloudKitManager {
             }
         }
     }
+    
     
     // MARK: - Save and Modify
     
@@ -250,26 +244,47 @@ class CloudKitManager {
     }
     
     
-    // MARK: - Owned Records
-    
-    //    func isMyRecord(recordID: CKRecordID) -> Bool {
-    //
-    //    }
-    
-    
     // MARK: - Subscriptions
     
-    func subscribe(type: String, predicate: NSPredicate, completion: ((subscription: CKSubscription?, error: NSError?) -> Void)?) {
+    func subscribe(type: String, predicate: NSPredicate, subscriptionIdentifier: String, contentAvailable: Bool, alertBody: String? = nil, desiredKeys: [String]? = nil, options: CKSubscriptionOptions, completion: ((subscription: CKSubscription?, error: NSError?) -> Void)?) {
         
+        let subscription = CKSubscription(recordType: type, predicate: predicate, subscriptionID: subscriptionIdentifier, options: options)
+        
+        let notificationInfo = CKNotificationInfo()
+        notificationInfo.alertBody = alertBody
+        notificationInfo.shouldSendContentAvailable = contentAvailable
+        notificationInfo.desiredKeys = desiredKeys
+        
+        subscription.notificationInfo = notificationInfo
+        
+        publicDatabase.saveSubscription(subscription) { (subscription, error) in
+            
+            if let completion = completion {
+                completion(subscription: subscription, error: error)
+            }
+        }
     }
     
-    func unsubscribe(subscription: CKSubscription, completion: (subscription: CKSubscription?, error: NSError?) -> Void) {
+    func unsubscribe(subscription: CKSubscription, completion: ((subscriptionID: String?, error: NSError?) -> Void)?) {
         
+        publicDatabase.deleteSubscriptionWithID(subscription.subscriptionID) { (subscriptionID, error) in
+            
+            if let completion = completion {
+                completion(subscriptionID: subscriptionID, error: error)
+            }
+        }
     }
     
     func fetchSubscriptions(completion: ((subscriptions: [CKSubscription]?, error: NSError?) -> Void)?) {
         
+        publicDatabase.fetchAllSubscriptionsWithCompletionHandler { (subscriptions, error) in
+            
+            if let completion = completion {
+                completion(subscriptions: subscriptions, error: error)
+            }
+        }
     }
+    
     
     // MARK: - CloudKit Availability
     

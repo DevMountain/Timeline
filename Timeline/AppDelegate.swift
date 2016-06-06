@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CloudKit
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -17,7 +18,43 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         // Override point for customization after application launch.
         
+        let notificationSettings = UIUserNotificationSettings(forTypes: [.Alert, .Badge, .Sound], categories: nil)
+        UIApplication.sharedApplication().registerUserNotificationSettings(notificationSettings)
+        UIApplication.sharedApplication().registerForRemoteNotifications()
+        
         return true
+    }
+    
+    func application(application: UIApplication, didReceiveRemoteNotification userInfo: [NSObject : AnyObject], fetchCompletionHandler completionHandler: (UIBackgroundFetchResult) -> Void) {
+        
+        guard let notificationInfo = userInfo as? [String: NSObject] else { return }
+        
+        let queryNotification = CKQueryNotification(fromRemoteNotificationDictionary: notificationInfo)
+        
+        guard let recordID = queryNotification.recordID else { print("No Record ID available from CKQueryNotification."); return }
+        
+        let cloudKitManager = CloudKitManager()
+        
+        cloudKitManager.fetchRecordWithID(recordID) { (record, error) in
+            
+            guard let record = record else { print("Unable to fetch CKRecord from Record ID"); return }
+            
+            switch record.recordType {
+                
+            case "Post":
+                let _ = Post(record: record)
+                
+            case "Comment":
+                let _ = Comment(record: record)
+                
+            default:
+                return
+            }
+            
+            PostController.sharedController.saveContext()
+        }
+        
+        completionHandler(UIBackgroundFetchResult.NewData)
     }
 
     func applicationWillResignActive(application: UIApplication) {

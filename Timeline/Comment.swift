@@ -11,28 +11,35 @@ import CoreData
 import CloudKit
 
 
-class Comment: NSManagedObject, CloudKitManagedObject {
+class Comment: NSManagedObject, SearchableRecord, CloudKitManagedObject {
     
-//    @NSManaged var added: NSDate?
+//    @NSManaged var timestamp: NSDate?
 //    @NSManaged var text: String?
-//    @NSManaged var recordData: NSData?
+//    @NSManaged var recordIDData: NSData?
 //    @NSManaged var recordName: String?
 //    @NSManaged var post: Post?
 
-    private let addedKey = "added"
     private let textKey = "text"
+    private let timestampKey = "timestamp"
     private let postKey = "post"
     
-    convenience init(post: Post, text: String, added: NSDate = NSDate(), context: NSManagedObjectContext = Stack.sharedStack.managedObjectContext) {
+    convenience init(post: Post, text: String, timestamp: NSDate = NSDate(), context: NSManagedObjectContext = Stack.sharedStack.managedObjectContext) {
         
         guard let entity = NSEntityDescription.entityForName("Comment", inManagedObjectContext: context) else { fatalError("Error: Core Data failed to create entity from entity description.") }
         
         self.init(entity: entity, insertIntoManagedObjectContext: context)
         
-        self.post = post
         self.text = text
-        self.added = added
-        self.recordName = self.nameForManagedObject()
+        self.timestamp = timestamp
+        self.post = post
+        self.recordName = nameForManagedObject()
+    }
+    
+    // MARK: - SearchableRecord
+    
+    func matchesSearchTerm(searchTerm: String) -> Bool {
+        
+        return text?.containsString(searchTerm) ?? false
     }
     
     // MARK: - CloudKitManagedObject
@@ -41,58 +48,40 @@ class Comment: NSManagedObject, CloudKitManagedObject {
     
     var cloudKitRecord: CKRecord? {
         
-        if let recordData = recordData {
-            return NSKeyedUnarchiver.unarchiveObjectWithData(recordData) as? CKRecord
-        } else {
-            
-            let recordID = CKRecordID(recordName: self.recordName)
-            
-            let record = CKRecord(recordType: recordType, recordID: recordID)
-            record[addedKey] = added
-            record[textKey] = text
-            
-            guard let post = post,
-                let postRecord = post.cloudKitRecord else { fatalError("Post relation does not exist.") }
-            
-            let reference = CKReference(record: postRecord, action: .DeleteSelf)
-            
-            record[postKey] = reference
-            
-            return record
-        }
+        let recordID = CKRecordID(recordName: recordName)
+        let record = CKRecord(recordType: recordType, recordID: recordID)
+        
+        record[timestampKey] = timestamp
+        record[textKey] = text
+        
+        guard let post = post,
+            let postRecord = post.cloudKitRecord else { fatalError("Comment does not have a Post relationship") }
+        
+        record[postKey] = CKReference(record: postRecord, action: .DeleteSelf)
+        
+        return record
     }
     
     convenience init?(record: CKRecord, context: NSManagedObjectContext = Stack.sharedStack.managedObjectContext) {
         
-        guard let added = record.creationDate,
+        guard let timestamp = record.creationDate,
             let text = record["text"] as? String,
-            let reference = record["post"] as? CKReference else { return nil }
+            let postReference = record["post"] as? CKReference else { return nil }
         
         guard let entity = NSEntityDescription.entityForName("Comment", inManagedObjectContext: context) else { fatalError("Error: Core Data failed to create entity from entity description.") }
         
         self.init(entity: entity, insertIntoManagedObjectContext: context)
         
-        self.added = added
+        self.timestamp = timestamp
         self.text = text
-        self.recordData = NSKeyedArchiver.archivedDataWithRootObject(record)
+        self.recordIDData = NSKeyedArchiver.archivedDataWithRootObject(record.recordID)
         self.recordName = record.recordID.recordName
         
-        if let post = PostController.sharedController.postWithName(reference.recordID.recordName) {
-            
-            self.post = post
-        }
+        self.post = PostController.sharedController.postWithName(postReference.recordID.recordName)
     }
     
     func updateWithRecord(record: CKRecord) {
         
-        self.recordData = NSKeyedArchiver.archivedDataWithRootObject(record)
-    }
-}
-
-extension Comment: SearchableRecord {
-    
-    func matchesSearchTerm(searchTerm: String) -> Bool {
-        
-        return text?.containsString(searchTerm) ?? false
+        self.recordIDData = NSKeyedArchiver.archivedDataWithRootObject(record.recordID)
     }
 }

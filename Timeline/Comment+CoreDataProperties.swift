@@ -14,9 +14,9 @@ import CoreData
 
 extension Comment {
 
-    @NSManaged var added: NSDate?
     @NSManaged var text: String?
-    @NSManaged var recordData: NSData?
+    @NSManaged var timestamp: NSDate?
+    @NSManaged var recordIDData: NSData?
     @NSManaged var recordName: String
     @NSManaged var post: Post?
 

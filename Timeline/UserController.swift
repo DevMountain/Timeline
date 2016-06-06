@@ -11,7 +11,7 @@ import UIKit
 
 class UserController {
     
-    let currentUser: User?
+    var currentUser: User?
     
     static let sharedController = UserController()
     
@@ -31,6 +31,8 @@ class UserController {
         imageData.writeToFile(filePath, atomically: true)
         
         let newUser = User(displayName: displayName, profileImagePath: filePath)
+        
+        currentUser = newUser
         
         NSUserDefaults.standardUserDefaults().setObject(newUser.dictionaryValue, forKey: userDataKey)
     }

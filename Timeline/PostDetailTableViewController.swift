@@ -11,6 +11,11 @@ import UIKit
 class PostDetailTableViewController: UITableViewController {
     
     var post: Post?
+    var comments: [Comment]? {
+        
+        let sortDescriptor = NSSortDescriptor(key: "timestamp", ascending: true)
+        return post?.comments?.sortedArrayUsingDescriptors([sortDescriptor]) as? [Comment]
+    }
     
     @IBOutlet weak var imageView: UIImageView!
     
@@ -36,15 +41,16 @@ class PostDetailTableViewController: UITableViewController {
     
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
-        return post?.comments?.count ?? 0
+        return comments?.count ?? 0
     }
     
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         
         let cell = tableView.dequeueReusableCellWithIdentifier("commentCell", forIndexPath: indexPath)
         
-        if let comments = post?.comments,
-            let comment = comments[indexPath.row] as? Comment {
+        if let comments = comments {
+            
+            let comment = comments[indexPath.row]
             
             cell.textLabel?.text = comment.text
             cell.detailTextLabel?.text = comment.recordName
@@ -52,6 +58,7 @@ class PostDetailTableViewController: UITableViewController {
         
         return cell
     }
+    
     
     // MARK: - Post Actions
     

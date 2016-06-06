@@ -12,52 +12,49 @@ import CloudKit
 
 @objc protocol CloudKitManagedObject {
     
-    var added: NSDate? { get set }
-    var recordData: NSData? { get set }
+    var timestamp: NSDate? { get set }
+    var recordIDData: NSData? { get set }
     var recordName: String { get set }
     var recordType: String { get }
-    var cloudKitRecord: CKRecord? { get }
     
-    func updateWithRecord(record: CKRecord)
+    var cloudKitRecord: CKRecord? { get }
 }
 
 extension CloudKitManagedObject {
     
-    
-    var cloudKitRecordID: CKRecordID? {
-        guard let record = cloudKitRecord else { return nil }
-        return record.recordID
+    var isSynced: Bool {
+        
+        return recordIDData != nil
     }
     
-    var cloudKitRecordName: String? {
-        guard let recordName = cloudKitRecordID?.recordName else { return nil }
-        return recordName
+    var cloudKitRecordID: CKRecordID? {
+        
+        guard let recordIDData = recordIDData,
+            let recordID = NSKeyedUnarchiver.unarchiveObjectWithData(recordIDData) as? CKRecordID else { return nil }
+        
+        return recordID
     }
     
     var cloudKitReference: CKReference? {
         
-        guard let record = cloudKitRecord else { return nil }
+        guard let recordID = cloudKitRecordID else { return nil }
         
-        return CKReference(record: record, action: .None)
+        return CKReference(recordID: recordID, action: .None)
     }
     
-    var isSynced: Bool {
+    func update(record: CKRecord) {
         
-        return recordData != nil
-    }
-    
-    var creatorRecord: CKRecordID? {
-        guard let record = cloudKitRecord else { return nil }
-        return record.creatorUserRecordID
+        self.recordIDData = NSKeyedArchiver.archivedDataWithRootObject(record.recordID)
+        
+        do {
+            try Stack.sharedStack.managedObjectContext.save()
+        } catch {
+            print("Unable to save Managed Object Context: \(error)")
+        }
     }
     
     func nameForManagedObject() -> String {
-        let uuid = NSUUID()
         
-        let name = "\(self.recordType)-\(uuid.UUIDString)"
-        
-        print("generated name for managed object: \(name)")
-        
-        return name
+        return NSUUID().UUIDString
     }
 }
