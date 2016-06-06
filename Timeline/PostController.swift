@@ -13,23 +13,18 @@ class PostController {
     
     static let sharedController = PostController()
     
-    let fetchedResultsController: NSFetchedResultsController
     let cloudKitManager: CloudKitManager
     
+    var posts: [Post] {
+        
+        let fetchRequest = NSFetchRequest(entityName: "Post")
+        
+        let results = (try? Stack.sharedStack.managedObjectContext.executeFetchRequest(fetchRequest)) as? [Post] ?? []
+        
+        return results
+    }
+    
     init() {
-        
-        let request = NSFetchRequest(entityName: "Post")
-        request.returnsObjectsAsFaults = false
-        let dateSortDescription = NSSortDescriptor(key: "timestamp", ascending: false)
-        request.sortDescriptors = [dateSortDescription]
-        
-        self.fetchedResultsController = NSFetchedResultsController(fetchRequest: request, managedObjectContext: Stack.sharedStack.managedObjectContext, sectionNameKeyPath: nil, cacheName: nil)
-        
-        do {
-            try fetchedResultsController.performFetch()
-        } catch let error as NSError {
-            print("Unable to perform fetch request: \(error.localizedDescription)")
-        }
         
         self.cloudKitManager = CloudKitManager()
         

@@ -11,28 +11,49 @@ import CoreData
 
 class PostListTableViewController: UITableViewController, NSFetchedResultsControllerDelegate {
 
+    var fetchedResultsController: NSFetchedResultsController?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        PostController.sharedController.fetchedResultsController.delegate = self
+        setUpFetchedResultsController()
         
-        if UserController.sharedController.currentUser == nil {
-            
-            self.tabBarController?.performSegueWithIdentifier("toAccountSetup", sender: self)
+//        if UserController.sharedController.currentUser == nil {
+//            
+//            self.tabBarController?.performSegueWithIdentifier("toAccountSetup", sender: self)
+//        }
+    }
+    
+    func setUpFetchedResultsController() {
+        
+        let request = NSFetchRequest(entityName: "Post")
+        let dateSortDescription = NSSortDescriptor(key: "timestamp", ascending: false)
+        
+        request.returnsObjectsAsFaults = false
+        request.sortDescriptors = [dateSortDescription]
+        
+        self.fetchedResultsController = NSFetchedResultsController(fetchRequest: request, managedObjectContext: Stack.sharedStack.managedObjectContext, sectionNameKeyPath: nil, cacheName: nil)
+        
+        do {
+            try fetchedResultsController?.performFetch()
+        } catch let error as NSError {
+            print("Unable to perform fetch request: \(error.localizedDescription)")
         }
+        
+        fetchedResultsController?.delegate = self
     }
     
     // MARK: - Table view data source
     
     override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
         
-        guard let sections = PostController.sharedController.fetchedResultsController.sections else { return 1 }
+        guard let sections = fetchedResultsController?.sections else { return 1 }
         return sections.count
     }
     
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
-        guard let sections = PostController.sharedController.fetchedResultsController.sections else {return 0}
+        guard let sections = fetchedResultsController?.sections else {return 0}
         let sectionInfo = sections[section]
         return sectionInfo.numberOfObjects
     }
@@ -40,7 +61,7 @@ class PostListTableViewController: UITableViewController, NSFetchedResultsContro
     
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCellWithIdentifier("postCell", forIndexPath: indexPath) as? PostTableViewCell,
-            let post = PostController.sharedController.fetchedResultsController.objectAtIndexPath(indexPath) as? Post else { return PostTableViewCell() }
+            let post = fetchedResultsController?.objectAtIndexPath(indexPath) as? Post else { return PostTableViewCell() }
         
         cell.updateWithPost(post)
         
@@ -52,7 +73,7 @@ class PostListTableViewController: UITableViewController, NSFetchedResultsContro
         //TODO: Remove delete support
         
         if editingStyle == .Delete {
-            guard let task = PostController.sharedController.fetchedResultsController.objectAtIndexPath(indexPath) as? Post else {return}
+            guard let task = fetchedResultsController?.objectAtIndexPath(indexPath) as? Post else {return}
             task.managedObjectContext?.deleteObject(task)
             _ = try? task.managedObjectContext?.save()
         }
@@ -113,7 +134,7 @@ class PostListTableViewController: UITableViewController, NSFetchedResultsContro
             
             if let detailViewController = segue.destinationViewController as? PostDetailTableViewController,
                 let selectedIndexPath = self.tableView.indexPathForSelectedRow,
-                let post = PostController.sharedController.fetchedResultsController.objectAtIndexPath(selectedIndexPath) as? Post {
+                let post = fetchedResultsController?.objectAtIndexPath(selectedIndexPath) as? Post {
             
                 detailViewController.post = post
             }

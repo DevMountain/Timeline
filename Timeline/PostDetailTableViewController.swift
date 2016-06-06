@@ -7,15 +7,13 @@
 //
 
 import UIKit
+import CoreData
 
-class PostDetailTableViewController: UITableViewController {
+class PostDetailTableViewController: UITableViewController, NSFetchedResultsControllerDelegate {
     
     var post: Post?
-    var comments: [Comment]? {
-        
-        let sortDescriptor = NSSortDescriptor(key: "timestamp", ascending: true)
-        return post?.comments?.sortedArrayUsingDescriptors([sortDescriptor]) as? [Comment]
-    }
+    
+    var fetchedResultsController: NSFetchedResultsController?
     
     @IBOutlet weak var imageView: UIImageView!
     
@@ -29,6 +27,8 @@ class PostDetailTableViewController: UITableViewController {
             
             updateWithPost(post)
         }
+        
+        setUpFetchedResultsController()
     }
     
     func updateWithPost(post: Post) {
@@ -36,27 +36,97 @@ class PostDetailTableViewController: UITableViewController {
         imageView.image = post.photo
     }
     
+    func setUpFetchedResultsController() {
+        
+        guard let post = post else { fatalError("Unable to use Post to set up fetched results controller.") }
+        
+        let request = NSFetchRequest(entityName: "Comment")
+        let predicate = NSPredicate(format: "post == %@", argumentArray: [post])
+        let dateSortDescription = NSSortDescriptor(key: "timestamp", ascending: true)
+        
+        request.returnsObjectsAsFaults = false
+        request.predicate = predicate
+        request.sortDescriptors = [dateSortDescription]
+        
+        self.fetchedResultsController = NSFetchedResultsController(fetchRequest: request, managedObjectContext: Stack.sharedStack.managedObjectContext, sectionNameKeyPath: nil, cacheName: nil)
+        
+        do {
+            try fetchedResultsController?.performFetch()
+        } catch let error as NSError {
+            print("Unable to perform fetch request: \(error.localizedDescription)")
+        }
+        
+        fetchedResultsController?.delegate = self
+    }
+    
     
     // MARK: - Table view data source
     
+    override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
+        
+        guard let sections = fetchedResultsController?.sections else { return 1 }
+        return sections.count
+    }
+    
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
-        return comments?.count ?? 0
+        guard let sections = fetchedResultsController?.sections else { return 0 }
+        let sectionInfo = sections[section]
+        return sectionInfo.numberOfObjects
     }
     
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         
         let cell = tableView.dequeueReusableCellWithIdentifier("commentCell", forIndexPath: indexPath)
         
-        if let comments = comments {
-            
-            let comment = comments[indexPath.row]
+        if let comment = fetchedResultsController?.objectAtIndexPath(indexPath) as? Comment {
             
             cell.textLabel?.text = comment.text
             cell.detailTextLabel?.text = comment.recordName
         }
         
         return cell
+    }
+    
+    
+    // MARK: - NSFetchedResultsControllerDelegate
+    
+    func controllerWillChangeContent(controller: NSFetchedResultsController) {
+        tableView.beginUpdates()
+    }
+    
+    func controller(controller: NSFetchedResultsController, didChangeObject anObject: AnyObject, atIndexPath indexPath: NSIndexPath?, forChangeType type: NSFetchedResultsChangeType, newIndexPath: NSIndexPath?) {
+        switch type {
+        case .Delete:
+            guard let indexPath = indexPath else {return}
+            tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
+        case .Insert:
+            guard let newIndexPath = newIndexPath else {return}
+            tableView.insertRowsAtIndexPaths([newIndexPath], withRowAnimation: .Automatic)
+        case .Move:
+            guard let indexPath = indexPath,
+                newIndexPath = newIndexPath else {return}
+            tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Automatic)
+            tableView.insertRowsAtIndexPaths([newIndexPath], withRowAnimation: .Automatic)
+        case .Update:
+            guard let indexPath = indexPath else {return}
+            tableView.reloadRowsAtIndexPaths([indexPath], withRowAnimation: .Automatic)
+        }
+    }
+    
+    func controller(controller: NSFetchedResultsController, didChangeSection sectionInfo: NSFetchedResultsSectionInfo, atIndex sectionIndex: Int, forChangeType type: NSFetchedResultsChangeType) {
+        switch type {
+        case .Delete:
+            tableView.deleteSections(NSIndexSet(index: sectionIndex), withRowAnimation: .Automatic)
+        case .Insert:
+            tableView.insertSections(NSIndexSet(index: sectionIndex), withRowAnimation: .Automatic)
+        default:
+            break
+        }
+    }
+    
+    func controllerDidChangeContent(controller: NSFetchedResultsController) {
+        tableView.endUpdates()
     }
     
     

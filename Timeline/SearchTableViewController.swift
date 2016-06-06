@@ -22,14 +22,14 @@ class SearchTableViewController: UITableViewController, UISearchResultsUpdating 
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        posts = PostController.sharedController.fetchedResultsController.fetchedObjects as? [Post]
+        posts = PostController.sharedController.posts
         
         setUpSearchController()
     }
     
     override func viewDidAppear(animated: Bool) {
         
-        posts = PostController.sharedController.fetchedResultsController.fetchedObjects as? [Post]
+        posts = PostController.sharedController.posts
     }
     
     
