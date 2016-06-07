@@ -20,7 +20,7 @@ class UserDataController {
     init() {
         
         let userDictionary = NSUserDefaults.standardUserDefaults().objectForKey(userDataKey) as? [String: AnyObject] ?? [:]
-        currentUser = User(dictionary: userDictionary)
+        currentUser = UserData(dictionary: userDictionary)
     }
     
     func updateUser(displayName: String, profileImage: UIImage) {
@@ -30,7 +30,7 @@ class UserDataController {
         let filePath = getDocumentsDirectory().stringByAppendingPathComponent("profileImage.jpg")
         imageData.writeToFile(filePath, atomically: true)
         
-        let newUser = User(displayName: displayName, profileImagePath: filePath)
+        let newUser = UserData(displayName: displayName, profileImagePath: filePath)
         
         currentUser = newUser
         

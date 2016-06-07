@@ -24,7 +24,7 @@ class AccountSetupTableViewController: UITableViewController {
         
         if let image = image, let text = displayNameField.text {
             
-            UserController.sharedController.updateUser(text, profileImage: image)
+            UserDataController.sharedController.updateUser(text, profileImage: image)
             
             self.dismissViewControllerAnimated(true, completion: nil)
         } else {
