@@ -9,14 +9,17 @@
 import UIKit
 import CoreData
 
-class PostListTableViewController: UITableViewController, NSFetchedResultsControllerDelegate {
+class PostListTableViewController: UITableViewController, NSFetchedResultsControllerDelegate, UISearchResultsUpdating {
 
     var fetchedResultsController: NSFetchedResultsController?
+    var searchController: UISearchController?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         setUpFetchedResultsController()
+        
+        setUpSearchController()
         
 //        if UserController.sharedController.currentUser == nil {
 //            
@@ -24,24 +27,12 @@ class PostListTableViewController: UITableViewController, NSFetchedResultsContro
 //        }
     }
     
-    func setUpFetchedResultsController() {
+    override func viewDidAppear(animated: Bool) {
         
-        let request = NSFetchRequest(entityName: "Post")
-        let dateSortDescription = NSSortDescriptor(key: "timestamp", ascending: false)
-        
-        request.returnsObjectsAsFaults = false
-        request.sortDescriptors = [dateSortDescription]
-        
-        self.fetchedResultsController = NSFetchedResultsController(fetchRequest: request, managedObjectContext: Stack.sharedStack.managedObjectContext, sectionNameKeyPath: nil, cacheName: nil)
-        
-        do {
-            try fetchedResultsController?.performFetch()
-        } catch let error as NSError {
-            print("Unable to perform fetch request: \(error.localizedDescription)")
-        }
-        
-        fetchedResultsController?.delegate = self
+        // hide search bar
+        tableView.scrollToRowAtIndexPath(NSIndexPath(forRow: 0, inSection: 0), atScrollPosition: .Top, animated: false)
     }
+
     
     // MARK: - Table view data source
     
@@ -85,7 +76,26 @@ class PostListTableViewController: UITableViewController, NSFetchedResultsContro
         sender.endRefreshing()
     }
     
-    // MARK: - NSFetchedResultsControllerDelegate
+    // MARK: - Fetched Results Controller
+    
+    func setUpFetchedResultsController() {
+        
+        let request = NSFetchRequest(entityName: "Post")
+        let dateSortDescription = NSSortDescriptor(key: "timestamp", ascending: false)
+        
+        request.returnsObjectsAsFaults = false
+        request.sortDescriptors = [dateSortDescription]
+        
+        self.fetchedResultsController = NSFetchedResultsController(fetchRequest: request, managedObjectContext: Stack.sharedStack.managedObjectContext, sectionNameKeyPath: nil, cacheName: nil)
+        
+        do {
+            try fetchedResultsController?.performFetch()
+        } catch let error as NSError {
+            print("Unable to perform fetch request: \(error.localizedDescription)")
+        }
+        
+        fetchedResultsController?.delegate = self
+    }
     
     func controllerWillChangeContent(controller: NSFetchedResultsController) {
         tableView.beginUpdates()
@@ -124,6 +134,33 @@ class PostListTableViewController: UITableViewController, NSFetchedResultsContro
     func controllerDidChangeContent(controller: NSFetchedResultsController) {
         tableView.endUpdates()
     }
+    
+    
+    // MARK: - Search Controller
+    
+    func setUpSearchController() {
+        
+        let resultsController = UIStoryboard(name: "Main", bundle: nil).instantiateViewControllerWithIdentifier("SearchResultsTableViewController")
+        
+        searchController = UISearchController(searchResultsController: resultsController)
+        searchController?.searchResultsUpdater = self
+        searchController?.searchBar.sizeToFit()
+        searchController?.hidesNavigationBarDuringPresentation = true
+        tableView.tableHeaderView = searchController?.searchBar
+        
+        definesPresentationContext = true
+    }
+    
+    func updateSearchResultsForSearchController(searchController: UISearchController) {
+        
+        if let resultsViewController = searchController.searchResultsController as? SearchResultsTableViewController,
+            let searchTerm = searchController.searchBar.text?.lowercaseString,
+            let posts = fetchedResultsController?.fetchedObjects as? [Post] {
+            
+            resultsViewController.resultsArray = posts.filter({$0.matchesSearchTerm(searchTerm)})
+            resultsViewController.tableView.reloadData()
+        }
+    }
 
     
     // MARK: - Navigation
@@ -138,7 +175,19 @@ class PostListTableViewController: UITableViewController, NSFetchedResultsContro
             
                 detailViewController.post = post
             }
-            
+        }
+        
+        if segue.identifier == "toPostDetailFromSearch" {
+            if let detailViewController = segue.destinationViewController as? PostDetailTableViewController,
+                let sender = sender as? PostTableViewCell,
+                let selectedIndexPath = (searchController?.searchResultsController as? SearchResultsTableViewController)?.tableView.indexPathForCell(sender),
+                let searchTerm = searchController?.searchBar.text?.lowercaseString,
+                let posts = fetchedResultsController?.fetchedObjects?.filter({ $0.matchesSearchTerm(searchTerm) }) as? [Post] {
+                
+                let post = posts[selectedIndexPath.row]
+                
+                detailViewController.post = post
+            }
         }
     }
 }

@@ -18,6 +18,8 @@ class PostController {
     var posts: [Post] {
         
         let fetchRequest = NSFetchRequest(entityName: "Post")
+        let sortDescriptor = NSSortDescriptor(key: "timestamp", ascending: false)
+        fetchRequest.sortDescriptors = [sortDescriptor]
         
         let results = (try? Stack.sharedStack.managedObjectContext.executeFetchRequest(fetchRequest)) as? [Post] ?? []
         

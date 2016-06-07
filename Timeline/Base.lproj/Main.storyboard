@@ -58,10 +58,13 @@
                             <action selector="refreshControlActivated:" destination="gK2-fp-nri" eventType="valueChanged" id="YYF-zw-srz"/>
                         </connections>
                     </refreshControl>
+                    <connections>
+                        <segue destination="e8t-4a-dJD" kind="show" identifier="toPostDetailFromSearch" id="usP-Ct-O2G"/>
+                    </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="m46-f1-him" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2058" y="383"/>
+            <point key="canvasLocation" x="2042" y="1075"/>
         </scene>
         <!--Post Detail-->
         <scene sceneID="gKi-vZ-Bgw">
@@ -155,7 +158,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Yaz-k3-uLQ" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2824" y="383"/>
+            <point key="canvasLocation" x="2808" y="1075"/>
         </scene>
         <!--Set Up Account-->
         <scene sceneID="TzH-AC-Hh9">
@@ -367,7 +370,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="gFv-bJ-EKB" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2824" y="1088"/>
+            <point key="canvasLocation" x="2808" y="1780"/>
         </scene>
         <!--Search Results Table View Controller-->
         <scene sceneID="e7m-39-IS3">
@@ -409,51 +412,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="iCa-FA-REP" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2824" y="1824"/>
-        </scene>
-        <!--Search-->
-        <scene sceneID="bap-Hr-Hqu">
-            <objects>
-                <tableViewController id="g3U-i6-jMP" customClass="SearchTableViewController" customModule="Timeline" customModuleProvider="target" sceneMemberID="viewController">
-                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="300" sectionHeaderHeight="28" sectionFooterHeight="28" id="pMD-LI-HWP">
-                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                        <prototypes>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="postCell" rowHeight="300" id="ZIf-II-fx8" customClass="PostTableViewCell" customModule="Timeline" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="92" width="600" height="300"/>
-                                <autoresizingMask key="autoresizingMask"/>
-                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="ZIf-II-fx8" id="Kgk-cb-hV5">
-                                    <rect key="frame" x="0.0" y="0.0" width="600" height="299"/>
-                                    <autoresizingMask key="autoresizingMask"/>
-                                    <subviews>
-                                        <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="sdv-KA-Kkk">
-                                            <rect key="frame" x="0.0" y="0.0" width="600" height="300"/>
-                                        </imageView>
-                                    </subviews>
-                                    <constraints>
-                                        <constraint firstAttribute="trailing" secondItem="sdv-KA-Kkk" secondAttribute="trailing" id="8gn-E7-fKf"/>
-                                        <constraint firstItem="sdv-KA-Kkk" firstAttribute="leading" secondItem="Kgk-cb-hV5" secondAttribute="leading" id="9Dk-nP-thb"/>
-                                        <constraint firstAttribute="bottom" secondItem="sdv-KA-Kkk" secondAttribute="bottom" id="JYe-ZX-BGs"/>
-                                        <constraint firstItem="sdv-KA-Kkk" firstAttribute="top" secondItem="Kgk-cb-hV5" secondAttribute="top" id="awJ-PK-RGn"/>
-                                    </constraints>
-                                </tableViewCellContentView>
-                                <connections>
-                                    <outlet property="postImageView" destination="sdv-KA-Kkk" id="coX-Bd-hiN"/>
-                                    <segue destination="e8t-4a-dJD" kind="show" identifier="toPostDetail" id="4zP-9A-n47"/>
-                                </connections>
-                            </tableViewCell>
-                        </prototypes>
-                        <connections>
-                            <outlet property="dataSource" destination="g3U-i6-jMP" id="FW3-VZ-h54"/>
-                            <outlet property="delegate" destination="g3U-i6-jMP" id="drg-h1-cIR"/>
-                        </connections>
-                    </tableView>
-                    <navigationItem key="navigationItem" title="Search" id="dp8-cC-Tmh"/>
-                </tableViewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="bku-Kh-KWA" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="2058" y="1824"/>
+            <point key="canvasLocation" x="1230" y="1824"/>
         </scene>
         <!--Tab Bar Controller-->
         <scene sceneID="j3h-dd-OR3">
@@ -467,7 +426,6 @@
                     <connections>
                         <segue destination="vL8-g2-3E9" kind="show" identifier="toAccountSetup" id="wve-ZM-TJO"/>
                         <segue destination="Wjq-MM-JzB" kind="relationship" relationship="viewControllers" id="E5y-yK-Pal"/>
-                        <segue destination="9Ev-jm-rGT" kind="relationship" relationship="viewControllers" id="Vxz-em-zfc"/>
                     </connections>
                 </tabBarController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="2U5-To-kpi" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -493,7 +451,7 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="hWd-k1-uWR" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1246" y="383"/>
+            <point key="canvasLocation" x="1230" y="1075"/>
         </scene>
         <!--Add Post-->
         <scene sceneID="Dga-xv-2a5">
@@ -512,26 +470,7 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="BpP-z5-cNh" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2058" y="1088"/>
-        </scene>
-        <!--Search-->
-        <scene sceneID="J2K-Ow-4yU">
-            <objects>
-                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="9Ev-jm-rGT" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Search" id="zbX-nr-9uO"/>
-                    <toolbarItems/>
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="sf4-7g-4L6">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
-                        <autoresizingMask key="autoresizingMask"/>
-                    </navigationBar>
-                    <nil name="viewControllers"/>
-                    <connections>
-                        <segue destination="g3U-i6-jMP" kind="relationship" relationship="rootViewController" id="vOW-ff-CFF"/>
-                    </connections>
-                </navigationController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="n4n-EI-D4f" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="1254" y="1824"/>
+            <point key="canvasLocation" x="2042" y="1780"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="RwR-fu-ba1">
@@ -560,18 +499,18 @@
                         <viewControllerLayoutGuide type="bottom" id="lEY-bb-klE"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="i1E-fg-15X">
-                        <rect key="frame" x="0.0" y="0.0" width="584" height="248"/>
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="264"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="KDr-Ta-ObC">
-                                <rect key="frame" x="0.0" y="0.0" width="584" height="248"/>
+                                <rect key="frame" x="0.0" y="0.0" width="600" height="264"/>
                                 <state key="normal" title="Select Photo"/>
                                 <connections>
                                     <action selector="selectPhotoButtonTapped" destination="dpi-1H-L3H" eventType="touchUpInside" id="Qdn-r3-COD"/>
                                 </connections>
                             </button>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="zUo-a5-2Ge">
-                                <rect key="frame" x="0.0" y="0.0" width="584" height="248"/>
+                                <rect key="frame" x="0.0" y="0.0" width="600" height="264"/>
                             </imageView>
                         </subviews>
                         <gestureRecognizers/>
@@ -597,7 +536,7 @@
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>
-        <segue reference="4zP-9A-n47"/>
-        <segue reference="d8H-Gr-H7I"/>
+        <segue reference="usP-Ct-O2G"/>
+        <segue reference="asj-Eb-Atf"/>
     </inferredMetricsTieBreakers>
 </document>
