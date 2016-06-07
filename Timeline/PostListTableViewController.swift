@@ -20,17 +20,17 @@ class PostListTableViewController: UITableViewController, NSFetchedResultsContro
         setUpFetchedResultsController()
         
         setUpSearchController()
+
+        // hide search bar
         
+        if tableView.numberOfRowsInSection(0) > 0 {
+            tableView.scrollToRowAtIndexPath(NSIndexPath(forRow: 0, inSection: 0), atScrollPosition: .Top, animated: false)
+        }
+
 //        if UserController.sharedController.currentUser == nil {
 //            
 //            self.tabBarController?.performSegueWithIdentifier("toAccountSetup", sender: self)
 //        }
-    }
-    
-    override func viewDidAppear(animated: Bool) {
-        
-        // hide search bar
-        tableView.scrollToRowAtIndexPath(NSIndexPath(forRow: 0, inSection: 0), atScrollPosition: .Top, animated: false)
     }
 
     
