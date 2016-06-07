@@ -9,7 +9,7 @@
 import Foundation
 import UIKit
 
-struct User {
+struct UserData {
     
     private let displayNameKey = "displayName"
     private let profileImageKey = "profileImagePath"

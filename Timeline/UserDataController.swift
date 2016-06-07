@@ -9,11 +9,11 @@
 import Foundation
 import UIKit
 
-class UserController {
+class UserDataController {
     
-    var currentUser: User?
+    var currentUser: UserData?
     
-    static let sharedController = UserController()
+    static let sharedController = UserDataController()
     
     private let userDataKey = "userData"
     
