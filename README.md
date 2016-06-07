@@ -22,17 +22,17 @@ Students who complete this project independently are able to:
 * use the image picker controller and activity controller
 * use container views to implement similar functionality in multiple view controllers
 
-#### Part Three - Basic CloudKit: CloudKitManager, CloudKitManagedObject, Manual Sync, Cloud Image Search
+#### Part Three - Basic CloudKit: CloudKitManager, CloudKitManagedObject, Manual Sync
 
 * check CloudKit availability
 * save data to CloudKit
 * fetch data from CloudKit
-* query data from CloudKit
 * sync pulled CloudKit data to a local Core Data persistent store
 
-#### Part Four - Intermediate CloudKit: Subscriptions, Push Notifications, Automatic Sync, User Search
+#### Part Four - Intermediate CloudKit: Post Search, User Search, Subscriptions, Push Notifications, Automatic Sync
 
 * use Discoverability to find other users
+* query data from CloudKit
 * use subscriptions to generate push notifications
 * use push notifications to run a push based sync engine
 
@@ -371,3 +371,68 @@ You have declared a protocol, adopted the protocol, but you now must assign the 
 * Some apps will save photos taken or processed in their app in a custom Album in the user's Camera Roll. Add this feature.
 * Review the README instructions and solution code for clarity and functionality, submit a GitHub pull request with suggested changes.
 * Provide feedback on the expectations for Part One to a mentor or instructor.
+
+## Part Three - Basic CloudKit: CloudKitManager, CloudKitManagedObject, Manual Sync
+
+* check CloudKit availability
+* save data to CloudKit
+* fetch data from CloudKit
+* query data from CloudKit
+* sync pulled CloudKit data to a local Core Data persistent store
+
+Following some of the best practices in the documentation, add CloudKit to your project as a backend syncing engine for photos. Check for CloudKit availability, save new posts and comments to CloudKit, fetch posts and comments from CloudKit and save them to Core Data.
+
+At this stage you are simply syncing photos, posts, and comments from the device to CloudKit, and pulling new photos, posts, and comments from CloudKit. You will implement user discoverability and search in a future part of the project.
+
+### CloudKit Manager
+
+Add a CloudKit Manager that abstracts your CloudKit code into a single helper class, and fulfills the basic required CloudKit functions. 
+
+You will add more CloudKit functionality to the `CloudKitManager` in future steps.
+
+1. Add a `CloudKitManager` helper class.
+2. Add function signatures that perform basic CloudKit functionality. 
+
+``swift
+
+    internal func fetchRecordsWithType(type: String, completion: ((records: [CKRecord]?, error: NSError?) -> Void)?)
+
+    internal func fetchRecordWithID(recordID: CKRecordID, completion: ((record: CKRecord?, error: NSError?) -> Void)?)
+
+    internal func fetchRecentRecords(recordType: String, fromDate: NSDate, toDate: NSDate, completion: ((records: [CKRecord]?, error: NSError?) -> Void)?)
+
+    internal func deleteRecordWithID(recordID: CKRecordID, completion: ((recordID: CKRecordID?, error: NSError?) -> Void)?)
+
+    internal func deleteRecordsWithID(recordIDs: [CKRecordID], completion: ((records: [CKRecord]?, recordIDs: [CKRecordID]?, error: NSError?) -> Void)?)
+
+    internal func saveRecord(record: CKRecord, completion: ((record: CKRecord?, error: NSError?) -> Void)?)
+
+    internal func modifyRecord(record: CKRecord, completion: ((record: CKRecord?, error: NSError?) -> Void)?)
+
+    internal func handleCloudKitUnavailable(accountStatus: CKAccountStatus, error: NSError?)
+
+    internal func displayCloudKitNotAvailableError(errorText: String)
+```
+
+3. Using the documentation for CloudKit, fulfill the contract of each function signature. Using the data passed in as a paremeter, write code that will return the requested information. When it makes sense to do so using the NSOperation subclasses, try to use them over the convenience functions.
+
+### CloudKitManagedObject
+
+Write a protocol that will define how the app will work with CloudKit and Core Data objects. Add a protocol extension that adds predefined convenience functionality to each object that adopts that protocol.
+
+Our `CloudKitManagedObject` types will need to have a timestamp, a way to persist the data from a `CKRecord` object into the persistent store, a unique record name, a record type that matches a `CKRecord` type, and a way to represent the managed object as a `CKRecord` for when we want to push the data to CloudKit.
+
+1. Create a new `CloudKitManagedObject` file that defines a new protocol named `CloudKitManagedObject`.
+2. Add required gettable and settable variables for the `timestamp` as an NSDate, `recordData` as optional NSData.
+    * `CKRecord` conforms to the `NSCoding` protocol, which allows it to be easily serialized to and from `NSData`. Core Data does not natively support saving `CKRecord` objects, but we can set the `NSData` of a `CKRecord` to the `recordData` to persist the `CKRecord`.
+3. Add required gettable computed properties for the `recordType` as a String, and `cloudKitRecord` as an optional CKRecord.
+4. Add a required `updateWithRecord` function that accepts a `CKRecord` as a parameter. This function will be used to update the Core Data object with `CKRecord` data received from CloudKit.
+
+
+### Post Controller Manual Sync
+
+#### Update Post for Sync Functionality
+
+#### Update Comment for Sync Functionality
+
+#### Update the Post Controller for Manual Sync
