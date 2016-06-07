@@ -16,11 +16,26 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
-        // Override point for customization after application launch.
         
+        // Request notification permissions
         let notificationSettings = UIUserNotificationSettings(forTypes: [.Alert, .Badge, .Sound], categories: nil)
         UIApplication.sharedApplication().registerUserNotificationSettings(notificationSettings)
         UIApplication.sharedApplication().registerForRemoteNotifications()
+        
+        // Initialize Post Controller for a full sync
+        
+        let _ = PostController.sharedController
+        
+        PostController.sharedController.cloudKitManager.fetchLoggedInUserRecord { (record, error) in
+            
+            if let recordID = record?.recordID {
+                
+                PostController.sharedController.cloudKitManager.fetchUsernameFromRecordID(recordID, completion: { (firstName, lastName) in
+                    
+                    print("\(firstName) \(lastName)")
+                })
+            }
+        }
         
         return true
     }

@@ -24,6 +24,7 @@ class CloudKitManager {
     init() {
         
         checkCloudKitAvailability()
+        requestDiscoverabilityPermission()
     }
     
     // MARK: - User Info Discovery
@@ -286,7 +287,7 @@ class CloudKitManager {
     }
     
     
-    // MARK: - CloudKit Availability
+    // MARK: - CloudKit Permissions
     
     func checkCloudKitAvailability() {
         
@@ -329,6 +330,69 @@ class CloudKitManager {
         dispatch_async(dispatch_get_main_queue(),{
             
             let alertController = UIAlertController(title: "iCloud Synchronization Error", message: errorText, preferredStyle: .Alert)
+            
+            let dismissAction = UIAlertAction(title: "Ok", style: .Cancel, handler: nil);
+            
+            alertController.addAction(dismissAction)
+            
+            if let appDelegate = UIApplication.sharedApplication().delegate,
+                let appWindow = appDelegate.window!,
+                let rootViewController = appWindow.rootViewController {
+                rootViewController.presentViewController(alertController, animated: true, completion: nil)
+            }
+        })
+    }
+    
+    
+    // MARK: - CloudKit Discoverability
+    
+    func requestDiscoverabilityPermission() {
+        
+        CKContainer.defaultContainer().statusForApplicationPermission(.UserDiscoverability) { (permissionStatus, error) in
+            
+            if permissionStatus == .InitialState {
+                CKContainer.defaultContainer().requestApplicationPermission(.UserDiscoverability, completionHandler: { (permissionStatus, error) in
+                    
+                    self.handleCloudKitPermissionStatus(permissionStatus, error: error)
+                })
+            } else {
+                
+                self.handleCloudKitPermissionStatus(permissionStatus, error: error)
+            }
+        }
+    }
+    
+    func handleCloudKitPermissionStatus(permissionStatus: CKApplicationPermissionStatus, error:NSError?) {
+        
+        if permissionStatus == .Granted {
+            print("User Discoverability permission granted. User may proceed with full access.")
+        } else {
+            var errorText = "Synchronization is disabled\n"
+            if let error = error {
+                print("handleCloudKitUnavailable ERROR: \(error)")
+                print("An error occured: \(error.localizedDescription)")
+                errorText += error.localizedDescription
+            }
+            
+            switch permissionStatus {
+            case .Denied:
+                errorText += "You have denied User Discoverability permissions. You may be unable to use certain features that require User Discoverability."
+            case .CouldNotComplete:
+                errorText += "Unable to verify User Discoverability permissions. You may have a connectivity issue. Please try again."
+            default:
+                break
+                
+            }
+            
+            displayCloudKitPermissionsNotGrantedError(errorText)
+        }
+    }
+    
+    func displayCloudKitPermissionsNotGrantedError(errorText: String) {
+        
+        dispatch_async(dispatch_get_main_queue(),{
+            
+            let alertController = UIAlertController(title: "CloudKit Permissions Error", message: errorText, preferredStyle: .Alert)
             
             let dismissAction = UIAlertAction(title: "Ok", style: .Cancel, handler: nil);
             
