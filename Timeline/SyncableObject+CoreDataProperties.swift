@@ -1,5 +1,5 @@
 //
-//  Comment+CoreDataProperties.swift
+//  SyncableObject+CoreDataProperties.swift
 //  Timeline
 //
 //  Created by Caleb Hicks on 6/7/16.
@@ -12,10 +12,10 @@
 import Foundation
 import CoreData
 
-extension Comment {
+extension SyncableObject {
 
-    @NSManaged var text: String?
-    @NSManaged var post: Post?
-    @NSManaged var creatorData: UserData?
+    @NSManaged var recordIDData: NSData?
+    @NSManaged var recordName: String
+    @NSManaged var timestamp: NSDate?
 
 }

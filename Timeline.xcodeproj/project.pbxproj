@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		681DF3C61D072C9C00A4AB75 /* UserData+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 681DF3C31D072C9C00A4AB75 /* UserData+CoreDataProperties.swift */; };
+		681DF3C81D072CD500A4AB75 /* UserData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 681DF3C71D072CD500A4AB75 /* UserData.swift */; };
+		681DF3CF1D0733EB00A4AB75 /* SyncableObject+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 681DF3CD1D0733EB00A4AB75 /* SyncableObject+CoreDataProperties.swift */; };
+		681DF3D01D0733EB00A4AB75 /* SyncableObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 681DF3CE1D0733EB00A4AB75 /* SyncableObject.swift */; };
 		682FA4D71CF5427500B81932 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 682FA4D61CF5427500B81932 /* AppDelegate.swift */; };
 		682FA4DC1CF5427500B81932 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 682FA4DA1CF5427500B81932 /* Main.storyboard */; };
 		682FA4DE1CF5427500B81932 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 682FA4DD1CF5427500B81932 /* Assets.xcassets */; };
@@ -16,7 +20,6 @@
 		68402B571CF93CB000EECEF3 /* CloudKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68402B561CF93CB000EECEF3 /* CloudKitManager.swift */; };
 		68402B591CFA048700EECEF3 /* CloudKitManagedObject.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68402B581CFA048700EECEF3 /* CloudKitManagedObject.swift */; };
 		68402B5B1CFC195E00EECEF3 /* UserDataController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68402B5A1CFC195E00EECEF3 /* UserDataController.swift */; };
-		68402B5D1CFC197B00EECEF3 /* UserData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68402B5C1CFC197B00EECEF3 /* UserData.swift */; };
 		6857CAA11CF5F00F0072C237 /* PostController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6857CAA01CF5F00F0072C237 /* PostController.swift */; };
 		68658B561CF8A9B50016C5CD /* Stack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68658B551CF8A9B50016C5CD /* Stack.swift */; };
 		68658B591CF8A9E30016C5CD /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 68658B571CF8A9E30016C5CD /* Model.xcdatamodeld */; };
@@ -54,6 +57,10 @@
 
 /* Begin PBXFileReference section */
 		68199A871D007F96001C6FAE /* Timeline.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Timeline.entitlements; sourceTree = "<group>"; };
+		681DF3C31D072C9C00A4AB75 /* UserData+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UserData+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		681DF3C71D072CD500A4AB75 /* UserData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserData.swift; sourceTree = "<group>"; };
+		681DF3CD1D0733EB00A4AB75 /* SyncableObject+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SyncableObject+CoreDataProperties.swift"; sourceTree = "<group>"; };
+		681DF3CE1D0733EB00A4AB75 /* SyncableObject.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SyncableObject.swift; sourceTree = "<group>"; };
 		682FA4D31CF5427500B81932 /* Timeline.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Timeline.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		682FA4D61CF5427500B81932 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		682FA4DB1CF5427500B81932 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -69,7 +76,6 @@
 		68402B561CF93CB000EECEF3 /* CloudKitManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CloudKitManager.swift; sourceTree = "<group>"; };
 		68402B581CFA048700EECEF3 /* CloudKitManagedObject.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CloudKitManagedObject.swift; sourceTree = "<group>"; };
 		68402B5A1CFC195E00EECEF3 /* UserDataController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserDataController.swift; sourceTree = "<group>"; };
-		68402B5C1CFC197B00EECEF3 /* UserData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserData.swift; sourceTree = "<group>"; };
 		6857CAA01CF5F00F0072C237 /* PostController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PostController.swift; sourceTree = "<group>"; };
 		68658B551CF8A9B50016C5CD /* Stack.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Stack.swift; sourceTree = "<group>"; };
 		68658B581CF8A9E30016C5CD /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
@@ -173,6 +179,10 @@
 			isa = PBXGroup;
 			children = (
 				68658B551CF8A9B50016C5CD /* Stack.swift */,
+				681DF3CD1D0733EB00A4AB75 /* SyncableObject+CoreDataProperties.swift */,
+				681DF3CE1D0733EB00A4AB75 /* SyncableObject.swift */,
+				681DF3C31D072C9C00A4AB75 /* UserData+CoreDataProperties.swift */,
+				681DF3C71D072CD500A4AB75 /* UserData.swift */,
 				68658B5A1CF8AC4B0016C5CD /* Post+CoreDataProperties.swift */,
 				68658B5B1CF8AC4B0016C5CD /* Post.swift */,
 				68658B5C1CF8AC4B0016C5CD /* Comment+CoreDataProperties.swift */,
@@ -244,7 +254,6 @@
 		9D6CD0261CFC8FC70002C64B /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				68402B5C1CFC197B00EECEF3 /* UserData.swift */,
 				68658B621CF8AC5D0016C5CD /* Core Data */,
 			);
 			name = Model;
@@ -405,15 +414,18 @@
 			buildActionMask = 2147483647;
 			files = (
 				68658B681CF8F3280016C5CD /* SearchResultsTableViewController.swift in Sources */,
+				681DF3D01D0733EB00A4AB75 /* SyncableObject.swift in Sources */,
 				68AA932B1CF68ECD0006A751 /* PhotoSelectViewController.swift in Sources */,
 				68402B5B1CFC195E00EECEF3 /* UserDataController.swift in Sources */,
 				68AA93231CF68A020006A751 /* PostDetailTableViewController.swift in Sources */,
 				68658B661CF8B8730016C5CD /* PostTableViewCell.swift in Sources */,
 				68AA93211CF689F30006A751 /* PostListTableViewController.swift in Sources */,
 				68658B611CF8AC4B0016C5CD /* Comment.swift in Sources */,
+				681DF3CF1D0733EB00A4AB75 /* SyncableObject+CoreDataProperties.swift in Sources */,
 				68658B5F1CF8AC4B0016C5CD /* Post.swift in Sources */,
 				68AA93291CF68A3C0006A751 /* AccountSetupTableViewController.swift in Sources */,
 				68402B571CF93CB000EECEF3 /* CloudKitManager.swift in Sources */,
+				681DF3C81D072CD500A4AB75 /* UserData.swift in Sources */,
 				68658B601CF8AC4B0016C5CD /* Comment+CoreDataProperties.swift in Sources */,
 				68402B591CFA048700EECEF3 /* CloudKitManagedObject.swift in Sources */,
 				68658B561CF8A9B50016C5CD /* Stack.swift in Sources */,
@@ -423,7 +435,7 @@
 				68AA93251CF68A1A0006A751 /* AddPostTableViewController.swift in Sources */,
 				68658B591CF8A9E30016C5CD /* Model.xcdatamodeld in Sources */,
 				68658B6A1CF8F3820016C5CD /* SearchableRecord.swift in Sources */,
-				68402B5D1CFC197B00EECEF3 /* UserData.swift in Sources */,
+				681DF3C61D072C9C00A4AB75 /* UserData+CoreDataProperties.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -11,7 +11,7 @@ import UIKit
 
 class UserDataController {
     
-    var currentUser: UserData?
+    var currentUserData: UserData?
     
     static let sharedController = UserDataController()
     
@@ -24,17 +24,16 @@ class UserDataController {
     }
     
     func updateUser(displayName: String, profileImage: UIImage) {
-                
-        guard let imageData = UIImageJPEGRepresentation(profileImage, 0.8) else { fatalError("Unable to serialize profile image to NSData.") }
         
-        let filePath = getDocumentsDirectory().stringByAppendingPathComponent("profileImage.jpg")
-        imageData.writeToFile(filePath, atomically: true)
+        // fetch current user userdata record
+        // update it
+        // save it
+    }
+    
+    func fetchCurrentUserData(completion: (() -> Void)?) {
         
-        let newUser = UserData(displayName: displayName, profileImagePath: filePath)
-        
-        currentUser = newUser
-        
-        NSUserDefaults.standardUserDefaults().setObject(newUser.dictionaryValue, forKey: userDataKey)
+        // fetch current user record id
+        // fetch userdata record with current user data
     }
     
     func getDocumentsDirectory() -> NSString {

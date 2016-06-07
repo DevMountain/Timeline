@@ -11,17 +11,11 @@ import CoreData
 import CloudKit
 
 
-class Comment: NSManagedObject, SearchableRecord, CloudKitManagedObject {
-    
-//    @NSManaged var timestamp: NSDate?
-//    @NSManaged var text: String?
-//    @NSManaged var recordIDData: NSData?
-//    @NSManaged var recordName: String?
-//    @NSManaged var post: Post?
+class Comment: SyncableObject, SearchableRecord, CloudKitManagedObject {
 
     private let textKey = "text"
-    private let timestampKey = "timestamp"
     private let postKey = "post"
+    private let timestampKey = "timestamp"
     
     convenience init(post: Post, text: String, timestamp: NSDate = NSDate(), context: NSManagedObjectContext = Stack.sharedStack.managedObjectContext) {
         

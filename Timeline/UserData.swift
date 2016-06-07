@@ -1,51 +1,65 @@
 //
-//  User.swift
+//  UserData.swift
 //  Timeline
 //
-//  Created by Caleb Hicks on 5/30/16.
+//  Created by Caleb Hicks on 6/7/16.
 //  Copyright © 2016 DevMountain. All rights reserved.
 //
 
 import Foundation
-import UIKit
+import CoreData
+import CloudKit
 
-struct UserData {
-    
+
+class UserData: SyncableObject, CloudKitManagedObject {
+
     private let displayNameKey = "displayName"
-    private let profileImageKey = "profileImagePath"
+    private let profileImageKey = "profileImage"
+    private let timestampKey = "timestamp"
     
-    let displayName: String
-    let profileImagePath: String
+    lazy var temporaryPhotoURL: NSURL = {
+        
+        // must write to temporary directory to be able to pass image url to CKAsset
+        
+        let temporaryDirectory = NSTemporaryDirectory()
+        let temporaryDirectoryURL = NSURL(fileURLWithPath: temporaryDirectory)
+        let fileURL = temporaryDirectoryURL.URLByAppendingPathComponent(NSUUID().UUIDString).URLByAppendingPathExtension("jpg")
+        
+        self.profileImageData?.writeToURL(fileURL, atomically: true)
+        
+        return fileURL
+    }()
     
-    var profileImage: UIImage? {
+    // MARK: - CloudKitManagedObject
+    
+    var recordType: String = "UserData"
+    
+    var cloudKitRecord: CKRecord? {
         
-        guard let imageData = NSData(contentsOfFile: profileImagePath) else { return nil }
+        let recordID = CKRecordID(recordName: recordName)
+        let record = CKRecord(recordType: recordType, recordID: recordID)
         
-        return UIImage(data: imageData)
+        record[displayNameKey] = displayName
+        record[profileImageKey] = CKAsset(fileURL: temporaryPhotoURL)
+        record[timestampKey] = timestamp
+        
+        return record
     }
     
-    var dictionaryValue: [String: AnyObject] {
+    convenience init?(record: CKRecord, context: NSManagedObjectContext = Stack.sharedStack.managedObjectContext) {
         
-        let userDictionary = [
-            displayNameKey: self.displayName,
-            profileImageKey: self.profileImagePath
-        ]
+        guard let timestamp = record.creationDate,
+            let displayName = record["displayName"] as? String,
+            let photoData = record["profileImage"] as? CKAsset else { return nil }
         
-        return userDictionary
-    }
-    
-    init(displayName: String, profileImagePath: String) {
+        guard let entity = NSEntityDescription.entityForName("UserData", inManagedObjectContext: context) else { fatalError("Error: Core Data failed to create entity from entity description.") }
         
+        self.init(entity: entity, insertIntoManagedObjectContext: context)
+        
+        self.timestamp = timestamp
         self.displayName = displayName
-        self.profileImagePath = profileImagePath
-    }
-    
-    init?(dictionary: [String: AnyObject]) {
-        
-        guard let displayName = dictionary[displayNameKey] as? String,
-            let profileImagePath = dictionary[profileImageKey] as? String else { return nil }
-        
-        self.displayName = displayName
-        self.profileImagePath = profileImagePath
+        self.profileImageData = NSData(contentsOfURL: photoData.fileURL)
+        self.recordIDData = NSKeyedArchiver.archivedDataWithRootObject(record.recordID)
+        self.recordName = record.recordID.recordName
     }
 }

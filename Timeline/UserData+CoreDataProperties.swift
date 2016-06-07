@@ -1,5 +1,5 @@
 //
-//  Comment+CoreDataProperties.swift
+//  UserData+CoreDataProperties.swift
 //  Timeline
 //
 //  Created by Caleb Hicks on 6/7/16.
@@ -12,10 +12,11 @@
 import Foundation
 import CoreData
 
-extension Comment {
+extension UserData {
 
-    @NSManaged var text: String?
-    @NSManaged var post: Post?
-    @NSManaged var creatorData: UserData?
+    @NSManaged var displayName: String?
+    @NSManaged var profileImageData: NSData?
+    @NSManaged var comments: NSSet?
+    @NSManaged var posts: NSSet?
 
 }

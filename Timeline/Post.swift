@@ -12,15 +12,10 @@ import CoreData
 import CloudKit
 
 
-class Post: NSManagedObject, SearchableRecord, CloudKitManagedObject {
-
-//    @NSManaged var timestamp: NSDate?
-//    @NSManaged var photoData: NSData?
-//    @NSManaged var recordIDData: NSData?
-//    @NSManaged var comments: NSOrderedSet?
+class Post: SyncableObject, SearchableRecord, CloudKitManagedObject {
     
-    private let timestampKey = "timestamp"
     private let photoDataKey = "photoData"
+    private let timestampKey = "timestamp"
     
     convenience init(photo: NSData, timestamp: NSDate = NSDate(), context: NSManagedObjectContext = Stack.sharedStack.managedObjectContext) {
         
@@ -57,13 +52,7 @@ class Post: NSManagedObject, SearchableRecord, CloudKitManagedObject {
     
     func matchesSearchTerm(searchTerm: String) -> Bool {
         
-        if let comments = self.comments?.array as? [Comment] {
-
-            let matchingCommentTerms = comments.filter({ $0.matchesSearchTerm(searchTerm) })
-            return matchingCommentTerms.count > 0
-        } else {
-            return false
-        }
+        return (self.comments?.array as? [Comment])?.filter({ $0.matchesSearchTerm(searchTerm) }).count > 0
     }
     
     // MARK: - CloudKitManagedObject
@@ -94,10 +83,5 @@ class Post: NSManagedObject, SearchableRecord, CloudKitManagedObject {
         self.photoData = NSData(contentsOfURL: photoData.fileURL)
         self.recordIDData = NSKeyedArchiver.archivedDataWithRootObject(record.recordID)
         self.recordName = record.recordID.recordName
-    }
-    
-    func updateWithRecord(record: CKRecord) {
-        
-        self.recordIDData = NSKeyedArchiver.archivedDataWithRootObject(record)
     }
 }
