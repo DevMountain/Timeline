@@ -247,9 +247,9 @@ class CloudKitManager {
     
     // MARK: - Subscriptions
     
-    func subscribe(type: String, predicate: NSPredicate, subscriptionIdentifier: String, contentAvailable: Bool, alertBody: String? = nil, desiredKeys: [String]? = nil, options: CKSubscriptionOptions, completion: ((subscription: CKSubscription?, error: NSError?) -> Void)?) {
+    func subscribe(type: String, predicate: NSPredicate, subscriptionID: String, contentAvailable: Bool, alertBody: String? = nil, desiredKeys: [String]? = nil, options: CKSubscriptionOptions, completion: ((subscription: CKSubscription?, error: NSError?) -> Void)?) {
         
-        let subscription = CKSubscription(recordType: type, predicate: predicate, subscriptionID: subscriptionIdentifier, options: options)
+        let subscription = CKSubscription(recordType: type, predicate: predicate, subscriptionID: subscriptionID, options: options)
         
         let notificationInfo = CKNotificationInfo()
         notificationInfo.alertBody = alertBody
@@ -266,9 +266,9 @@ class CloudKitManager {
         }
     }
     
-    func unsubscribe(subscription: CKSubscription, completion: ((subscriptionID: String?, error: NSError?) -> Void)?) {
+    func unsubscribe(subscriptionID: String, completion: ((subscriptionID: String?, error: NSError?) -> Void)?) {
         
-        publicDatabase.deleteSubscriptionWithID(subscription.subscriptionID) { (subscriptionID, error) in
+        publicDatabase.deleteSubscriptionWithID(subscriptionID) { (subscriptionID, error) in
             
             if let completion = completion {
                 completion(subscriptionID: subscriptionID, error: error)
@@ -282,6 +282,16 @@ class CloudKitManager {
             
             if let completion = completion {
                 completion(subscriptions: subscriptions, error: error)
+            }
+        }
+    }
+    
+    func fetchSubscription(subscriptionID: String, completion: ((subscription: CKSubscription?, error: NSError?) -> Void)?) {
+        
+        publicDatabase.fetchSubscriptionWithID(subscriptionID) { (subscription, error) in
+            
+            if let completion = completion {
+                completion(subscription: subscription, error: error)
             }
         }
     }

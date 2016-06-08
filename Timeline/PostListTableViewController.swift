@@ -15,24 +15,27 @@ class PostListTableViewController: UITableViewController, NSFetchedResultsContro
     var searchController: UISearchController?
     
     override func viewDidLoad() {
+        
         super.viewDidLoad()
         
         setUpFetchedResultsController()
         
         setUpSearchController()
 
-        // hide search bar
-        
+        // hides search bar
         if tableView.numberOfRowsInSection(0) > 0 {
             tableView.scrollToRowAtIndexPath(NSIndexPath(forRow: 0, inSection: 0), atScrollPosition: .Top, animated: false)
         }
-
-//        if UserController.sharedController.currentUser == nil {
-//            
-//            self.tabBarController?.performSegueWithIdentifier("toAccountSetup", sender: self)
-//        }
     }
-
+    
+    @IBAction func refreshControlActivated(sender: UIRefreshControl) {
+        
+        PostController.sharedController.fullSync { 
+        
+            sender.endRefreshing()
+        }
+    }
+    
     
     // MARK: - Table view data source
     
@@ -51,6 +54,7 @@ class PostListTableViewController: UITableViewController, NSFetchedResultsContro
     
     
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+        
         guard let cell = tableView.dequeueReusableCellWithIdentifier("postCell", forIndexPath: indexPath) as? PostTableViewCell,
             let post = fetchedResultsController?.objectAtIndexPath(indexPath) as? Post else { return PostTableViewCell() }
         
@@ -59,22 +63,6 @@ class PostListTableViewController: UITableViewController, NSFetchedResultsContro
         return cell
     }
     
-    override func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
-        
-        //TODO: Remove delete support
-        
-        if editingStyle == .Delete {
-            guard let task = fetchedResultsController?.objectAtIndexPath(indexPath) as? Post else {return}
-            task.managedObjectContext?.deleteObject(task)
-            _ = try? task.managedObjectContext?.save()
-        }
-    }
-    
-    @IBAction func refreshControlActivated(sender: UIRefreshControl) {
-        
-        PostController.sharedController.fullSync()
-        sender.endRefreshing()
-    }
     
     // MARK: - Fetched Results Controller
     
@@ -98,10 +86,12 @@ class PostListTableViewController: UITableViewController, NSFetchedResultsContro
     }
     
     func controllerWillChangeContent(controller: NSFetchedResultsController) {
+        
         tableView.beginUpdates()
     }
     
     func controller(controller: NSFetchedResultsController, didChangeObject anObject: AnyObject, atIndexPath indexPath: NSIndexPath?, forChangeType type: NSFetchedResultsChangeType, newIndexPath: NSIndexPath?) {
+        
         switch type {
         case .Delete:
             guard let indexPath = indexPath else {return}
@@ -121,6 +111,7 @@ class PostListTableViewController: UITableViewController, NSFetchedResultsContro
     }
     
     func controller(controller: NSFetchedResultsController, didChangeSection sectionInfo: NSFetchedResultsSectionInfo, atIndex sectionIndex: Int, forChangeType type: NSFetchedResultsChangeType) {
+        
         switch type {
         case .Delete:
             tableView.deleteSections(NSIndexSet(index: sectionIndex), withRowAnimation: .Automatic)

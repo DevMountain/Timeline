@@ -2,29 +2,20 @@
 <model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="10174" systemVersion="15F34" minimumToolsVersion="Xcode 7.0">
     <entity name="Comment" representedClassName=".Comment" parentEntity="SyncableObject" syncable="YES">
         <attribute name="text" optional="YES" attributeType="String" syncable="YES"/>
-        <relationship name="creatorData" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="UserData" inverseName="comments" inverseEntity="UserData" syncable="YES"/>
         <relationship name="post" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Post" inverseName="comments" inverseEntity="Post" syncable="YES"/>
     </entity>
     <entity name="Post" representedClassName=".Post" parentEntity="SyncableObject" syncable="YES">
         <attribute name="photoData" optional="YES" attributeType="Binary" allowsExternalBinaryDataStorage="YES" syncable="YES"/>
         <relationship name="comments" optional="YES" toMany="YES" deletionRule="Cascade" ordered="YES" destinationEntity="Comment" inverseName="post" inverseEntity="Comment" syncable="YES"/>
-        <relationship name="creatorData" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="UserData" inverseName="posts" inverseEntity="UserData" syncable="YES"/>
     </entity>
     <entity name="SyncableObject" representedClassName=".SyncableObject" syncable="YES">
         <attribute name="recordIDData" optional="YES" attributeType="Binary" syncable="YES"/>
         <attribute name="recordName" attributeType="String" syncable="YES"/>
         <attribute name="timestamp" optional="YES" attributeType="Date" syncable="YES"/>
     </entity>
-    <entity name="UserData" representedClassName=".UserData" parentEntity="SyncableObject" syncable="YES">
-        <attribute name="displayName" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="profileImageData" optional="YES" attributeType="Binary" allowsExternalBinaryDataStorage="YES" syncable="YES"/>
-        <relationship name="comments" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Comment" inverseName="creatorData" inverseEntity="Comment" syncable="YES"/>
-        <relationship name="posts" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Post" inverseName="creatorData" inverseEntity="Post" syncable="YES"/>
-    </entity>
     <elements>
-        <element name="Comment" positionX="-54" positionY="-9" width="128" height="90"/>
-        <element name="Post" positionX="-63" positionY="-18" width="128" height="90"/>
-        <element name="UserData" positionX="-63" positionY="36" width="128" height="105"/>
+        <element name="Comment" positionX="-54" positionY="-9" width="128" height="75"/>
+        <element name="Post" positionX="-63" positionY="-18" width="128" height="75"/>
         <element name="SyncableObject" positionX="-54" positionY="54" width="128" height="90"/>
     </elements>
 </model>

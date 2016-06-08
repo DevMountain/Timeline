@@ -48,6 +48,7 @@ class Post: SyncableObject, SearchableRecord, CloudKitManagedObject {
         return fileURL
     }()
     
+    
     // MARK: - SearchableRecord
     
     func matchesSearchTerm(searchTerm: String) -> Bool {

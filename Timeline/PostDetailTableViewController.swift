@@ -14,7 +14,8 @@ class PostDetailTableViewController: UITableViewController, NSFetchedResultsCont
     var post: Post?
     
     var fetchedResultsController: NSFetchedResultsController?
-    
+
+    @IBOutlet weak var followPostButton: UIBarButtonItem!
     @IBOutlet weak var imageView: UIImageView!
     
     override func viewDidLoad() {
@@ -34,6 +35,13 @@ class PostDetailTableViewController: UITableViewController, NSFetchedResultsCont
     func updateWithPost(post: Post) {
         
         imageView.image = post.photo
+        
+        PostController.sharedController.checkSubscriptionToPostComments(post) { (subscribed) in
+            
+            dispatch_async(dispatch_get_main_queue(), { 
+                self.followPostButton.title = subscribed ? "Unfollow Post" : "Follow Post"
+            })
+        }
     }
     
     func setUpFetchedResultsController() {
@@ -142,8 +150,14 @@ class PostDetailTableViewController: UITableViewController, NSFetchedResultsCont
         presentActivityViewController()
     }
     
-    @IBAction func followUserButtonTapped(sender: AnyObject) {
+    @IBAction func followPostButtonTapped(sender: AnyObject) {
         
+        guard let post = post else { return }
+        
+        PostController.sharedController.togglePostCommentSubscription(post) { (success, isSubscribed, error) in
+            
+            self.updateWithPost(post)
+        }
     }
     
     func presentCommentAlert() {
