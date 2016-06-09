@@ -18,6 +18,8 @@ import CloudKit
     var recordType: String { get }
     
     var cloudKitRecord: CKRecord? { get }
+    
+    init?(record: CKRecord, context: NSManagedObjectContext)
 }
 
 extension CloudKitManagedObject {

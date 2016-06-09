@@ -17,8 +17,8 @@ class PostController {
     
     var posts: [Post] {
         
-        let fetchRequest = NSFetchRequest(entityName: "Post")
-        let sortDescriptor = NSSortDescriptor(key: "timestamp", ascending: false)
+        let fetchRequest = NSFetchRequest(entityName: Post.typeKey)
+        let sortDescriptor = NSSortDescriptor(key: Post.timestampKey, ascending: false)
         fetchRequest.sortDescriptors = [sortDescriptor]
         
         let results = (try? Stack.sharedStack.managedObjectContext.executeFetchRequest(fetchRequest)) as? [Post] ?? []
@@ -92,37 +92,20 @@ class PostController {
         }
     }
     
+    
     // MARK: - Helper Fetches
     
     func postWithName(name: String) -> Post? {
         
         if name.isEmpty { return nil }
         
-        let fetchRequest = NSFetchRequest(entityName: "Post")
+        let fetchRequest = NSFetchRequest(entityName: Post.typeKey)
         let predicate = NSPredicate(format: "recordName == %@", argumentArray: [name])
         fetchRequest.predicate = predicate
         
         let result = (try? Stack.sharedStack.managedObjectContext.executeFetchRequest(fetchRequest) as? [Post]) ?? nil
         
         return result?.first
-    }
-    
-    // MARK: - Sync
-    
-    func fullSync(completion: (() -> Void)? = nil) {
-        
-        pushChangesToCloudKit { (success) in
-            
-            self.fetchNewRecords("Post") {
-                
-                self.fetchNewRecords("Comment", completion: nil)
-                
-                if let completion = completion {
-                    
-                    completion()
-                }
-            }
-        }
     }
     
     func syncedRecords(type: String) -> [CloudKitManagedObject] {
@@ -149,6 +132,25 @@ class PostController {
         return results
     }
     
+    
+    // MARK: - Sync
+    
+    func fullSync(completion: (() -> Void)? = nil) {
+        
+        pushChangesToCloudKit { (success) in
+            
+            self.fetchNewRecords(Post.typeKey) {
+                
+                self.fetchNewRecords(Comment.typeKey, completion: nil)
+                
+                if let completion = completion {
+                    
+                    completion()
+                }
+            }
+        }
+    }
+    
     func fetchNewRecords(type: String, completion: (() -> Void)?) {
         
         let referencesToExclude = syncedRecords(type).flatMap({ $0.cloudKitReference })
@@ -162,10 +164,10 @@ class PostController {
             
             switch type {
                 
-            case "Post":
+            case Post.typeKey:
                 let _ = Post(record: record)
                 
-            case "Comment":
+            case Comment.typeKey:
                 let _ = Comment(record: record)
                 
             default:
@@ -188,7 +190,7 @@ class PostController {
     
     func pushChangesToCloudKit(completion: ((success: Bool, error: NSError?) -> Void)?) {
         
-        let unsavedManagedObjects = unsyncedRecords("Post") + unsyncedRecords("Comment")
+        let unsavedManagedObjects = unsyncedRecords(Post.typeKey) + unsyncedRecords(Comment.typeKey)
         let unsavedRecords = unsavedManagedObjects.flatMap({ $0.cloudKitRecord })
         
         cloudKitManager.saveRecords(unsavedRecords, perRecordCompletion: { (record, error) in
@@ -210,13 +212,14 @@ class PostController {
         }
     }
     
+    
     // MARK: - Subscriptions
     
     func subscribeToNewPosts(completion: ((success: Bool, error: NSError?) -> Void)?) {
         
         let predicate = NSPredicate(value: true)
         
-        cloudKitManager.subscribe("Post", predicate: predicate, subscriptionID: "allPosts", contentAvailable: true, options: .FiresOnRecordCreation) { (subscription, error) in
+        cloudKitManager.subscribe(Post.typeKey, predicate: predicate, subscriptionID: "allPosts", contentAvailable: true, options: .FiresOnRecordCreation) { (subscription, error) in
             
             if let completion = completion {
                 
@@ -244,7 +247,7 @@ class PostController {
         
         let predicate = NSPredicate(format: "post == %@", argumentArray: [recordID])
         
-        cloudKitManager.subscribe("Comment", predicate: predicate, subscriptionID: post.recordName, contentAvailable: true, alertBody: alertBody, desiredKeys: ["text", "post"], options: .FiresOnRecordCreation) { (subscription, error) in
+        cloudKitManager.subscribe(Comment.typeKey, predicate: predicate, subscriptionID: post.recordName, contentAvailable: true, alertBody: alertBody, desiredKeys: [Comment.textKey, Comment.postKey], options: .FiresOnRecordCreation) { (subscription, error) in
             
             if let completion = completion {
                 

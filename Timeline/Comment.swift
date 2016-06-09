@@ -13,13 +13,14 @@ import CloudKit
 
 class Comment: SyncableObject, SearchableRecord, CloudKitManagedObject {
 
-    private let textKey = "text"
-    private let postKey = "post"
-    private let timestampKey = "timestamp"
+    static let typeKey = "Comment"
+    static let textKey = "text"
+    static let postKey = "post"
+    static let timestampKey = "timestamp"
     
     convenience init(post: Post, text: String, timestamp: NSDate = NSDate(), context: NSManagedObjectContext = Stack.sharedStack.managedObjectContext) {
         
-        guard let entity = NSEntityDescription.entityForName("Comment", inManagedObjectContext: context) else { fatalError("Error: Core Data failed to create entity from entity description.") }
+        guard let entity = NSEntityDescription.entityForName(Comment.typeKey, inManagedObjectContext: context) else { fatalError("Error: Core Data failed to create entity from entity description.") }
         
         self.init(entity: entity, insertIntoManagedObjectContext: context)
         
@@ -38,31 +39,31 @@ class Comment: SyncableObject, SearchableRecord, CloudKitManagedObject {
     
     // MARK: - CloudKitManagedObject
     
-    var recordType: String = "Comment"
+    var recordType: String = Comment.typeKey
     
     var cloudKitRecord: CKRecord? {
         
         let recordID = CKRecordID(recordName: recordName)
         let record = CKRecord(recordType: recordType, recordID: recordID)
         
-        record[timestampKey] = timestamp
-        record[textKey] = text
+        record[Comment.timestampKey] = timestamp
+        record[Comment.textKey] = text
         
         guard let post = post,
             let postRecord = post.cloudKitRecord else { fatalError("Comment does not have a Post relationship") }
         
-        record[postKey] = CKReference(record: postRecord, action: .DeleteSelf)
+        record[Comment.postKey] = CKReference(record: postRecord, action: .DeleteSelf)
         
         return record
     }
     
-    convenience init?(record: CKRecord, context: NSManagedObjectContext = Stack.sharedStack.managedObjectContext) {
+    convenience required init?(record: CKRecord, context: NSManagedObjectContext = Stack.sharedStack.managedObjectContext) {
         
         guard let timestamp = record.creationDate,
-            let text = record["text"] as? String,
-            let postReference = record["post"] as? CKReference else { return nil }
+            let text = record[Comment.textKey] as? String,
+            let postReference = record[Comment.postKey] as? CKReference else { return nil }
         
-        guard let entity = NSEntityDescription.entityForName("Comment", inManagedObjectContext: context) else { fatalError("Error: Core Data failed to create entity from entity description.") }
+        guard let entity = NSEntityDescription.entityForName(Comment.typeKey, inManagedObjectContext: context) else { fatalError("Error: Core Data failed to create entity from entity description.") }
         
         self.init(entity: entity, insertIntoManagedObjectContext: context)
         

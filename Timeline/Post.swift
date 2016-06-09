@@ -14,8 +14,9 @@ import CloudKit
 
 class Post: SyncableObject, SearchableRecord, CloudKitManagedObject {
     
-    private let photoDataKey = "photoData"
-    private let timestampKey = "timestamp"
+    static let typeKey = "Post"
+    static let photoDataKey = "photoData"
+    static let timestampKey = "timestamp"
     
     convenience init(photo: NSData, timestamp: NSDate = NSDate(), context: NSManagedObjectContext = Stack.sharedStack.managedObjectContext) {
         
@@ -37,7 +38,7 @@ class Post: SyncableObject, SearchableRecord, CloudKitManagedObject {
     
     lazy var temporaryPhotoURL: NSURL = {
         
-        // must write to temporary directory to be able to pass image url to CKAsset
+        // Must write to temporary directory to be able to pass image file path url to CKAsset
         
         let temporaryDirectory = NSTemporaryDirectory()
         let temporaryDirectoryURL = NSURL(fileURLWithPath: temporaryDirectory)
@@ -58,23 +59,23 @@ class Post: SyncableObject, SearchableRecord, CloudKitManagedObject {
     
     // MARK: - CloudKitManagedObject
     
-    var recordType: String = "Post"
+    var recordType: String = Post.typeKey
     
     var cloudKitRecord: CKRecord? {
         
         let recordID = CKRecordID(recordName: recordName)
         let record = CKRecord(recordType: recordType, recordID: recordID)
         
-        record[timestampKey] = timestamp
-        record[photoDataKey] = CKAsset(fileURL: temporaryPhotoURL)
+        record[Post.timestampKey] = timestamp
+        record[Post.photoDataKey] = CKAsset(fileURL: temporaryPhotoURL)
         
         return record
     }
     
-    convenience init?(record: CKRecord, context: NSManagedObjectContext = Stack.sharedStack.managedObjectContext) {
+    convenience required init?(record: CKRecord, context: NSManagedObjectContext = Stack.sharedStack.managedObjectContext) {
         
         guard let timestamp = record.creationDate,
-            let photoData = record["photoData"] as? CKAsset else { return nil }
+            let photoData = record[Post.photoDataKey] as? CKAsset else { return nil }
         
         guard let entity = NSEntityDescription.entityForName("Post", inManagedObjectContext: context) else { fatalError("Error: Core Data failed to create entity from entity description.") }
         
