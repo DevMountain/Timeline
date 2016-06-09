@@ -24,7 +24,6 @@ class CloudKitManager {
     init() {
         
         checkCloudKitAvailability()
-        requestDiscoverabilityPermission()
     }
     
     // MARK: - User Info Discovery
@@ -48,7 +47,7 @@ class CloudKitManager {
         }
     }
     
-    func fetchUsernameFromRecordID(recordID: CKRecordID, completion: ((firstName: String?, lastName: String?) -> Void)?) {
+    func fetchUsernameFromRecordID(recordID: CKRecordID, completion: ((givenName: String?, familyName: String?) -> Void)?) {
         
         let operation = CKDiscoverUserInfosOperation(emailAddresses: nil, userRecordIDs: [recordID])
         
@@ -58,9 +57,9 @@ class CloudKitManager {
                 let userInfo = userRecordIDsToUserInfos[recordID],
                 let completion = completion {
                 
-                completion(firstName: userInfo.displayContact?.givenName, lastName: userInfo.displayContact?.familyName)
+                completion(givenName: userInfo.displayContact?.givenName, familyName: userInfo.displayContact?.familyName)
             } else if let completion = completion {
-                completion(firstName: nil, lastName: nil)
+                completion(givenName: nil, familyName: nil)
             }
         }
         
@@ -391,7 +390,6 @@ class CloudKitManager {
                 errorText += "Unable to verify User Discoverability permissions. You may have a connectivity issue. Please try again."
             default:
                 break
-                
             }
             
             displayCloudKitPermissionsNotGrantedError(errorText)
