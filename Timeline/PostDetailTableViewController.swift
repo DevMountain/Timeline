@@ -90,7 +90,7 @@ class PostDetailTableViewController: UITableViewController, NSFetchedResultsCont
         if let comment = fetchedResultsController?.objectAtIndexPath(indexPath) as? Comment {
             
             cell.textLabel?.text = comment.text
-            cell.detailTextLabel?.text = comment.recordName
+            cell.detailTextLabel?.text = comment.cloudKitRecordID?.recordName
         }
         
         return cell
