@@ -2,12 +2,17 @@
 
 ## Features
 
-* View timeline of friends' posts
-* Follow user
+* View timeline of posts
 * Search all posts by user or hashtag
 * Comment on photos
 * Push notification for comments on photos
-* Push notifications for new followers
+
+## Black Diamond Features
+
+* Follow users
+* User profile page
+* Report explicit content
+* Add better support for portrait photos
 
 Black Diamonds:
 
@@ -28,19 +33,20 @@ Black Diamonds:
 * Add post view
     * Tap to present UIPhotoPickerController
     * Add a Caption
-* Account Setup view
+
+<!-- * Account Setup view
     * TableViewController
     * Appears when I pull a current user's record with no 'display name' property
-    * Add photo and display name
+    * Add photo and display name -->
 
 ## Model Objects
 
-User
+<!-- User
 - init(record: CKUserRecord)
 - recordValue -> CKUserRecord
 - displayName: String
 - image: UIImage
-- friends: [User]
+- friends: [User] -->
 
 Post
 - init(record: CKRecord)
@@ -60,18 +66,27 @@ Comment
 
 ## Controllers and Helpers
 
+CoreDataManager
+- save() # take insertedObjects and call CloudKitManager.saveChangesToCloudKit(insertedManagedObjectIDs) to save updates
+- fetchCloudKitManagedObjects(managedObjectIDs: [NSManagedObjectID]) -> [CloudKitManagedObject]
+
 CloudKitManager
+
+Make each NSOperation subclass a function on the Manager
+
 - publicDatabase
-- fetchCurrentUser(completion: (user: User) -> Void)
+- init # call accountStatusWithCompletionHandler to check for logged in user, respond to success or failure
+- saveChangedToCloudKit(insertedObjects: [NSManagedObjectID])
 - fetchRecord(query: CKQuery)
 - saveRecord
-- createFollowerSubscription
+- createFollowSubscription
 - createCommentsSubscription
+- fetchCurrentUser(completion: (user: User) -> Void)
 
-UserController
+<!-- UserController
 - currentUser # lazy var, loaded from fetchCurentUser
 - updateCurrentUser(displayName: String, image: UIImage, completion: () -> Void)
-- followUser(user: User, completion: () -> Void)
+- followUser(user: User, completion: () -> Void) -->
 
 PostController
 - createPost(image: UIImage, caption: String) # or (url: NSURL, caption: String) if we just want the image capture to save the photo
