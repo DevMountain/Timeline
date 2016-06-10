@@ -15,6 +15,8 @@ class PostController {
     
     let cloudKitManager: CloudKitManager
     
+    var isSyncing: Bool = false
+    
     var posts: [Post] {
         
         let fetchRequest = NSFetchRequest(entityName: Post.typeKey)
@@ -137,15 +139,27 @@ class PostController {
     
     func fullSync(completion: (() -> Void)? = nil) {
         
-        pushChangesToCloudKit { (success) in
+        if isSyncing {
+            if let completion = completion {
+                completion()
+            }
             
-            self.fetchNewRecords(Post.typeKey) {
+        } else {
+            isSyncing = true
+            
+            pushChangesToCloudKit { (success) in
                 
-                self.fetchNewRecords(Comment.typeKey, completion: nil)
-                
-                if let completion = completion {
+                self.fetchNewRecords(Post.typeKey) {
                     
-                    completion()
+                    self.fetchNewRecords(Comment.typeKey, completion: { 
+                        
+                        self.isSyncing = false
+                        
+                        if let completion = completion {
+
+                            completion()
+                        }
+                    })
                 }
             }
         }
