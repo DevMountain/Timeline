@@ -198,6 +198,8 @@ Add and implement search functionality to the search view. Implement the Image P
 
 ### Search Controller
 
+Build functionality that will allow the user to search for posts with comments that have specific text in them. For example, if a user creates a `Post` with a photo of a waterfall, and there are comments that mention the waterfall, the user should be able to search the Timeline view for the term 'water' and filter down to that post (and any others with water in the comments).
+
 #### Update the Model
 
 Add a `SearchableRecord` protocol that requires a `matchesSearchTerm` function. Update the `Post` and `Comment` objects to conform to the protocol.
@@ -213,50 +215,34 @@ Consider how each model object will match to a specific search term. What search
 
 Use a Playground to test your `SearchableRecord` and `matchesSearchTerm` functionality and understand what you are implementing.
 
-_Note: Not final. Expect the Search API and instructions to change._
+#### Search Results Controller
 
-#### Build Search Scene
+Search controllers typically have two views: a list view, and a search result view that displays the filtered results. The list view holds the search bar. When the user begins typing in the search bar, the `UISSearchController` presents a search results view. Your list view must conform to the `SearchResultsUpdating` protocol function, which implements updates to the results view.
 
-Implement the Search Table View Controller and the Search Results Table View Controller. You will use the same cell that you built in the Timeline scene. Use the same  `PostTableViewCell` you built for the Timeline scene.
-
-Search controllers typically have two views: a list view, and a search result view that displays the filtered results. You must create a 'search results view' that is overlayed on top of your list view when the search bar is actively editing, and then your main list view handles a `SearchResultsUpdating` protocol function that updates the results view.
-
-Understanding Search Controllers requires you to understand that the main view controller can (and must) implement methods that handle what is being displayed on another view controller. The results controller must also implement a way to communicate back to the main list view controller to notify it of events. This two way relationship with communication happening in both directions.
-
-##### Search Results Controller
+Understanding Search Controllers requires you to understand that the main view controller can (and must) implement methods that handle what is being displayed on another view controller. The results controller must also implement a way to communicate back to the main list view controller to notify it of events. This is a two way relationship with communication happening in both directions.
 
 1. Create a `SearchResultsTableViewController` subclass of `UITableViewController` and assign it to the scene in Interface Builder.
 2. Add a `resultsArray` property that contains a list of `SearchableRecords`
 3. Implement the `UITableViewDatasource` functions to display the search results.   
     * note: For now you will only display `Post` objects as a result of a search. Use the `PostTableViewCell` to do so.
 
-##### Search Scene
+#### Update Timeline Scene
 
-1. Implement the scene in Interface Builder by updating the prototype cell with an image view that fills the cell. Use the Timeline scene's cell as the blueprint for constraints, views, height, etc.
-2. Assign the cell to your `PostTableViewCell` class.
-    * note: As of Xcode 7, you must set up the views for the cell for each separate table view in the Storyboard, but you can assign multiple views to the same class, and have outlets or actions triggered from multiple instances.
-3. Add a `posts` array as a property on the `SearchTableViewController`.
-    * note: You will populate this array with remote search results. 
-4. Update the `viewDidLoad` function to set the `posts` array to a copy of the `fetchedObjects` from the Fetched Results Controller.
-    * note: To build prototype search functionality for this scene, you will use the local posts as the initial datasource. 
-5. Implement the `UITableViewDataSource` functions using the `posts` array.
-6. Add a function `setUpSearchController` that captures the `resultsController` from the Storyboard, instantiates the `UISearchController`, sets the `searchResultsUpdater` to self, and adds the `searchController`'s `searchBar` as the table's header view.
-7. Implement the `UISearchResultsUpdating` protocol `updateSearchResultsforSearchController` function. The function should capture the `resultsViewController` and the search text from the `searchController`'s `searchBar`, filter the local `posts` array for posts that match, assign the filtered results to the `resultsViewController`'s `resultsArray`, and reload the `resultsViewController`'s `tableView`.
+1. Add a function `setUpSearchController` that captures the `resultsController` from the Storyboard, instantiates the `UISearchController`, sets the `searchResultsUpdater` to self, and adds the `searchController`'s `searchBar` as the table's header view.
+2. Implement the `UISearchResultsUpdating` protocol `updateSearchResultsforSearchController` function. The function should capture the `resultsViewController` and the search text from the `searchController`'s `searchBar`, filter the local `posts` array for posts that match, assign the filtered results to the `resultsViewController`'s `resultsArray`, and reload the `resultsViewController`'s `tableView`.
     * note: Consider the communication that is happening here between two separate view controllers. Be sure that you understand this relationship.
 
 ##### Segue to Post Detail View
 
-Remember that even though the tableviews are displaying similar cells and model objects, you are working with separate view controllers with separate cells and instances of table views. 
+Remember that even though the Timeline view and the Search Results view are displaying similar cells and model objects, you are working with separate view controllers with separate cells and instances of table views. 
 
-The segue from a `Post` should take the user to the Post Detail scene, regardless of whether that is from the Search Scene or the Search Results scene.
+The segue from a `Post` should take the user to the Post Detail scene, regardless of whether that is from the Timeline view or the Search Results view.
 
 To do so, implement the `UITableViewDelegate` `didSelectRow` function on the Search Results scene to manually call the `toPostDetail` segue _from the Search scene_.
 
-1. Implement a segue on the Search Scene to check for the segue identifier, capture the detail view controller, index path, selected post, and assign the selected post to the detail view controller.
-    * note: Should be similar to the segue used on the Timeline scene
-2. Adopt the `UITableViewDelegate` on the Search Results scene and add the `didSelectRowAtIndexPath` function. Implement the function by capturing the sending cell and telling the Search Result scene's `presentingViewController` to `performSegueWithIdentifier` and send the selected cell so that the Search scene can get the selected `Post`.
-    * note: Every view controller class has an optional `presentingViewController` reference to the view controller that presented it. In this case, the presenting view controller of the Search Results scene is the Search scene. So this step will manually call the `performSegueWithIdentifier` on the Search scene.
-3. Update the `prepareForSegue` function on the Search Scene to capture and segue to the Post Detail scene with the correct post. Try to do so without looking at the solution code.
+1. Adopt the `UITableViewDelegate` on the Search Results scene and add the `didSelectRowAtIndexPath` function. Implement the function by capturing the sending cell and telling the Search Result scene's `presentingViewController` to `performSegueWithIdentifier` and send the selected cell so that the Search scene can get the selected `Post`.
+    * note: Every view controller class has an optional `presentingViewController` reference to the view controller that presented it. In this case, the presenting view controller of the Search Results scene is the Timeline scene. So this step will manually call the `performSegueWithIdentifier` on the Search scene.
+2. Update the `prepareForSegue` function on the Search Scene to capture and segue to the Post Detail scene with the correct post. Try to do so without looking at the solution code.
     * note: You must check if the `tableView` can get an `indexPath` for the sender. If it can, that means that the cell was from the Search scene's `tableView`. If it can't, that means the cell is from the Search Result scene's `tableView` and that the user tapped a search result. If that is the case, capture the `Post` from the `resultsArray` on the `searchResultscontroller`.
     * note: You can access the `searchResultsController` by calling `(searchController.searchResultsController as? SearchResultsTableViewController)`
 
@@ -271,14 +257,6 @@ Implement the Image Picker Controller in place of the prototype functionality yo
 
 1. Update the 'Select Image' IBAction to present a `UIImagePickerController`. Give the user the option to select from their Photo Library or from the device's camera if their device has one. 
 2. Implement the `UIImagePickerControllerDelegate` function to capture the selected image and assign it to the image view.
-
-#### Account Setup Scene
-
-Implement the Image Picker Controller in place of the prototype functionality you built previously.
-
-1. Update the 'Select Image' IBAction to present a `UIImagePickerController`. Give the user the option to select from their Photo Library or from the device's camera if their device has one. 
-2. Implement the `UIImagePickerControllerDelegate` function to capture the selected image and assign it to the image view.
-
 
 ### Reduce Code Repetition
 
@@ -326,11 +304,20 @@ You have declared a protocol, adopted the protocol, but you now must assign the 
 1. Assign segue identifiers to the embed segues in the Storyboard file
 2. Update the `prepareForSegue` function in the Account Setup scene to check for the segue identifier, capture the `destinationViewController` as a `PhotoSelectViewController`, and assign `self` as the child view controller's delegate.
 
+### Post Detail View Controller Share Sheet
+
+Use the `UIActivityController` class to present a share sheet from the Post Detail view. Share the image and the text of the first comment.
+
+1. Add an IBAction from the Share button in your `PostDetailTableViewController`.
+2. Initialize a `UIActivityController` with the `Post`'s image and the text of the first comment as the shareable objects.
+3. Present the `UIActivityController`.
+
 ### Black Diamonds:
 
 * Some apps will save photos taken or processed in their app in a custom Album in the user's Camera Roll. Add this feature.
 * Review the README instructions and solution code for clarity and functionality, submit a GitHub pull request with suggested changes.
 * Provide feedback on the expectations for Part One to a mentor or instructor.
+
 
 ## Part Three - Basic CloudKit: CloudKitManager, CloudKitManagedObject, Manual Sync
 
