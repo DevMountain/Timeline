@@ -38,7 +38,7 @@ class PostListTableViewController: UITableViewController, NSFetchedResultsContro
     func requestFullSync() {
         
         UIApplication.sharedApplication().networkActivityIndicatorVisible = true
-                
+        
         PostController.sharedController.fullSync {
             
             UIApplication.sharedApplication().networkActivityIndicatorVisible = false
@@ -105,7 +105,7 @@ class PostListTableViewController: UITableViewController, NSFetchedResultsContro
         switch type {
         case .Delete:
             guard let indexPath = indexPath else {return}
-            tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Fade)
+            tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Automatic)
         case .Insert:
             guard let newIndexPath = newIndexPath else {return}
             tableView.insertRowsAtIndexPaths([newIndexPath], withRowAnimation: .Automatic)

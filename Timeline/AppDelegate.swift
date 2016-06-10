@@ -21,9 +21,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         UIApplication.sharedApplication().registerUserNotificationSettings(notificationSettings)
         UIApplication.sharedApplication().registerForRemoteNotifications()
         
-        // Initialize Post Controller for a full sync
-        let _ = PostController.sharedController
-        
         return true
     }
     

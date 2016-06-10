@@ -12,7 +12,7 @@ import CloudKit
 
 @objc protocol CloudKitManagedObject {
     
-    var timestamp: NSDate? { get set }
+    var timestamp: NSDate { get set }
     var recordIDData: NSData? { get set }
     var recordName: String { get set }
     var recordType: String { get }
