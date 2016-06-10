@@ -9,10 +9,12 @@
 
 ## Black Diamond Features
 
+* Better system for asking for permissions
 * Follow users
 * User profile page
 * Report explicit content
 * Add better support for portrait photos
+
 
 Black Diamonds:
 
