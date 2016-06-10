@@ -8,15 +8,14 @@
 
 import Foundation
 import UIKit
-import CoreData
 import CloudKit
 
+private let CreatorUserRecordIDKey = "creatorUserRecordID"
+private let LastModifiedUserRecordIDKey = "creatorUserRecordID"
+private let CreationDateKey = "creationDate"
+private let ModificationDateKey = "modificationDate"
+
 class CloudKitManager {
-    
-    private let CreatorUserRecordIDKey = "creatorUserRecordID"
-    private let LastModifiedUserRecordIDKey = "creatorUserRecordID"
-    private let CreationDateKey = "creationDate"
-    private let ModificationDateKey = "modificationDate"
     
     let publicDatabase = CKContainer.defaultContainer().publicCloudDatabase
     let privateDatabase = CKContainer.defaultContainer().privateCloudDatabase
@@ -136,7 +135,7 @@ class CloudKitManager {
             
             if let record = record {
                 
-                let predicate = NSPredicate(format: "%K == %@", argumentArray: ["creatorUserRecordID", record.recordID])
+                let predicate = NSPredicate(format: "%K == %@", argumentArray: [CreatorUserRecordIDKey, record.recordID])
                 
                 self.fetchRecordsWithType(type, predicate: predicate, recordFetchedBlock: nil, completion: { (records, error) in
                     
@@ -146,10 +145,6 @@ class CloudKitManager {
                 })
             }
         }
-    }
-    
-    func fetchRecordsNearLocation(type: String, location: CLLocation, completion: ((records: [CKRecord]?, error: NSError?) -> Void)?) {
-        
     }
     
     func fetchRecordsFromDateRange(type: String, recordType: String, fromDate: NSDate, toDate: NSDate, completion: ((records: [CKRecord]?, error: NSError?) -> Void)?) {
@@ -184,9 +179,6 @@ class CloudKitManager {
         
         let operation = CKModifyRecordsOperation(recordsToSave: nil, recordIDsToDelete: recordIDs)
         operation.savePolicy = .IfServerRecordUnchanged
-        operation.queuePriority = .High
-        
-        operation.qualityOfService = .UserInitiated
         
         operation.modifyRecordsCompletionBlock = { (records, recordIDs, error) -> Void in
             

@@ -43,9 +43,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             
             switch record.recordType {
                 
-            case "Post":
+            case Post.typeKey:
                 let _ = Post(record: record)
-            case "Comment":
+            case Comment.typeKey:
                 let _ = Comment(record: record)
             default:
                 return

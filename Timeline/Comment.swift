@@ -72,11 +72,8 @@ class Comment: SyncableObject, SearchableRecord, CloudKitManagedObject {
         self.recordIDData = NSKeyedArchiver.archivedDataWithRootObject(record.recordID)
         self.recordName = record.recordID.recordName
         
-        self.post = PostController.sharedController.postWithName(postReference.recordID.recordName)
-    }
-    
-    func updateWithRecord(record: CKRecord) {
-        
-        self.recordIDData = NSKeyedArchiver.archivedDataWithRootObject(record.recordID)
+        if let post = PostController.sharedController.postWithName(postReference.recordID.recordName) {
+            self.post = post
+        }
     }
 }

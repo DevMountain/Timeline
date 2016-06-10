@@ -20,7 +20,7 @@ class Post: SyncableObject, SearchableRecord, CloudKitManagedObject {
     
     convenience init(photo: NSData, timestamp: NSDate = NSDate(), context: NSManagedObjectContext = Stack.sharedStack.managedObjectContext) {
         
-        guard let entity = NSEntityDescription.entityForName("Post", inManagedObjectContext: context) else { fatalError("Error: Core Data failed to create entity from entity description.") }
+        guard let entity = NSEntityDescription.entityForName(Post.typeKey, inManagedObjectContext: context) else { fatalError("Error: Core Data failed to create entity from entity description.") }
         
         self.init(entity: entity, insertIntoManagedObjectContext: context)
         
@@ -42,7 +42,7 @@ class Post: SyncableObject, SearchableRecord, CloudKitManagedObject {
         
         let temporaryDirectory = NSTemporaryDirectory()
         let temporaryDirectoryURL = NSURL(fileURLWithPath: temporaryDirectory)
-        let fileURL = temporaryDirectoryURL.URLByAppendingPathComponent(NSUUID().UUIDString).URLByAppendingPathExtension("jpg")
+        let fileURL = temporaryDirectoryURL.URLByAppendingPathComponent(self.recordName).URLByAppendingPathExtension("jpg")
         
         self.photoData?.writeToURL(fileURL, atomically: true)
         
@@ -77,7 +77,7 @@ class Post: SyncableObject, SearchableRecord, CloudKitManagedObject {
         guard let timestamp = record.creationDate,
             let photoData = record[Post.photoDataKey] as? CKAsset else { return nil }
         
-        guard let entity = NSEntityDescription.entityForName("Post", inManagedObjectContext: context) else { fatalError("Error: Core Data failed to create entity from entity description.") }
+        guard let entity = NSEntityDescription.entityForName(Post.typeKey, inManagedObjectContext: context) else { fatalError("Error: Core Data failed to create entity from entity description.") }
         
         self.init(entity: entity, insertIntoManagedObjectContext: context)
 

@@ -21,6 +21,8 @@ class PostListTableViewController: UITableViewController, NSFetchedResultsContro
         setUpFetchedResultsController()
         
         setUpSearchController()
+        
+        requestFullSync()
 
         // hides search bar
         if tableView.numberOfRowsInSection(0) > 0 {
@@ -30,9 +32,17 @@ class PostListTableViewController: UITableViewController, NSFetchedResultsContro
     
     @IBAction func refreshControlActivated(sender: UIRefreshControl) {
         
-        PostController.sharedController.fullSync { 
+        requestFullSync()
+    }
+    
+    func requestFullSync() {
         
-            sender.endRefreshing()
+        UIApplication.sharedApplication().networkActivityIndicatorVisible = true
+                
+        PostController.sharedController.fullSync {
+            
+            UIApplication.sharedApplication().networkActivityIndicatorVisible = false
+            self.refreshControl?.endRefreshing()
         }
     }
     
