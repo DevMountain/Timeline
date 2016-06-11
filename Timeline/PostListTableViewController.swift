@@ -39,7 +39,7 @@ class PostListTableViewController: UITableViewController, NSFetchedResultsContro
         
         UIApplication.sharedApplication().networkActivityIndicatorVisible = true
         
-        PostController.sharedController.fullSync {
+        PostController.sharedController.performFullSync {
             
             UIApplication.sharedApplication().networkActivityIndicatorVisible = false
             self.refreshControl?.endRefreshing()

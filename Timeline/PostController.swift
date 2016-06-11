@@ -32,7 +32,7 @@ class PostController {
         
         self.cloudKitManager = CloudKitManager()
         
-        fullSync()
+        performFullSync()
         
         subscribeToNewPosts { (success, error) in
             
@@ -137,7 +137,7 @@ class PostController {
     
     // MARK: - Sync
     
-    func fullSync(completion: (() -> Void)? = nil) {
+    func performFullSync(completion: (() -> Void)? = nil) {
         
         if isSyncing {
             if let completion = completion {
