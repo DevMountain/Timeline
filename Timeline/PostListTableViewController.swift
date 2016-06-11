@@ -32,17 +32,22 @@ class PostListTableViewController: UITableViewController, NSFetchedResultsContro
     
     @IBAction func refreshControlActivated(sender: UIRefreshControl) {
         
-        requestFullSync()
+        requestFullSync { 
+            self.refreshControl?.endRefreshing()
+        }
     }
     
-    func requestFullSync() {
+    func requestFullSync(completion: (() -> Void)? = nil) {
         
         UIApplication.sharedApplication().networkActivityIndicatorVisible = true
         
         PostController.sharedController.performFullSync {
             
             UIApplication.sharedApplication().networkActivityIndicatorVisible = false
-            self.refreshControl?.endRefreshing()
+            
+            if let completion = completion {
+                completion()
+            }
         }
     }
     
