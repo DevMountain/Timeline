@@ -194,7 +194,7 @@ Use the app and polish any rough edges. Check table view cell selection. Check t
 * use the image picker controller and activity controller
 * use container views to abstract shared functionality into a single view controller
 
-Add and implement search functionality to the search view. Implement the Image Picker Controller on the Account Setup scene and Add Post scene. Decrease the amount of repeated code by refactoring the similar functionality in the Account Setup and Add Post scenes into a child view controller that is used in both classes.
+Add and implement search functionality to the search view. Implement the Image Picker Controller on the Add Post scene. Decrease the amount of repeated code by refactoring the similar functionality in the Add Post scenes into a child view controller that is used in both classes.
 
 ### Search Controller
 
@@ -251,7 +251,7 @@ Try to work through the Search segue without looking at the solution code. Under
 
 ### Image Picker Controller
 
-#### Add Post Scene
+#### Photo Select Child Scene
 
 Implement the Image Picker Controller in place of the prototype functionality you built previously.
 
@@ -260,7 +260,7 @@ Implement the Image Picker Controller in place of the prototype functionality yo
 
 ### Reduce Code Repetition
 
-Refactor the photo selection functionality from the Account Setup and Add Post scenes into a child view controller. 
+Refactor the photo selection functionality from the Add Post scene into a child view controller. 
 
 Child view controllers control views that are a subview of another view controller. It is a great way to encapsulate functionality into one class that can be reused in multiple places. This is a great tool for any time you want a similar view to be present in multiple places.
 
@@ -268,19 +268,19 @@ In this instance, you will put 'Select Photo' button, the image view, and the co
 
 #### Container View and Embed Segues
 
-Use a container view to embed a child view controller into the Account Setup scene and Add Post scene.
+Use a container view to embed a child view controller into the Add Post scene.
 
 >Container View defines a region within a view controller's view subgraph that can include a child view controller. Create an embed segue from the container view to the child view controller in the storyboard.
 
-1. Open `Main.storyboard` to your Account Setup scene.
+1. Open `Main.storyboard` to your Add Post scene.
 2. Add a new section to the static table view to build the Container View to embed the child view controller.
 3. Search for Container View in the Object Library and add it to the newly created table view cell.
     * note: The Container View object will come with a view controller scene. You can use the included scene, or replace it with another scene. For now, use the included scene.
 4. Set up contraints so that the Container View fills the entire cell.
 5. Move or copy the Image View and 'Select Photo' button to the container view controller.
 6. Create a new `PhotoSelectViewController` file as a subclass of `UIViewController` and assign the class to the scene in Interface Builder.
-7. Create the necessary IBOutlets and IBActions, and migrate your Photo Picker code from the Account Setup view controller class. Delete the old code from the Account Setup view controller class.
-8. Repeat the above steps for the Add Post scene. Instead of keeping the included child view controller from the Container View object, delete it, and add an 'Embed' segue from the container view to the scene you set up for the Account Setup scene.
+7. Create the necessary IBOutlets and IBActions, and migrate your Photo Picker code from the Add Post view controller class. Delete the old code from the Add Post view controller class.
+8. Repeat the above steps for the Add Post scene. Instead of keeping the included child view controller from the Container View object, delete it, and add an 'Embed' segue from the container view to the scene you set up for the Add Post scene.
 
 You now have two views that reference the same scene as a child view controller. This scene and accompanying class can now be used in both places, eliminating the need for code duplication.
 
@@ -292,9 +292,7 @@ Your child view controller needs a way to communicate events to it's parent view
     * note: This function will tell the assigned delegate (the parent view controller, in this example) what image the user selected.
 2. Add a weak optional delegate property.
 3. Call the delegate function in the `didFinishPickingMediaWithInfo` function, passing the selected media to the delegate.
-4. Adopt the `PhotoSelectViewControllerDelegate` protocol in the Account Setup class file, implement the `photoSelectViewControllerSelectedImage` function to capture a reference to the selected image.
-    * note: In the Account Setup scene, you will use that captured reference to update the user.
-5. Adopt the `PhotoSelectViewControllerDelegate` protocol in the Add Post class file, implement the `photoSelectViewControllerSelectedImage` function to capture a reference to the selected image.
+4. Adopt the `PhotoSelectViewControllerDelegate` protocol in the Add Post class file, implement the `photoSelectViewControllerSelectedImage` function to capture a reference to the selected image.
     * note: In the Add Post scene, you will use that captured reference to create a new post.
 
 Note the use of the delegate pattern. You have encapsulated the Photo Selection workflow in one class, but by implementing the delegate pattern,  each parent view controller can implement it's own response to when a photo was selected. 
@@ -302,7 +300,7 @@ Note the use of the delegate pattern. You have encapsulated the Photo Selection 
 You have declared a protocol, adopted the protocol, but you now must assign the delegate property on the instance of the child view controller so that the `PhotoSelectViewController` can communicate with it's parent view controller. This is done by using the embed segue, which is called when the Container View is initialized from the Storyboard, which occurs when the view loads.
 
 1. Assign segue identifiers to the embed segues in the Storyboard file
-2. Update the `prepareForSegue` function in the Account Setup scene to check for the segue identifier, capture the `destinationViewController` as a `PhotoSelectViewController`, and assign `self` as the child view controller's delegate.
+2. Update the `prepareForSegue` function in the Add Post scene to check for the segue identifier, capture the `destinationViewController` as a `PhotoSelectViewController`, and assign `self` as the child view controller's delegate.
 
 ### Post Detail View Controller Share Sheet
 
