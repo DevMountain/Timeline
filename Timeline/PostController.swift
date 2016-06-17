@@ -287,10 +287,9 @@ class PostController {
     
     func togglePostCommentSubscription(post: Post, completion: ((success: Bool, isSubscribed: Bool, error: NSError?) -> Void)?) {
         
-        cloudKitManager.fetchSubscriptions { (subscriptions, error) in
+        cloudKitManager.fetchSubscription(post.recordName) { (subscription, error) in
             
-            if subscriptions?.filter({ $0.subscriptionID == post.recordName }).first != nil {
-                
+            if subscription != nil {
                 self.removeSubscriptionToPostComments(post, completion: { (success, error) in
                     
                     if let completion = completion {
@@ -298,7 +297,6 @@ class PostController {
                     }
                 })
             } else {
-                
                 self.addSubscriptionToPostComments(post, alertBody: "Someone commented on a post you follow! 👍", completion: { (success, error) in
                     
                     if let completion = completion {

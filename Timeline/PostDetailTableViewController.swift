@@ -153,7 +153,6 @@ class PostDetailTableViewController: UITableViewController, NSFetchedResultsCont
     @IBAction func followPostButtonTapped(sender: AnyObject) {
         
         guard let post = post else { return }
-        
         PostController.sharedController.togglePostCommentSubscription(post) { (success, isSubscribed, error) in
             
             self.updateWithPost(post)
