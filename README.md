@@ -26,11 +26,11 @@ Students who complete this project independently are able to:
 * check CloudKit availability
 * save data to CloudKit
 * fetch data from CloudKit
+* query data from CloudKit
 * sync pulled CloudKit data to a local Core Data persistent store
 
 #### Part Four - Intermediate CloudKit: Subscriptions, Push Notifications, Automatic Sync
 
-* query data from CloudKit
 * use subscriptions to generate push notifications
 * use push notifications to run a push based sync engine
 
@@ -194,7 +194,7 @@ Use the app and polish any rough edges. Check table view cell selection. Check t
 * use the image picker controller and activity controller
 * use container views to abstract shared functionality into a single view controller
 
-Add and implement search functionality to the search view. Implement the Image Picker Controller on the Account Setup scene and Add Post scene. Decrease the amount of repeated code by refactoring the similar functionality in the Account Setup and Add Post scenes into a child view controller that is used in both classes.
+Add and implement search functionality to the search view. Implement the Image Picker Controller on the Add Post scene. Decrease the amount of repeated code by refactoring the similar functionality in the Add Post scenes into a child view controller that is used in both classes.
 
 ### Search Controller
 
@@ -251,7 +251,7 @@ Try to work through the Search segue without looking at the solution code. Under
 
 ### Image Picker Controller
 
-#### Add Post Scene
+#### Photo Select Child Scene
 
 Implement the Image Picker Controller in place of the prototype functionality you built previously.
 
@@ -260,7 +260,7 @@ Implement the Image Picker Controller in place of the prototype functionality yo
 
 ### Reduce Code Repetition
 
-Refactor the photo selection functionality from the Account Setup and Add Post scenes into a child view controller. 
+Refactor the photo selection functionality from the Add Post scene into a child view controller. 
 
 Child view controllers control views that are a subview of another view controller. It is a great way to encapsulate functionality into one class that can be reused in multiple places. This is a great tool for any time you want a similar view to be present in multiple places.
 
@@ -268,19 +268,19 @@ In this instance, you will put 'Select Photo' button, the image view, and the co
 
 #### Container View and Embed Segues
 
-Use a container view to embed a child view controller into the Account Setup scene and Add Post scene.
+Use a container view to embed a child view controller into the Add Post scene.
 
 >Container View defines a region within a view controller's view subgraph that can include a child view controller. Create an embed segue from the container view to the child view controller in the storyboard.
 
-1. Open `Main.storyboard` to your Account Setup scene.
+1. Open `Main.storyboard` to your Add Post scene.
 2. Add a new section to the static table view to build the Container View to embed the child view controller.
 3. Search for Container View in the Object Library and add it to the newly created table view cell.
     * note: The Container View object will come with a view controller scene. You can use the included scene, or replace it with another scene. For now, use the included scene.
 4. Set up contraints so that the Container View fills the entire cell.
 5. Move or copy the Image View and 'Select Photo' button to the container view controller.
 6. Create a new `PhotoSelectViewController` file as a subclass of `UIViewController` and assign the class to the scene in Interface Builder.
-7. Create the necessary IBOutlets and IBActions, and migrate your Photo Picker code from the Account Setup view controller class. Delete the old code from the Account Setup view controller class.
-8. Repeat the above steps for the Add Post scene. Instead of keeping the included child view controller from the Container View object, delete it, and add an 'Embed' segue from the container view to the scene you set up for the Account Setup scene.
+7. Create the necessary IBOutlets and IBActions, and migrate your Photo Picker code from the Add Post view controller class. Delete the old code from the Add Post view controller class.
+8. Repeat the above steps for the Add Post scene. Instead of keeping the included child view controller from the Container View object, delete it, and add an 'Embed' segue from the container view to the scene you set up for the Add Post scene.
 
 You now have two views that reference the same scene as a child view controller. This scene and accompanying class can now be used in both places, eliminating the need for code duplication.
 
@@ -292,9 +292,7 @@ Your child view controller needs a way to communicate events to it's parent view
     * note: This function will tell the assigned delegate (the parent view controller, in this example) what image the user selected.
 2. Add a weak optional delegate property.
 3. Call the delegate function in the `didFinishPickingMediaWithInfo` function, passing the selected media to the delegate.
-4. Adopt the `PhotoSelectViewControllerDelegate` protocol in the Account Setup class file, implement the `photoSelectViewControllerSelectedImage` function to capture a reference to the selected image.
-    * note: In the Account Setup scene, you will use that captured reference to update the user.
-5. Adopt the `PhotoSelectViewControllerDelegate` protocol in the Add Post class file, implement the `photoSelectViewControllerSelectedImage` function to capture a reference to the selected image.
+4. Adopt the `PhotoSelectViewControllerDelegate` protocol in the Add Post class file, implement the `photoSelectViewControllerSelectedImage` function to capture a reference to the selected image.
     * note: In the Add Post scene, you will use that captured reference to create a new post.
 
 Note the use of the delegate pattern. You have encapsulated the Photo Selection workflow in one class, but by implementing the delegate pattern,  each parent view controller can implement it's own response to when a photo was selected. 
@@ -302,7 +300,7 @@ Note the use of the delegate pattern. You have encapsulated the Photo Selection 
 You have declared a protocol, adopted the protocol, but you now must assign the delegate property on the instance of the child view controller so that the `PhotoSelectViewController` can communicate with it's parent view controller. This is done by using the embed segue, which is called when the Container View is initialized from the Storyboard, which occurs when the view loads.
 
 1. Assign segue identifiers to the embed segues in the Storyboard file
-2. Update the `prepareForSegue` function in the Account Setup scene to check for the segue identifier, capture the `destinationViewController` as a `PhotoSelectViewController`, and assign `self` as the child view controller's delegate.
+2. Update the `prepareForSegue` function in the Add Post scene to check for the segue identifier, capture the `destinationViewController` as a `PhotoSelectViewController`, and assign `self` as the child view controller's delegate.
 
 ### Post Detail View Controller Share Sheet
 
@@ -328,7 +326,7 @@ Use the `UIActivityController` class to present a share sheet from the Post Deta
 
 Following some of the best practices in the CloudKit documentation, add CloudKit to your project as a backend syncing engine for posts and comments. Check for CloudKit availability, save new posts and comments to CloudKit, fetch posts and comments from CloudKit and save them to Core Data.
 
-When you finish this part, the app will support syncing photos, posts, and comments from the device to CloudKit, and pulling new photos, posts, and comments from CloudKit. When new posts or comments are fetched from CloudKit, they will be serialized into Core Data objects, and the Fetched Results Controllers will automatically update the User Interface with the new data.
+When you finish this part, the app will support syncing photos, posts, and comments from the device to CloudKit, and pulling new photos, posts, and comments from CloudKit. When new posts or comments are fetched from CloudKit, they will be serialized into Core Data objects, and the Fetched Results Controllers will automatically update the user interface with the new data.
 
 You will implement push notifications, subscriptions, and basic automatic sync functionality in Part Four.
 
@@ -341,65 +339,65 @@ Add a CloudKit Manager that abstracts your CloudKit code into a single helper cl
 
 ```swift
 
-    internal let publicDatabase: CKDatabase
-    internal let privateDatabase: CKDatabase
+    let publicDatabase: CKDatabase
+    let privateDatabase: CKDatabase
 
-    internal init()
+    init()
     // check CloudKit availability
 
 
     // MARK: - User Info Discovery
 
-    internal func fetchLoggedInUserRecord(completion: ((record: CKRecord?, error: NSError?) -> Void)?)
+    func fetchLoggedInUserRecord(completion: ((record: CKRecord?, error: NSError?) -> Void)?)
 
-    internal func fetchUsernameFromRecordID(recordID: CKRecordID, completion: ((givenName: String?, familyName: String?) -> Void)?)
+    func fetchUsernameFromRecordID(recordID: CKRecordID, completion: ((givenName: String?, familyName: String?) -> Void)?)
 
-    internal func fetchAllDiscoverableUsers(completion: ((userInfoRecords: [CKDiscoveredUserInfo]?) -> Void)?)
+    func fetchAllDiscoverableUsers(completion: ((userInfoRecords: [CKDiscoveredUserInfo]?) -> Void)?)
 
 
     // MARK: - Fetch Records
 
-    internal func fetchRecordWithID(recordID: CKRecordID, completion: ((record: CKRecord?, error: NSError?) -> Void)?)
+    func fetchRecordWithID(recordID: CKRecordID, completion: ((record: CKRecord?, error: NSError?) -> Void)?)
 
-    internal func fetchRecordsWithType(type: String, predicate: NSPredicate = default, recordFetchedBlock: ((record: CKRecord) -> Void)?, completion: ((records: [CKRecord]?, error: NSError?) -> Void)?)
+    func fetchRecordsWithType(type: String, predicate: NSPredicate = default, recordFetchedBlock: ((record: CKRecord) -> Void)?, completion: ((records: [CKRecord]?, error: NSError?) -> Void)?)
 
-    internal func fetchCurrentUserRecords(type: String, completion: ((records: [CKRecord]?, error: NSError?) -> Void)?)
+    func fetchCurrentUserRecords(type: String, completion: ((records: [CKRecord]?, error: NSError?) -> Void)?)
 
-    internal func fetchRecordsFromDateRange(type: String, recordType: String, fromDate: NSDate, toDate: NSDate, completion: ((records: [CKRecord]?, error: NSError?) -> Void)?)
+    func fetchRecordsFromDateRange(type: String, recordType: String, fromDate: NSDate, toDate: NSDate, completion: ((records: [CKRecord]?, error: NSError?) -> Void)?)
 
 
     // MARK: - Delete Records
 
-    internal func deleteRecordWithID(recordID: CKRecordID, completion: ((recordID: CKRecordID?, error: NSError?) -> Void)?)
+    func deleteRecordWithID(recordID: CKRecordID, completion: ((recordID: CKRecordID?, error: NSError?) -> Void)?)
 
-    internal func deleteRecordsWithID(recordIDs: [CKRecordID], completion: ((records: [CKRecord]?, recordIDs: [CKRecordID]?, error: NSError?) -> Void)?)
+    func deleteRecordsWithID(recordIDs: [CKRecordID], completion: ((records: [CKRecord]?, recordIDs: [CKRecordID]?, error: NSError?) -> Void)?)
 
 
     // MARK: - Save Records
 
-    internal func saveRecords(records: [CKRecord], perRecordCompletion: ((record: CKRecord?, error: NSError?) -> Void)?, completion: ((records: [CKRecord]?, error: NSError?) -> Void)?)
+    func saveRecords(records: [CKRecord], perRecordCompletion: ((record: CKRecord?, error: NSError?) -> Void)?, completion: ((records: [CKRecord]?, error: NSError?) -> Void)?)
 
-    internal func saveRecord(record: CKRecord, completion: ((record: CKRecord?, error: NSError?) -> Void)?)
+    func saveRecord(record: CKRecord, completion: ((record: CKRecord?, error: NSError?) -> Void)?)
 
-    internal func modifyRecords(records: [CKRecord], perRecordCompletion: ((record: CKRecord?, error: NSError?) -> Void)?, completion: ((records: [CKRecord]?, error: NSError?) -> Void)?)
+    func modifyRecords(records: [CKRecord], perRecordCompletion: ((record: CKRecord?, error: NSError?) -> Void)?, completion: ((records: [CKRecord]?, error: NSError?) -> Void)?)
 
 
     // MARK: - CloudKit Availability
 
-    internal func checkCloudKitAvailability()
+    func checkCloudKitAvailability()
 
-    internal func handleCloudKitUnavailable(accountStatus: CKAccountStatus, error: NSError?)
+    func handleCloudKitUnavailable(accountStatus: CKAccountStatus, error: NSError?)
 
-    internal func displayCloudKitNotAvailableError(errorText: String)
+    func displayCloudKitNotAvailableError(errorText: String)
 
 
     // MARK: - CloudKit User Discoverability
 
-    internal func requestDiscoverabilityPermission()
+    func requestDiscoverabilityPermission()
 
-    internal func handleCloudKitPermissionStatus(permissionStatus: CKApplicationPermissionStatus, error: NSError?)
+    func handleCloudKitPermissionStatus(permissionStatus: CKApplicationPermissionStatus, error: NSError?)
 
-    internal func displayCloudKitPermissionsNotGrantedError(errorText: String)
+    func displayCloudKitPermissionsNotGrantedError(errorText: String)
 ```
 
 3. Using the documentation for CloudKit, fulfill the contract of each function signature. Using the data passed in as a paremeter, write code that will return the requested information. When it makes sense to do so using the NSOperation subclasses, try to use them over the convenience functions.
@@ -427,6 +425,8 @@ The protocol extension will add some shared functionality that our `Post` and `C
 ```
 
 The `CloudKitManagedObject` types will need to have a timestamp, a way to persist the data from a `CKRecordID` object into the persistent store, a unique record name, a record type that will be used to separate `CKRecord` types on CloudKit, and a way to represent the managed object as a `CKRecord` for when we want to push the data to CloudKit.
+
+Note that the timestamp, recordName, and recordIDData properties will already exist on the `Post` and `Comment` types because they are subclassed from the `SyncableObject` type defined in the Core Data model.
 
 1. Create a new `CloudKitManagedObject` file that defines a new protocol named `CloudKitManagedObject`.
 2. Add required gettable and settable variables for the `timestamp` as an `NSDate`, `recordIDData` as optional `NSData`, and `recordName` as a `String`.
@@ -593,9 +593,101 @@ There is a bug in the app that may result in duplicate `Post` and `Comment` obje
 2. While the Timeline scene is empty, use the refresh control to start a new sync operation.
 3. Identify the problem and implement the solution.
 
-### Part Four - Intermediate CloudKit: Subscriptions, Push Notifications, Automatic Sync
+## Part Four - Intermediate CloudKit: Subscriptions, Push Notifications, Automatic Sync
 
-* query data from CloudKit
 * use subscriptions to generate push notifications
 * use push notifications to run a push based sync engine
 
+Implement Subscriptions and push notifications to create a simple automatic sync engine. Add support for subscribing to new `Post` records and for subscribing to new `Comment` records on followed `Posts`s. Request permission for remote notifications. Respond to remote notifications by initializing the new `Post` or `Comment` with the new data.
+
+When you finish this part, the app will support syncing photos, posts, and comments from remote notifications generated when new records are created in CloudKit. This will allow all devices that have given permission for remote notifications the ability to sync new posts and comments automatically. When new posts or comments are created in CloudKit, they will be serialized into Core Data objects, and the Fetched Results Controllers will automatically updat ethe user interface with the new data.
+
+
+### Add Subscription Support to the CloudKitManager
+
+Build functionality into your `CloudKitManager` that can be used to manage subscriptions and push notifications. Add support for adding a subscription, fetching a single subscription, fetching all subscriptions, and deleting a subscription.
+
+1. Add the following properties and function signatures that perform basic CloudKit subscription management functionality. 
+
+```swift
+
+    // MARK: - Subscriptions
+    
+    func subscribe(type: String, predicate: NSPredicate, subscriptionID: String, contentAvailable: Bool, alertBody: String? = nil, desiredKeys: [String]? = nil, options: CKSubscriptionOptions, completion: ((subscription: CKSubscription?, error: NSError?) -> Void)?) 
+    
+    func unsubscribe(subscriptionID: String, completion: ((subscriptionID: String?, error: NSError?) -> Void)?)
+    
+    func fetchSubscriptions(completion: ((subscriptions: [CKSubscription]?, error: NSError?) -> Void)?)
+    
+    func fetchSubscription(subscriptionID: String, completion: ((subscription: CKSubscription?, error: NSError?) -> Void)?)
+```
+
+2. Using the documentation for CloudKit, fulfill the contract of each function signature. Using the data passed in as a paremeter, write code that will return the requested information. When it makes sense to do so using the NSOperation subclasses, try to use them over the convenience functions.
+
+### PostController Subscription Based Sync
+
+Update the `PostController` class to manage subscriptions for new posts and new comments on followed posts. Add functions for following and unfollowing individual posts.
+
+When a user follows a `Post`, he or she will receive a push notification and automatic sync for new `Comment` records added to the followed `Post`.
+
+#### Subscribe to New Posts
+
+Create and save a subscription for all new `Post` records.
+
+1. Add a function `subscribeToNewPosts` that takes an optional completion closure with `success` `Bool` and `error` `NSError?` parameters.
+    * note: Use an identifier that describes that this subscription is for all posts.
+2. Implement the function by using the `CloudKitManager` to subscribe to newly created `Post` records. Run the completion closure, passing a successful result if the subscription is successfully saved.
+3. Call the `subscribeToNewPosts` in the initializer for the `PostController` so that each user is subscribed to new `Post` records saved to CloudKit.
+
+#### Subscribe to New Comments
+
+Create and save a subscription for all new `Comment` records that point to a given `Post`
+
+1. Add a function `addSubscriptionToPostComments` that takes a `Post` parameter, an optional `alertBody` `String` parameter, and an optional completion closure with `success` `Bool` and `error` `NSError` parameters.
+2. Implement the function by using the `CloudKitManager` to subscribe to newly created `Comment` records that point to the `post` parameter. Run the completion closure, passing a successful result if the subscription is successfully saved.
+    * note: You will need to be able to identify this subscription later if you choose to delete it. Use a unique identifier on the `Post` as the identifier for the subscription so you can manage the matching subscription as needed.
+    * note: You will need an NSPredicate that checks if the `Comment`'s `post` is equal to the `post` parameter's `CKRecordID`
+
+#### Manage Post Comment Subscriptions
+
+The Post Detail scene allows users to follow and unfollow new `Comment`s on a given `Post`. Add a function for removing a subscription, and another function that will toggle a subscription for a given `Post`.
+
+1. Add a function `removeSubscriptionToPostcomments` that takes a `Post` parameter and an optional completion closure with `success` and `error` parameters.
+2. Implement the function by using the `CloudKitManager` to unsubscribe to the subscription for that `Post`.
+    * note: Use the unique identifier you used to save the subscription above. Most likely this will be your unique `recordName` for the `Post`.
+3. Add a function `checkSubscriptionToPostComments` that takes a `Post` parameter and an optional completion closure with a `subscribed` `Bool` parameter.
+4. Implement the function by using the `CloudKitManager` to fetch a subscription with the `post.recordName` as an identifier. If the subscription is not nil, the user is subscribed. If the subscription is nil, the user is not subscribed. Run the completion closure with the appropriate parameters.
+5. Add a function `togglePostCommentSubscription` that takes a `Post` parameter and an optional completion closure with `success`, `isSubscribed`, and `error` parameters.
+6. Implement the function by using the `CloudKitManager` to fetch subscriptions, check for a subscription that matches the `Post`, removes it if it exists, or adds it if it does not exist. Run the optional completion closure with the appropriate parameters.
+
+### Update User Interface
+
+Update the Post Detail scene's `Follow Post` button to display the correct text based on the current user's subscription. Update the outlet to toggle subscriptions for new comments on a `Post`.
+
+1. Update the `updateWithPost` function to call the `checkSubscriptionToPostcomments` on the `PostController` and set appropriate text for the button based on the response.
+2. Implement the `Follow Post` button's IBAction to call the `togglePostcommentSubscription` function on the `PostController` and update the `Follow Post` button's text based on the new subscription state.
+
+### Add Permissions
+
+Update the Info.plist to declare backgrounding support for responding to remote notifications. Request the user's permission to display remote notifications.
+
+1. Open the `Info.plist` file and add the following code to declare backgrounding support to respond to remote notifications:
+
+```
+    <key>UIBackgroundModes</key>
+    <array>
+        <string>remote-notification</string>
+    </array>
+```
+
+2. Request the user's permission to display notifications in the `AppDelegate` `didFinishLaunchingWithOptions` function.
+    * note: Use the `registerUserNotificationSettings` function.
+
+### Handle Received Push Notifications
+
+At this point the application will save subscriptions to the CloudKit database, and when new `Post` or `Comment` records are created that match those subscriptions, the CloudKit database will deliver a push notification to the application with the record data.
+
+Handle the push notification by serializing the data into a `Post` or `Comment` object, and persisting the object to Core Data. If the user is actively using the application, the Fetched Results Controller will handle updating the Timeline or Post Detail views with the new data.
+
+1. Add the `didReceiveRemoteNotification` delegate function to the `AppDelegate`.
+2. Implement the function by guarding against the user info parameter as a [String: AnyObject], initializing a `CKQueryNotification` from the unwrapped user info dictionary, guarding against the record ID, and using the `CloudKitManager` instance on the `PostController` to fetch the matching `CKRecord`. Switch on the returned record's `recordType`. If it is a `Post`, initialize a `Post` from the `CKRecord`, if it is a `Comment`, initialize a `Comment` from the `CKRecord`, otherwise, return. Save the context after initializing the new object. Run the completion handler by passing the `UIBackgroundFetchResult.NewData` response.

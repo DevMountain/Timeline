@@ -32,7 +32,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         guard let recordID = queryNotification.recordID else { print("No Record ID available from CKQueryNotification."); return }
         
-        let cloudKitManager = CloudKitManager()
+        let cloudKitManager = PostController.sharedController.cloudKitManager
         
         cloudKitManager.fetchRecordWithID(recordID) { (record, error) in
             
