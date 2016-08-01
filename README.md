@@ -12,7 +12,7 @@ Students who complete this project independently are able to:
 
 * follow a project planning framework to build a development plan
 * follow a project planning framework to prioritize and manage project progress
-* implement relationships in a Core Data model architecture
+* implement basic data model
 * use staged data to prototype features
 
 #### Part Two - Apple View Controllers, Search Controller, Container Views
@@ -34,12 +34,11 @@ Students who complete this project independently are able to:
 * use subscriptions to generate push notifications
 * use push notifications to run a push based sync engine
 
-
 ## Part One - Project Planning, Model Objects, and Controllers
 
 * follow a project planning framework to build a development plan
 * follow a project planning framework to prioritize and manage project progress
-* implement relationships in a Core Data model architecture
+* implement basic data model
 * use staged data to prototype features
 
 Follow the development plan included with the project to build out the basic view hierarchy, basic implementation of local model objects, model object controllers, and helper classes. Build staged data to lay a strong foundation for the rest of the app.
@@ -63,44 +62,28 @@ The Navigation Controller should have a Plus (+) button that presents a modal Ad
 
 ### Implement Model
 
-Timeline will use a Core Data local persistent storage with a basic CloudKit based sync engine. To begin, add Core Data to the project by creating a Core Data Model xcdatamodel file, and adding the `Stack` file that will be used to access Core Data. Then use the Core Data Model file to create your local Core Data model objects.
+Timeline will use a simple, non-persistent data model to locally represent data stored on CloudKit. 
 
-You will want to save `Post` objects that hold the image data, and `Comment` objects that hold text. A `Post` should own a set of `Comment` objects.
+Start by creating model objects. You will want to save `Post` objects that hold the image data, and `Comment` objects that hold text. A `Post` should own an array of `Comment` objects.
 
-While you will not implement sync in this portion of the project, it is important to recognize the need for syncing when designing your model.
-
-#### SyncableObject
-
-Create a `SyncableObject` model object that will hold shared data for both `Post` and `Comment` objects. `Post` and `Comment` objects will need to share a set of properties that make it easier for syncing in a future step. The shared properties will include a timestamp, a unique identifier, and additional data that will help determine if the object has been synced to the server.
-
-1. Add a new `SyncableObject` Core Data entity to your managed object model. Add a `timestamp` Date attribute, a `recordName` String attribute, and a `recordIDData` NSData attribute. Set the `recordName` and `timestamp` attributes as required.
-2. Select the `recordName` and `timestamp` attributes and deselect the 'Optional' option in the Attribute Inspector panel.
+While you will not implement sync in this portion of the project, it is important to recognize the need for syncing with CloudKit when designing your model.
 
 #### Post
 
-Create a `Post` model object that will hold image data. Most often, Core Data is backed by a SQLite persistent store. SQLite databases are not built for managing large data blobs like photos. Use the 'Allows external storage' option to have Core Data manage storing the data to disk instead of the database itself. Core Data will automatically store the data to disk and include a reference to that data in the database instead.
+Create a `Post` model object that will hold image data and comments.
 
-1. Add a new `Post` Core Data entity to your managed object model. Add a `photoData` Binary Data attribute. 
-2. Set the `SyncableObject` as the Parent Entity. 
-    * note: This will make the `Post` entity a subclass of the `SyncableObject` class, inheriting all of it's properties.
-3. Select the `photoData` attribute and choose the 'Allows External Storage' option in the Attribute Inspector panel.
-4. Create the `NSManagedObject` subclass files.
-5. Add a convenience initializer that accepts a `photo` parameter as `NSData`, and a timestamp parameter as an `NSDate`.
-6. Implement the convenience initializer, calling the `init(entity: insertIntoManagedObjectContext:)` function that normally is called by the `NSEntityDescription.entityForName(name:, inManagedObjectContext:)` function.
+1. Add a new `Post` class to your project.
+2. Add a `photoData` property of type `NSData?`, a `timestamp` `NSDate` property, and a `comments` property of type `[Comment]`.
+3. Add a computed property, `photo` that returns a `UIImage` initialized using the data in `photoData`.
+4. Add an initializer that accepts photoData, timestamp, and comments array. Provide default values for the `timestamp` and `comments` arguments, so they can be ommitted if desired.
 
 #### Comment
 
-Create a `Comment` model object that will hold user-submitted text comments for a specific `Post`. 
+Create a `Comment` model object that will hold user-submitted text comments for a specific `Post`.
 
-1. Add a new `Comment` Core Data entity to your managed object model. Add a `text` String attribute.
-2. Set the `SyncableObject` as the Parent Entity. 
-    * note: This will make the `Comment` entity a subclass of the `SyncableObject` class, inheriting all of it's properties.
-3. Add a relationship that supports adding multiple `Comment` object relationships to a single `Post` object, set the inverse relationship on the `Post` object.
-4. Create the `NSManagedObject` subclass files.
-5. Add a convenience initializer that accepts a `Post` parameter, a text parameter, and a timestamp parameter as an `NSDate`.
-    * note: Include the `Post` parameter because a `Comment` cannot exist without a parent `Post`. This is a common pattern for doing [dependency injection](https://en.wikipedia.org/wiki/Dependency_injection). 
-6. Implement the convenience initializer, calling the `init(entity: insertIntoManagedObjectContext:)` function that normally is called by the `NSEntityDescription.entityForName(name:, inManagedObjectContext:) function.
-
+1. Add a new `Comment` class to your project.
+2. Add a `text` property of type `String`, a `timestamp` `NSDate` property, and a `post` property of type `Post`.
+3. Add an initializer that accepts text, timestamp, and a post. Provide a default values for the `timestamp` argument, so it can be ommitted if desired.
 
 ### Model Object Controller
 
@@ -108,12 +91,11 @@ Add and implement the `PostController` class that will be used for CRUD operatio
 
 1. Add a new `PostController` class file.
 2. Add a `sharedController` singleton property.
-3. Add a `saveContext` function that saves the `Stack`'s `managedObjectContext`.
+3. Add a `posts` property.
 4. Add a `createPost` function that takes an image parameter as a `UIImage` and a caption as a `String`.
-5. Implement the `createPost` function to initialize a `Post` with the image and a `Comment` with the caption text and save the context.
+5. Implement the `createPost` function to initialize a `Post` with the image and a `Comment` with the caption text.
 6. Add a `addCommentToPost` function that takes a `text` parameter as a `String`, and a `Post` parameter.
-7. Implement the `addCommentToPost` function to call the appropriate `Comment` initializer and save the context.
-
+7. Implement the `addCommentToPost` function to call the appropriate `Comment` initializer and adds the comment to the appropriate post.
 
 ### Wire Up Views
 
@@ -124,11 +106,9 @@ Implement the Post List Table View Controller. You will use a similar cell to di
 1. Implement the scene in Interface Builder by creating a custom cell with an image view that fills the cell. 
 2. Create a `PostTableViewCell` class, add and implement an `updateWithPost` to the `PostTableViewCell` to update the image view with the `Post`'s photo.
 3. Choose a height that will be used for your image cells. To avoid worrying about resizing images or dynamic cell heights, you may want to use a consistent height for all of the image views in the app.
-4. Overwrite the `viewDidLoad()` function to initialize an `NSFetchedResultsController` that pulls `Post` objects ordered by the `timestamp` property in reverse chronological order (latest post on top).
-5. Implement the `UITableViewDataSource` functions using the `NSFetchedResultsController`.
+4. Implement the `UITableViewDataSource` functions
     * note: The final app does not need to support any editing styles, but you may want to include support for editing while developing early stages of the app.
-6. Implement the `NSFetchedResultsControllerDelegate` functions to begin and end table view updates.
-7. Implement the `prepareForSegue` function to check the segue identifier, capture the detail view controller, index path, selected post, and assign the selected post to the detail view controller.
+5. Implement the `prepareForSegue` function to check the segue identifier, capture the detail view controller, index path, selected post, and assign the selected post to the detail view controller.
     * note: You may need to quickly add a `post` property to the `PostDetailTableViewController`.
 
 #### Post Detail Scene
@@ -140,9 +120,7 @@ Use the table view's header view to display the photo and a toolbar that allows 
 1. Add a vertical `UIStackView` to the Header of the table view. Add a `UIImageView` and a `UIToolbar` to the stack view. Add 'Comment', 'Share', and 'Follow Post' `UIBarButtonItem`s to the toolbar. Set up your constraints so that the image view is the height you chose previously for displaying images within your app.
 2. Update the cell to support comments that span multiple lines without truncating them. Set the `UITableViewCell` to the subtitle style. Set the number of lines to zero. Implement dynamic heights by setting the `tableView.rowHeight` and `tableView.estimatedRowHeight` in the `viewDidLoad`.
 3. Add an `updateWithPost` function that will update the scene with the details of the post. Implement the function by setting the `imageView.image` and reloading the table view if needed.
-4. Overwrite the `viewDidLoad()` function to initialize an `NSFetchedResultsController` that pulls `Comment` objects matching the `self.post` property, ordered by the `timestamp` property in chronological order (latest comment on bottom).
-    * note: You will need to set a predicate on the `NSFetchRequest` (hint: `"post == $@"`)
-5. Implement the `UITableViewDataSource` functions using the `NSFetchedResultsController`.
+4. Implement the `UITableViewDataSource` functions.
     * note: The final app does not need to support any editing styles, but you may want to include support for editing while developing early stages of the app.
 5. Add an IBAction for the 'Comment' button. Implement the IBAction by presenting a `UIAlertController` with a text field, a Cancel action, and an 'OK' action. Implement the 'OK' action to initialize a new `Comment` via the `PostController` and reload the table view to display it.
     * note: Do not create a new `Comment` if the user has not added text.
@@ -402,11 +380,11 @@ Add a CloudKit Manager that abstracts your CloudKit code into a single helper cl
 
 3. Using the documentation for CloudKit, fulfill the contract of each function signature. Using the data passed in as a paremeter, write code that will return the requested information. When it makes sense to do so using the NSOperation subclasses, try to use them over the convenience functions.
 
-### CloudKitManagedObject
+### CloudKitSyncable
 
-Write a protocol that will define how the app will work with CloudKit and Core Data objects. Add a protocol extension that adds predefined convenience functionality to each object that adopts that protocol.
+Write a protocol that will define how the app will work with CloudKit and our model objects. Add a protocol extension that adds predefined convenience functionality to each object that adopts that protocol.
 
-The `CloudKitManagedObject` protocol will define the required properties and functions that our `Post` and `Comment` objects will need. 
+The `CloudKitSyncable` protocol will define the required properties and functions that our `Post` and `Comment` objects will need. 
 
 The protocol extension will add some shared functionality that our `Post` and `Comment` objects will need.
 
@@ -414,48 +392,33 @@ The protocol extension will add some shared functionality that our `Post` and `C
 
 ```swift
     
-    timestamp: NSDate // date and time the object was created
-    recordIDData: NSData? // persisted CKRecordID
-    recordName: String // unique name for the object
-    recordType: String // a consistent type string, 'Post' for Post, 'Comment' for Comment
+init?(record: CKRecord)
 
-    var cloudKitRecord: CKRecord? // a generated record representation of the `NSManagedObject` that can be saved to CloudKit (similar to `dictionaryValue` when working with REST APIs)
-
-    init?(record: CKRecord, context: NSManagedObjectContext) // to initialize a new `NSManagedObject` from a `CKRecord` from CloudKit (similar to `init?(json: [String: AnyObject])` when working with REST APIs)
+var cloudKitRecordID: CKRecordID? { get set }
+var recordType: String { get }
 ```
 
-The `CloudKitManagedObject` types will need to have a timestamp, a way to persist the data from a `CKRecordID` object into the persistent store, a unique record name, a record type that will be used to separate `CKRecord` types on CloudKit, and a way to represent the managed object as a `CKRecord` for when we want to push the data to CloudKit.
+The `CloudKitSyncable` types will need to have a way to tie instances to a particular `CKRecord` on the server along with a record type that will be used to separate `CKRecord` types on CloudKit. We'll also need a way to represent the managed object as a `CKRecord` for when we want to push the data to CloudKit, and a way to create a new model instance from `CKRecord`s we fetch from the server.
 
-Note that the timestamp, recordName, and recordIDData properties will already exist on the `Post` and `Comment` types because they are subclassed from the `SyncableObject` type defined in the Core Data model.
-
-1. Create a new `CloudKitManagedObject` file that defines a new protocol named `CloudKitManagedObject`.
-2. Add required gettable and settable variables for the `timestamp` as an `NSDate`, `recordIDData` as optional `NSData`, and `recordName` as a `String`.
-    * `CKRecordID` conforms to the `NSCoding` protocol, which allows it to be easily serialized to and from `NSData`. Core Data does not natively support saving `CKRecordID` objects, but we can set the `NSData` of a `CKRecordID` to the `recordIDData` by using `NSKeyedArchiver`.
-3. Add required gettable computed properties for the `recordType` as a String, and `cloudKitRecord` as an optional CKRecord.
-4. Add a required `updateWithRecord` function that accepts a `CKRecord` as a parameter. This function will be used to update the Core Data object with the `CKRecord` data received from CloudKit.
+1. Create a new `CloudKitSyncable` file that defines a new protocol named `CloudKitSyncable`.
+2. Add an intializer that takes a `CKRecord`.
+3. Add a required gettable and settable property `cloudKitRecordID` as an optional `CKRecordID?`.
+4. Add a required gettable computed properties for the `recordType` as a String
 
 #### Protocol Extension
 
 ```swift
 
-    var isSynced: Bool // helper variable to determine if a CloudKitManagedObject has a CKRecordID, which we can use to say that the record has been saved to the server
-    var cloudKitRecordID: CKRecordID? // a computed property that unwraps the persisted recordIDData into a CKRecordID, or returns nil if there isn't one
+    var isSynced: Bool // helper variable to determine if a CloudKitSyncable has a CKRecordID, which we can use to say that the record has been saved to the server
     var cloudKitReference: CKReference? // a computed property that returns a CKReference to the object in CloudKit
-
-    func update(record: CKRecord) // called after saving the object, saved the record.recordID to the recordIDData
+    
 ```
 
-5. Add a protocol extension for the `CloudKitManagedObject`
-6. Add a computed property `isSynced: Bool` that returns true if `recordIDData` is not nil
-    * note: When a record is synced to CloudKit, CloudKit returns a `CKRecord` object. You will pass that `CKRecord` object into the `update(record: CKRecord)` function, which will save the `record.recordID` as NSData to the `recordIDData` variable. So if that `recordIDData` variable _has_ data, then the object _has_ been synced. If not, it hasn't.
-7. Add a computed property `cloudKitRecordID: CKRecordID?` that guards for the `recordIDData`, unwraps it as a `CKRecordID`, and returns it. Otherwise, return nil.
-    * note: This is simply a helper function that returns our persisted `NSData?` version of the `CKRecordID` as an actual `CKRecordID`
-    * note: Use `NSKeyedUnarchiver` to decode the `NSData`
-8. Add a computed property `cloudKitReference: CKReference?` that guards for the `cloudKitRecordID` and returns a `CKReference` initialized with the `CKRecordID`. Otherwise, return nil.
+5. Add a protocol extension for the `CloudKitSyncable`
+6. Add a computed property `isSynced: Bool` that returns true if `cloudKitRecordID` is not nil
+    * note: When a record is synced to CloudKit, CloudKit returns a `CKRecord` object. You will pass that `CKRecord` object's `recordID` into the `cloudKitRecordID` property. So if the `cloudKitRecordID` property _has_ a value (is not nil), then the object _has_ been synced. If not, it hasn't.
+7. Add a computed property `cloudKitReference: CKReference?` that guards for the `cloudKitRecordID` and returns a `CKReference` initialized with the `CKRecordID`. Otherwise, return nil.
     * note: In a future step, this will be used to help us pass a list of all synced objects to CloudKit so that we can request any new objects.
-9. Add a update function that takes a `CKRecord` as a parameter. Implement the function to use `NSKeyedArchiver` to archive the `record.recordID` as NSData, set the `recordIDData` property, and save the managed object context.
-10. Add a `nameForManagedObject` that returns a unique `String` identifier.
-    * note: Use the `NSUUID` class to generate a unique identifier.
 
 ### Post Controller Manual Sync
 
