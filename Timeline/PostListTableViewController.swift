@@ -7,18 +7,14 @@
 //
 
 import UIKit
-import CoreData
 
-class PostListTableViewController: UITableViewController, NSFetchedResultsControllerDelegate, UISearchResultsUpdating {
+class PostListTableViewController: UITableViewController, UISearchResultsUpdating {
 
-    var fetchedResultsController: NSFetchedResultsController?
     var searchController: UISearchController?
     
     override func viewDidLoad() {
         
         super.viewDidLoad()
-        
-        setUpFetchedResultsController()
         
         setUpSearchController()
         
@@ -28,6 +24,9 @@ class PostListTableViewController: UITableViewController, NSFetchedResultsContro
         if tableView.numberOfRowsInSection(0) > 0 {
             tableView.scrollToRowAtIndexPath(NSIndexPath(forRow: 0, inSection: 0), atScrollPosition: .Top, animated: false)
         }
+		
+		let nc = NSNotificationCenter.defaultCenter()
+		nc.addObserver(self, selector: #selector(postsChanged(_:)), name: PostController.PostsChangedNotification, object: nil)
     }
     
     @IBAction func refreshControlActivated(sender: UIRefreshControl) {
@@ -50,97 +49,31 @@ class PostListTableViewController: UITableViewController, NSFetchedResultsContro
             }
         }
     }
-    
-    
+	
+	// MARK: - Notifications
+	
+	func postsChanged(notification: NSNotification) {
+		tableView.reloadData()
+	}
+	
     // MARK: - Table view data source
-    
-    override func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-        
-        guard let sections = fetchedResultsController?.sections else { return 1 }
-        return sections.count
-    }
-    
+	
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        
-        guard let sections = fetchedResultsController?.sections else {return 0}
-        let sectionInfo = sections[section]
-        return sectionInfo.numberOfObjects
+       return PostController.sharedController.posts.count
     }
-    
-    
+	
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        
-        guard let cell = tableView.dequeueReusableCellWithIdentifier("postCell", forIndexPath: indexPath) as? PostTableViewCell,
-            let post = fetchedResultsController?.objectAtIndexPath(indexPath) as? Post else { return PostTableViewCell() }
-        
+		
+        guard let cell = tableView.dequeueReusableCellWithIdentifier("postCell", forIndexPath: indexPath) as? PostTableViewCell else { return PostTableViewCell() }
+		
+		let posts = PostController.sharedController.posts
+		let post = posts[indexPath.row]
+		
         cell.updateWithPost(post)
         
         return cell
     }
-    
-    
-    // MARK: - Fetched Results Controller
-    
-    func setUpFetchedResultsController() {
-        
-        let request = NSFetchRequest(entityName: "Post")
-        let dateSortDescription = NSSortDescriptor(key: "timestamp", ascending: false)
-        
-        request.returnsObjectsAsFaults = false
-        request.sortDescriptors = [dateSortDescription]
-        
-        self.fetchedResultsController = NSFetchedResultsController(fetchRequest: request, managedObjectContext: Stack.sharedStack.managedObjectContext, sectionNameKeyPath: nil, cacheName: nil)
-        
-        do {
-            try fetchedResultsController?.performFetch()
-        } catch let error as NSError {
-            print("Unable to perform fetch request: \(error.localizedDescription)")
-        }
-        
-        fetchedResultsController?.delegate = self
-    }
-    
-    func controllerWillChangeContent(controller: NSFetchedResultsController) {
-        
-        tableView.beginUpdates()
-    }
-    
-    func controller(controller: NSFetchedResultsController, didChangeObject anObject: AnyObject, atIndexPath indexPath: NSIndexPath?, forChangeType type: NSFetchedResultsChangeType, newIndexPath: NSIndexPath?) {
-        
-        switch type {
-        case .Delete:
-            guard let indexPath = indexPath else {return}
-            tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Automatic)
-        case .Insert:
-            guard let newIndexPath = newIndexPath else {return}
-            tableView.insertRowsAtIndexPaths([newIndexPath], withRowAnimation: .Automatic)
-        case .Move:
-            guard let indexPath = indexPath,
-                newIndexPath = newIndexPath else {return}
-            tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: .Automatic)
-            tableView.insertRowsAtIndexPaths([newIndexPath], withRowAnimation: .Automatic)
-        case .Update:
-            guard let indexPath = indexPath else {return}
-            tableView.reloadRowsAtIndexPaths([indexPath], withRowAnimation: .Automatic)
-        }
-    }
-    
-    func controller(controller: NSFetchedResultsController, didChangeSection sectionInfo: NSFetchedResultsSectionInfo, atIndex sectionIndex: Int, forChangeType type: NSFetchedResultsChangeType) {
-        
-        switch type {
-        case .Delete:
-            tableView.deleteSections(NSIndexSet(index: sectionIndex), withRowAnimation: .Automatic)
-        case .Insert:
-            tableView.insertSections(NSIndexSet(index: sectionIndex), withRowAnimation: .Automatic)
-        default:
-            break
-        }
-    }
-    
-    func controllerDidChangeContent(controller: NSFetchedResultsController) {
-        tableView.endUpdates()
-    }
-    
+	
     
     // MARK: - Search Controller
     
@@ -160,9 +93,9 @@ class PostListTableViewController: UITableViewController, NSFetchedResultsContro
     func updateSearchResultsForSearchController(searchController: UISearchController) {
         
         if let resultsViewController = searchController.searchResultsController as? SearchResultsTableViewController,
-            let searchTerm = searchController.searchBar.text?.lowercaseString,
-            let posts = fetchedResultsController?.fetchedObjects as? [Post] {
-            
+            searchTerm = searchController.searchBar.text?.lowercaseString {
+			
+			let posts = PostController.sharedController.posts
             resultsViewController.resultsArray = posts.filter({$0.matchesSearchTerm(searchTerm)})
             resultsViewController.tableView.reloadData()
         }
@@ -176,10 +109,10 @@ class PostListTableViewController: UITableViewController, NSFetchedResultsContro
         if segue.identifier == "toPostDetail" {
             
             if let detailViewController = segue.destinationViewController as? PostDetailTableViewController,
-                let selectedIndexPath = self.tableView.indexPathForSelectedRow,
-                let post = fetchedResultsController?.objectAtIndexPath(selectedIndexPath) as? Post {
-            
-                detailViewController.post = post
+                selectedIndexPath = self.tableView.indexPathForSelectedRow {
+				
+				let posts = PostController.sharedController.posts
+                detailViewController.post = posts[selectedIndexPath.row]
             }
         }
         
@@ -187,9 +120,9 @@ class PostListTableViewController: UITableViewController, NSFetchedResultsContro
             if let detailViewController = segue.destinationViewController as? PostDetailTableViewController,
                 let sender = sender as? PostTableViewCell,
                 let selectedIndexPath = (searchController?.searchResultsController as? SearchResultsTableViewController)?.tableView.indexPathForCell(sender),
-                let searchTerm = searchController?.searchBar.text?.lowercaseString,
-                let posts = fetchedResultsController?.fetchedObjects?.filter({ $0.matchesSearchTerm(searchTerm) }) as? [Post] {
-                
+                let searchTerm = searchController?.searchBar.text?.lowercaseString {
+				
+				let posts = PostController.sharedController.posts.filter({ $0.matchesSearchTerm(searchTerm) })
                 let post = posts[selectedIndexPath.row]
                 
                 detailViewController.post = post

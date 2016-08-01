@@ -99,10 +99,7 @@ class CloudKitManager {
 		queryOperation.recordFetchedBlock = { (fetchedRecord) -> Void in
 			
 			fetchedRecords.append(fetchedRecord)
-			
-			if let recordFetchedBlock = recordFetchedBlock {
-				recordFetchedBlock(record: fetchedRecord)
-			}
+			recordFetchedBlock?(record: fetchedRecord)
 		}
 		
 		queryOperation.queryCompletionBlock = { (queryCursor, error) -> Void in

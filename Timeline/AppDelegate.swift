@@ -47,8 +47,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             default:
                 return
             }
-            
-            PostController.sharedController.saveContext()
         }
         
         completionHandler(UIBackgroundFetchResult.NewData)
