@@ -34,15 +34,23 @@ class PostController {
 	func createPost(image: UIImage, caption: String, completion: ((Post) -> Void)?) {
 		guard let data = UIImageJPEGRepresentation(image, 0.8) else { return }
 		
-		var post = Post(photoData: data)
-		addCommentToPost(caption, post: post, completion: nil)
+		let post = Post(photoData: data)
 		posts.append(post)
-		
+		let captionComment = addCommentToPost(caption, post: post)
+	
 		cloudKitManager.saveRecord(CKRecord(post)) { (record, error) in
-			defer { completion?(post) }
-			guard let record = record else { return }
+			guard let record = record else {
+				completion?(post)
+				return
+			}
 			post.cloudKitRecordID = record.recordID
 			
+			// Save comment record
+			self.cloudKitManager.saveRecord(CKRecord(captionComment)) { (record, error) in
+				captionComment.cloudKitRecordID = record?.recordID
+				completion?(post)
+			}
+
 			self.addSubscriptionToPostComments(post, alertBody: "Someone commented on your post! 👍") { (success, error) in
 				if let error = error {
 					print("Unable to save comment subscription: \(error.localizedDescription)")
@@ -51,9 +59,9 @@ class PostController {
 		}
 	}
 	
-	func addCommentToPost(text: String, post: Post, completion: ((Comment) -> Void)?) {
+	func addCommentToPost(text: String, post: Post) -> Comment {
 		
-		var comment = Comment(post: post, text: text)
+		let comment = Comment(post: post, text: text)
 		post.comments.append(comment)
 		
 		dispatch_async(dispatch_get_main_queue()) {
@@ -61,11 +69,7 @@ class PostController {
 			nc.postNotificationName(PostController.PostCommentsChangedNotification, object: post)
 		}
 		
-		cloudKitManager.saveRecord(CKRecord(comment)) { (record, error) in
-			defer { completion?(comment) }
-			guard let record = record else { return }
-			comment.cloudKitRecordID = record.recordID
-		}
+		return comment
 	}
 	
 	

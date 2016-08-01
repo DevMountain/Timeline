@@ -41,6 +41,7 @@ class Post: CloudKitSyncable {
 		
 		let photoData = NSData(contentsOfURL: photoAsset.fileURL)
 		self.init(photoData: photoData, timestamp: timestamp)
+		cloudKitRecordID = record.recordID
 	}
 	
 	private var temporaryPhotoURL: NSURL {

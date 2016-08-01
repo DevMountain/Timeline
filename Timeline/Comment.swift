@@ -35,10 +35,8 @@ class Comment: CloudKitSyncable {
 		guard let timestamp = record.creationDate,
 			let text = record[Comment.textKey] as? String else { return nil }
 		
-		// FIXME: This should be done *by* the post controller
-		//		let postReference = record[Comment.postKey] as? CKReference
-		//		let post = PostController.sharedController.postWithName(postReference.recordID.recordName)
 		self.init(post: nil, text: text, timestamp: timestamp)
+		cloudKitRecordID = record.recordID
 	}
 
 	var cloudKitRecordID: CKRecordID?
