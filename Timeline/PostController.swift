@@ -40,6 +40,10 @@ class PostController {
 	
 		cloudKitManager.saveRecord(CKRecord(post)) { (record, error) in
 			guard let record = record else {
+				if let error = error {
+					NSLog("Error saving new post to CloudKit: \(error)")
+					return
+				}
 				completion?(post)
 				return
 			}
@@ -47,6 +51,10 @@ class PostController {
 			
 			// Save comment record
 			self.cloudKitManager.saveRecord(CKRecord(captionComment)) { (record, error) in
+				if let error = error {
+					NSLog("Error saving new comment to CloudKit: \(error)")
+					return
+				}
 				captionComment.cloudKitRecordID = record?.recordID
 				completion?(post)
 			}
@@ -59,10 +67,19 @@ class PostController {
 		}
 	}
 	
-	func addCommentToPost(text: String, post: Post) -> Comment {
+	func addCommentToPost(text: String, post: Post, completion: ((Comment) -> Void)? = nil) -> Comment {
 		
 		let comment = Comment(post: post, text: text)
 		post.comments.append(comment)
+		
+		self.cloudKitManager.saveRecord(CKRecord(comment)) { (record, error) in
+			if let error = error {
+				NSLog("Error saving new comment to CloudKit: \(error)")
+				return
+			}
+			comment.cloudKitRecordID = record?.recordID
+			completion?(comment)
+		}
 		
 		dispatch_async(dispatch_get_main_queue()) {
 			let nc = NSNotificationCenter.defaultCenter()
@@ -120,7 +137,7 @@ class PostController {
 		
 	}
 	
-	func fetchNewRecords(type: String, completion: (() -> Void)?) {
+	func fetchNewRecords(type: String, completion: (() -> Void)? = nil) {
 		
 		var referencesToExclude = [CKReference]()
 		var predicate: NSPredicate!
@@ -142,7 +159,9 @@ class PostController {
 				guard let postReference = record[Comment.postKey] as? CKReference,
 					postIndex = self.posts.indexOf({ $0.cloudKitRecordID == postReference.recordID }),
 					comment = Comment(record: record) else { return }
-				self.posts[postIndex].comments.append(comment)
+				let post = self.posts[postIndex]
+				post.comments.append(comment)
+				comment.post = post
 			default:
 				return
 			}
@@ -171,7 +190,7 @@ class PostController {
 			unsavedObjectsByRecord[record] = comment
 		}
 		
-		let unsavedRecords = unsavedPosts.map { CKRecord($0) } + unsavedComments.map { CKRecord($0) }
+		let unsavedRecords = Array(unsavedObjectsByRecord.keys)
 		
 		cloudKitManager.saveRecords(unsavedRecords, perRecordCompletion: { (record, error) in
 			
