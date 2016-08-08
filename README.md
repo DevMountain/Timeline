@@ -21,13 +21,13 @@ Students who complete this project independently are able to:
 * use the image picker controller and activity controller
 * use container views to abstract shared functionality into a single view controller
 
-#### Part Three - Basic CloudKit: CloudKitManager, CloudKitManagedObject, Manual Sync
+#### Part Three - Basic CloudKit: CloudKitManager, CloudKitSyncable, Manual Sync
 
 * check CloudKit availability
 * save data to CloudKit
 * fetch data from CloudKit
 * query data from CloudKit
-* sync pulled CloudKit data to a local Core Data persistent store
+* sync pulled CloudKit data to local model objects
 
 #### Part Four - Intermediate CloudKit: Subscriptions, Push Notifications, Automatic Sync
 
@@ -184,7 +184,6 @@ Add a `SearchableRecord` protocol that requires a `matchesSearchTerm` function. 
 
 1. Add a new `SearchableRecord.swift` file.
 2. Define a `SearchableRecord` protocol with a required `matchesSearchTerm` function that takes a `searchTerm` parameter as a `String` and returns a `Bool`.
-    * note: Because this protocol will be used on `NSManagedObject`s, add the `@objc` keyword to the protocol.
 
 Consider how each model object will match to a specific search term. What searchable text is there on a `Comment`? What searchable text is there on a `Post`?
 
@@ -292,25 +291,24 @@ Use the `UIActivityController` class to present a share sheet from the Post Deta
 
 * Some apps will save photos taken or processed in their app in a custom Album in the user's Camera Roll. Add this feature.
 * Review the README instructions and solution code for clarity and functionality, submit a GitHub pull request with suggested changes.
-* Provide feedback on the expectations for Part One to a mentor or instructor.
+* Provide feedback on the expectations for Part Two to a mentor or instructor.
 
 
-## Part Three - Basic CloudKit: CloudKitManager, CloudKitManagedObject, Manual Sync
+## Part Three - Basic CloudKit: CloudKitManager, CloudKitSyncable, Manual Sync
 
 * check CloudKit availability
 * save data to CloudKit
 * fetch data from CloudKit
-* sync pulled CloudKit data to a local Core Data persistent store
 
-Following some of the best practices in the CloudKit documentation, add CloudKit to your project as a backend syncing engine for posts and comments. Check for CloudKit availability, save new posts and comments to CloudKit, fetch posts and comments from CloudKit and save them to Core Data.
+Following some of the best practices in the CloudKit documentation, add CloudKit to your project as a backend syncing engine for posts and comments. Check for CloudKit availability, save new posts and comments to CloudKit, and fetch posts and comments from CloudKit.
 
-When you finish this part, the app will support syncing photos, posts, and comments from the device to CloudKit, and pulling new photos, posts, and comments from CloudKit. When new posts or comments are fetched from CloudKit, they will be serialized into Core Data objects, and the Fetched Results Controllers will automatically update the user interface with the new data.
+When you finish this part, the app will support syncing photos, posts, and comments from the device to CloudKit, and pulling new photos, posts, and comments from CloudKit. When new posts or comments are fetched from CloudKit, they will be turned into model objects, and the Fetched Results Controllers will automatically update the user interface with the new data.
 
 You will implement push notifications, subscriptions, and basic automatic sync functionality in Part Four.
 
 ### CloudKit Manager
 
-Add a CloudKit Manager that abstracts your CloudKit code into a single helper class that implements basic CloudKit functionality. You will not necessarily use all of the `CloudKitManager` functionality in this application, but this will be a great reusable class for future CloudKit applications that you build in the future.
+Add a CloudKit Manager that abstracts your CloudKit code into a single helper class that implements basic CloudKit functionality. You will not necessarily use all of the `CloudKitManager` functionality in this application, but this will be a great reusable class for CloudKit applications that you build in the future.
 
 1. Add a `CloudKitManager` helper class.
 2. Add the following properties and function signatures that perform basic CloudKit functionality. 
@@ -378,7 +376,7 @@ Add a CloudKit Manager that abstracts your CloudKit code into a single helper cl
     func displayCloudKitPermissionsNotGrantedError(errorText: String)
 ```
 
-3. Using the documentation for CloudKit, fulfill the contract of each function signature. Using the data passed in as a paremeter, write code that will return the requested information. When it makes sense to do so using the NSOperation subclasses, try to use them over the convenience functions.
+3. Using the documentation for CloudKit, fulfill the contract of each function signature. Using the data passed in as a parameter, write code that will return the requested information. When it makes sense to do so using the NSOperation subclasses, try to use them over the convenience functions.
 
 ### CloudKitSyncable
 
@@ -398,7 +396,7 @@ var cloudKitRecordID: CKRecordID? { get set }
 var recordType: String { get }
 ```
 
-The `CloudKitSyncable` types will need to have a way to tie instances to a particular `CKRecord` on the server along with a record type that will be used to separate `CKRecord` types on CloudKit. We'll also need a way to represent the managed object as a `CKRecord` for when we want to push the data to CloudKit, and a way to create a new model instance from `CKRecord`s we fetch from the server.
+The `CloudKitSyncable` types will need to have a way to tie instances to a particular `CKRecord` on the server along with a record type that will be used to separate `CKRecord` types on CloudKit. We'll also need a way to represent the model object as a `CKRecord` for when we want to push the data to CloudKit, and a way to create a new model instance from `CKRecord`s we fetch from the server.
 
 1. Create a new `CloudKitSyncable` file that defines a new protocol named `CloudKitSyncable`.
 2. Add an intializer that takes a `CKRecord`.
@@ -422,58 +420,50 @@ The `CloudKitSyncable` types will need to have a way to tie instances to a parti
 
 ### Post Controller Manual Sync
 
-Adopt the `CloudKitManagedObject` protocol in the `Post` and `Comment` classes. Update the `PostController` to use push `Post` and `Comment` objects to CloudKit and pull new `Post` or `Comment` objects from CloudKit.
+Adopt the `CloudKitSyncable` protocol in the `Post` and `Comment` classes. Update the `PostController` to use push `Post` and `Comment` objects to CloudKit and pull new `Post` or `Comment` objects from CloudKit.
 
 #### Update Post for Sync Functionality
 
-Adopt the `CloudKitManagedObject` protocol in the `Post` class.
+Adopt the `CloudKitSyncable` protocol in the `Post` class.
 
 1. Add a computed property `recordType` and return the type you would like used to identify 'Post' objects in CloudKit.
-2. Add a computed property `cloudKitRecord` that returns an optional `CKRecord?` representation of the `Post`. Include the `timestamp` and a `CKAsset` that points to a URL of the photo data.
+2. Add an extension to `CKRecord` that implements a convenience initializer to create a `CKRecord` using a `Post` object. It should be initialized to include the `timestamp` and a `CKAsset` that points to a URL of the photo data.
     * note: `CKAsset` is initialized with a URL. When creating a `CKAsset` on the local device, you initialize it with a URL to a local file path where the photo is located on disk. When you save a `CKAsset`, the data at that file path is uploaded to CloudKit. When you pull a `CKAsset` from CloudKit, the URL will point to the remotely stored data.
 
-You must initialize a `CKAsset` with a file path URL. Core Data does not give you a URL pointer to the photo data. You will need to create a variable `temporaryPhotoURL` that copies the `photoData: NSData?` to a temporary directory and returns the URL to that directory.
+You must initialize a `CKAsset` with a file path URL. You will need to create a variable `temporaryPhotoURL` that copies the contents of the `photoData: NSData?` property to a file in a temporary directory and returns the URL to the file.
 
-3. Add a `temporaryPhotoURL` lazy property that returns an `NSURL` reference to the data the `CKAsset` should upload. 
-    * Lazy properties are only loaded when accessed, and are only loaded once. This differs from a computed property in that a computed property is calculated each time the property is accessed. You use a lazy property as the `temporaryPhotoURL` because it will perform disk operations that are computationally expensive. You do not want to perform a disk operation unless you _need_ the temporary photo URL, and if you need it, you do not want to perform the disk operation each time it is accessed.
-4. Implement the lazy property by capturing the path of the temporary directory, initializing an NSURL with that path, initializing a file URL that uses the `self.recordName` property with jpg as the file extension. Write `self.photoData` to that file URL, and then return the file URL.
+3. Add a `temporaryPhotoURL` computed property that returns an `NSURL` reference to the data the `CKAsset` should upload. 
+4. Implement the computed property by getting the path of the temporary directory, initializing an NSURL with that path, initializing a file URL that uses a unique name with jpg as the file extension. Write `self.photoData` to that file URL, and then return the file URL.
 
 ```swift
-    lazy var temporaryPhotoURL: NSURL = {
-        
-        // Must write to temporary directory to be able to pass image file path url to CKAsset
-        
-        let temporaryDirectory = NSTemporaryDirectory()
-        let temporaryDirectoryURL = NSURL(fileURLWithPath: temporaryDirectory)
-        let fileURL = temporaryDirectoryURL.URLByAppendingPathComponent(self.recordName).URLByAppendingPathExtension("jpg")
-        
-        self.photoData?.writeToURL(fileURL, atomically: true)
-        
-        return fileURL
-    }()
+private var temporaryPhotoURL: NSURL {
+	
+	// Must write to temporary directory to be able to pass image file path url to CKAsset
+	
+	let temporaryDirectory = NSTemporaryDirectory()
+	let temporaryDirectoryURL = NSURL(fileURLWithPath: temporaryDirectory)
+	let fileURL = temporaryDirectoryURL.URLByAppendingPathComponent(NSUUID().UUIDString).URLByAppendingPathExtension("jpg")
+	
+	photoData?.writeToURL(fileURL, atomically: true)
+	
+	return fileURL
+}
 ```
 
-5. Add the convenience initializer `init?(record: CKRecord, context: NSManagedObjectContext)`.
-6. Implement the convenience initializer by guarding for the timestamp and photo data, initializing the entity, and setting the `timestamp`, `photoData`, `recordIDData`, and `recordName` properties.
-    * note: Use `NSKeyedArchiver` to archive the `recordIDData`.
+5. Add the convenience initializer `init?(record: CKRecord)`.
+6. Implement the convenience initializer by guarding for the timestamp and photo data, calling the designated initializer, then setting the `cloudKitRecordID` property.
 
 #### Update Comment for Sync Functionality
 
-Adopt the `CloudKitManagedObject` protocol in the `Comment` class.
+Adopt the `CloudKitSyncable` protocol in the `Comment` class.
 
 1. Add a computed property `recordType` and return the type you would like used to identify 'Comment' objects in CloudKit.
-2. Add a computed property `cloudKitRecord` that returns an optional `CKRecord?` representation of the `Comment`. Include the `timestamp`, `text`, and a `CKReference` to the `Comment`'s `Post`'s `CKRecord`.
-    * note: Consider what you want to happen to a `Comment` if the `Post` is deleted in CloudKit when assigning the action.
+2. Add an extension to `CKRecord` that implements a convenience initializer to create a `CKRecord` using a `Comment` object. It should be initialized to include the `timestamp`, `text`, and a `CKReference` to the `Comment`'s `Post`'s `CKRecord`.
     * note: You will need to guard for the `Comment`'s `Post` and the `Post`'s `cloudKitRecord` to be able to initialize the `CKReference`.
-3. Add the convenience initializer `init?(record: CKRecord, context: NSManagedObjectContext)`.
-4. Implement the convenience initializer by guarding for the timestamp and post reference, initializing the entity, and setting the `timestamp`, `text`, `recordIDData`, and `recordName` properties. 
-    * note: Use `NSKeyedArchiver` to archive the `recordIDData`.
+3. Add the convenience initializer `init?(record: CKRecord)`.
+4. Implement the convenience initializer by guarding for the timestamp and post reference, calling the designated initializer, then setting the `cloudKitRecordID` property.
 
-Remember that a `Comment` should not exist without a `Post`. You will also need to set the `Post` relationship in the convenience initializer. Consider how you would approach this. 
-
-5. Add a function `postWithName` to the `PostController` that takes a name parameter as a `String` and returns a `Post?` object.
-6. Implement the function to initialize and execute a `NSFetchRequest` for any `Post` object with a matching `recordName`. Return the first result, or nil if the fetch fails.
-7. Use the new `postWithName` function in the required `CloudKitManagedObject` initializer to set `self.post` to the result of the `postWithName` using the unwrapped `CKReference`.
+Remember that a `Comment` should not exist without a `Post`. When a `Comment` is created from a `CKRecord`, you will also need to set the new comment's `Post` property. Consider how you would approach this. We will address it in the next section.
 
 #### Update the Post Controller for Manual Sync
 
@@ -482,8 +472,8 @@ Update the `PostController` to support pushing and pulling data from CloudKit us
 To implement sync, you will need to save a record to CloudKit when a new `Post` or `Comment` is created, fetch new records from CloudKit and serialize them into `Post` and `Comment` objects, write a `performFullSync` function that will push all unsynced objects to CloudKit and check for any new `Post` or `Comment` objects, and then update the user interface to support the new functionality.
 
 1. Add a `cloudKitManager` property and set it to a new instance of the `CloudKitManager` class in the initializer.
-2. Update the `createPost` function to unwrap the `post.cloudKitRecord`, and call the `cloudKitManager.saveRecord` function. Use the completion closure to call the `update(record: CKRecord)` on the `Post` to persist the `CKRecordID`.
-3. Update the `addCommentToPost` function to unwrap the `comment.cloudKitRecord`, and call the `cloudKitManager.saveRecord` function. Use the completion closure to call the `update(record: CKRecord)` on the `Comment` to persist the `CKRecordID`.
+2. Update the `createPost` function to create a `CKRecord` using the custom convenience initializer you created, and call the `cloudKitManager.saveRecord` function. Use the completion closure to set the `cloudKitRecordID` property on the `Post` to persist the `CKRecordID`.
+3. Update the `addCommentToPost` function to to create a `CKRecord` using the custom convenience initializer you created, and call the `cloudKitManager.saveRecord` function. Use the completion closure to set the `cloudKitRecordID` property on the `Comment` to persist the `CKRecordID`.
 
 At this point, each new `Post` or `Comment` should be pushed to CloudKit when new instances are created from the Add Post or Post Detail scenes.
 
@@ -491,10 +481,10 @@ At this point, each new `Post` or `Comment` should be pushed to CloudKit when ne
 
 As you implement the next few steps, you will want to be able to get a list of synced records and unsynced records. Create two helper functions that will help you do so.
 
-1. Add a `syncedRecords` function that takes a `type` parameter as a `String` and returns an array of `CloudKitManagedObject`s.
+1. Add a `syncedRecords` function that takes a `type` parameter as a `String` and returns an array of `CloudKitSyncable`s.
 2. Implement the function.
     * note: There are many ways you could approach this. Choose one and implement it independently.
-3. Add a `unsyncedRecords` function that takes a `type` parameter as a `String` and returns an array of `CloudKitManagedObject`s.
+3. Add a `unsyncedRecords` function that takes a `type` parameter as a `String` and returns an array of `CloudKitSyncable`s.
 4. Implement the function.
     * note: There are many ways you could approach this. Choose one and implement it independently.
 
@@ -513,15 +503,22 @@ Not every backend service will support a request like the latter. CloudKit does.
 3. Create a predicate that says that 'do not give me any CKRecords with recordIDs that match this list of references to exclude'.
     * note: `NSPredicate(format: "NOT(recordID IN %@)", argumentArray: [referencesToExclude])`
 4. If the `referencesToExclude` is empty, you need to use a simple `true` `NSPredicate`. Otherwise the above predicate will not work.
-5. Call the `cloudKitManager.fetchRecordsWithType` function. Use the `recordFetchedBlock` to switch the type, initialize the correct `Post` or `Comment` object, and save the context. Use the function's completion block to check for errors and run the optional completion block parameter.
+5. Call the `cloudKitManager.fetchRecordsWithType` function. Use the `recordFetchedBlock` to switch on the type, and  initialize the correct `Post` or `Comment` object. Use the function's completion block to check for errors and run the optional completion block parameter.
 
 ##### Push Changes
 
 Add functionality that will check for any unsynced records and attempt to save them to CloudKit. Theoretically, if you save each new `Post` and `Comment` to CloudKit as they are initialized, this function will not need to be used very often. But your users may have connectivity issues, or CloudKit may be down right when they create a `Post` or `Comment`, so you should build a backstop that will push them the next time the user opens the app or attemps a sync.
 
 1. Add a `pushChangestoCloudKit` function that takes a completion parameter with a `success` `Bool` and an optional `NSError` parameters.
-2. Create an single array of unsynced `Post` and `Comment` objects, flatMap to an array of `CKRecord` objects.
-3. Call the `cloudKitManager.saveRecords` function. Use the `perRecordCompletion` to update the matching object with the `CKRecord` (filter the `unsavedManagedObjects` for the first object that matches the `record.recordID.recordName`) Use the `completion` to call the optional `completion` with a success flag.
+2. Create an array of unsaved `Post` objects, and an array of unsynced `Comment` objects.
+
+You will need a way to match the saved `CKRecord`s to their corresponding `Post`s and `Comment`s in the completion handler for the save. Think about how you would accomplish this.
+
+3. Declare and initialize an empty `[CKRecord : CloudKitSyncable]` dictionary variable.
+4. For each post in the array of unsaved posts, create a `CKRecord` for it, and add the record and the post to the dictionary.
+4. For each comment in the array of unsaved comment, create a `CKRecord` for it, and add the record and the comment to the dictionary.
+5. Create a single array containing all the unsaved CKRecords. You can use `Array(unsavedObjectsByRecord.keys)` to create an array of all the dictionary's keys, which are `CKRecord` objects.
+3. Call the `cloudKitManager.saveRecords` function. Use the `perRecordCompletion` to update the matching object with the `CKRecord`'s `recordID`. Use the `completion` handler to call the optional `completion` with a success flag.
 
 ##### Full Manual Sync
 
@@ -532,7 +529,19 @@ Add functionality that will perform a full sync by pushing all unsynced changes 
     * note: You want to nest these calls because you only want one to happen after the previous one has completely finished. If you call them asynchronously, you may get `Comment` objects that do not have an initialized `Post`, or other unexpected behavior.
 3. Call the `performFullSync` function in the `PostController` initializer.
 
-//TODO Add 'isSyncing' logic
+If `performFullSync()` is called while a previously initiated sync is still in progress, we don't want to start another sync. How can we prevent this?
+
+4. Add an `isSyncing` property to `PostController`.
+5. In `performFullSync()` guard to make sure `isSyncing` is false. If it is true, call the completion closure immediately and bail out.
+6. Set `isSyncing` to true before starting the sync process.
+7. Set `isSyncing` to false after the sync is complete.
+
+When a sync is complete, and new data has been fetched, the user interface will need to be updated to display the new data. In other words, the UI portion of our code needs a way to know that new data has been fetched. Think about how you might accomplish this.
+
+8. Add static `PostsChangedNotification` and `PostCommentsChangedNotification` string properties.
+9. Add a `didSet` property observer to the `posts` property.
+10. In the `didSet`, post a `PostController.PostsChangedNotification` `NSNotification` to notify any interested listeners that the array of posts has changed. Post the notification on the main queue since observers will be updating UI in response, and that can only be done on the main queue.
+11. In `addCommentToPost()` post a `PostController.PostCommentsChangedNotification`. Again this must be done on the main queue. Use the `Post` whose comments changed as the object of the notification.
 
 #### Update the Post List Table View Controller
 
@@ -541,20 +550,16 @@ Update the Post List view to support Pull to Refresh to initiate a sync operatio
 1. Add a new function to request a full sync operation that takes an optional completion closure. Implement the function by turning on the network activity indicator, calling the `performFullSync` function on the `PostController`, and turning off the network activity indicator in the completion.
 2. Call the function in the `viewDidLoad` lifecycle function to initiate a full sync when the user first opens the application.
 3. Add and implement a `UIRefreshControl` IBAction that uses the sync function.
+4. In `viewDidLoad()`, start observing the `PostController.PostsChangedNotification`. In your observation method, reload the table view.
 
-Note the convenience of the `NSFetchedResultsController` handling the UI updates. You do not need to write any code that reloads the view or watches for when syncing finishes. 
+#### Update the Post Detail Table View Controller
+
+1. In `viewDidLoad()`, start observing the `PostController.PostCommentsChangedNotification`.
+2. In your observation method, check that the notification's object is the post whose detail is being displayed, and if so, reload the table view.
 
 #### Check Functionality
 
 At this point the app should support basic push and fetch syncing from CloudKit. Use your Simulator and your Device to create new `Post` and `Comment` objects. Use the Refresh Control to initiate new sync operations between the two instances of your app. Check for and fix any bugs.
-
-#### Fix Double Sync Bug
-
-There is a bug in the app that may result in duplicate `Post` and `Comment` objects being initialized and stored into Core Data. Reproduce the bug using the following steps:
-
-1. Open a fresh instance of the app.
-2. While the Timeline scene is empty, use the refresh control to start a new sync operation.
-3. Identify the problem and implement the solution.
 
 ## Part Four - Intermediate CloudKit: Subscriptions, Push Notifications, Automatic Sync
 
@@ -563,7 +568,7 @@ There is a bug in the app that may result in duplicate `Post` and `Comment` obje
 
 Implement Subscriptions and push notifications to create a simple automatic sync engine. Add support for subscribing to new `Post` records and for subscribing to new `Comment` records on followed `Posts`s. Request permission for remote notifications. Respond to remote notifications by initializing the new `Post` or `Comment` with the new data.
 
-When you finish this part, the app will support syncing photos, posts, and comments from remote notifications generated when new records are created in CloudKit. This will allow all devices that have given permission for remote notifications the ability to sync new posts and comments automatically. When new posts or comments are created in CloudKit, they will be serialized into Core Data objects, and the Fetched Results Controllers will automatically updat ethe user interface with the new data.
+When you finish this part, the app will support syncing photos, posts, and comments from remote notifications generated when new records are created in CloudKit. This will allow all devices that have given permission for remote notifications the ability to sync new posts and comments automatically. When new posts or comments are created in CloudKit, they will be serialized into model objects, and the UI will update with the new data.
 
 
 ### Add Subscription Support to the CloudKitManager
@@ -650,7 +655,8 @@ Update the Info.plist to declare backgrounding support for responding to remote 
 
 At this point the application will save subscriptions to the CloudKit database, and when new `Post` or `Comment` records are created that match those subscriptions, the CloudKit database will deliver a push notification to the application with the record data.
 
-Handle the push notification by serializing the data into a `Post` or `Comment` object, and persisting the object to Core Data. If the user is actively using the application, the Fetched Results Controller will handle updating the Timeline or Post Detail views with the new data.
+Handle the push notification by serializing the data into a `Post` or `Comment` object. If the user is actively using the application, the user interface will be updated in response to notifications posted by the `PostController`.
 
 1. Add the `didReceiveRemoteNotification` delegate function to the `AppDelegate`.
-2. Implement the function by guarding against the user info parameter as a [String: AnyObject], initializing a `CKQueryNotification` from the unwrapped user info dictionary, guarding against the record ID, and using the `CloudKitManager` instance on the `PostController` to fetch the matching `CKRecord`. Switch on the returned record's `recordType`. If it is a `Post`, initialize a `Post` from the `CKRecord`, if it is a `Comment`, initialize a `Comment` from the `CKRecord`, otherwise, return. Save the context after initializing the new object. Run the completion handler by passing the `UIBackgroundFetchResult.NewData` response.
+2. Implement the function by telling the `PostController` to perform a full sync, which will fetch all new `Post`s and all new `Comment`s. Run the completion handler by passing in the `UIBackgroundFetchResult.NewData` response.
+    * note: Fetch _all_ new posts and comments here is somewhat inefficient, since we really only want the new record that triggered the push notification. However, it has the advantage of being very simple, and most of the time there will only be one new record anyway.
