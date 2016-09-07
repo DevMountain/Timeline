@@ -25,32 +25,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func application(application: UIApplication, didReceiveRemoteNotification userInfo: [NSObject : AnyObject], fetchCompletionHandler completionHandler: (UIBackgroundFetchResult) -> Void) {
-        
-        guard let notificationInfo = userInfo as? [String: NSObject] else { return }
-        
-        let queryNotification = CKQueryNotification(fromRemoteNotificationDictionary: notificationInfo)
-        
-        guard let recordID = queryNotification.recordID else { print("No Record ID available from CKQueryNotification."); return }
-        
-        let cloudKitManager = PostController.sharedController.cloudKitManager
-        
-        cloudKitManager.fetchRecordWithID(recordID) { (record, error) in
-            
-            guard let record = record else { print("Unable to fetch CKRecord from Record ID"); return }
-            
-            switch record.recordType {
-                
-            case Post.typeKey:
-                let _ = Post(record: record)
-            case Comment.typeKey:
-                let _ = Comment(record: record)
-            default:
-                return
-            }
-            
-            PostController.sharedController.saveContext()
-        }
-        
+		
+		let postController = PostController.sharedController
+		postController.performFullSync()
+		
         completionHandler(UIBackgroundFetchResult.NewData)
     }
 }

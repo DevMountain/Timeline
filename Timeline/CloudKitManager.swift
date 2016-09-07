@@ -88,31 +88,32 @@ class CloudKitManager {
 		}
 	}
 	
-	func fetchRecordsWithType(type: String, predicate: NSPredicate = NSPredicate(value: true), recordFetchedBlock: ((record: CKRecord) -> Void)?, completion: ((records: [CKRecord]?, error: NSError?) -> Void)?) {
+	func fetchRecordsWithType(type: String,
+	                          predicate: NSPredicate = NSPredicate(value: true),
+	                          recordFetchedBlock: ((record: CKRecord) -> Void)?,
+	                          completion: ((records: [CKRecord]?, error: NSError?) -> Void)?) {
 		
 		var fetchedRecords: [CKRecord] = []
 		
-		let predicate = predicate
 		let query = CKQuery(recordType: type, predicate: predicate)
 		let queryOperation = CKQueryOperation(query: query)
 		
-		queryOperation.recordFetchedBlock = { (fetchedRecord) -> Void in
-			
+		let perRecordBlock = { (fetchedRecord: CKRecord) -> Void in
 			fetchedRecords.append(fetchedRecord)
-			
-			if let recordFetchedBlock = recordFetchedBlock {
-				recordFetchedBlock(record: fetchedRecord)
-			}
+			recordFetchedBlock?(record: fetchedRecord)
 		}
+		queryOperation.recordFetchedBlock = perRecordBlock
 		
-		queryOperation.queryCompletionBlock = { (queryCursor, error) -> Void in
+		var queryCompletionBlock: (CKQueryCursor?, NSError?) -> Void = { (_, _) in }
+		
+		queryCompletionBlock = { (queryCursor: CKQueryCursor?, error: NSError?) -> Void in
 			
 			if let queryCursor = queryCursor {
 				// there are more results, go fetch them
 				
 				let continuedQueryOperation = CKQueryOperation(cursor: queryCursor)
-				continuedQueryOperation.recordFetchedBlock = queryOperation.recordFetchedBlock
-				continuedQueryOperation.queryCompletionBlock = queryOperation.queryCompletionBlock
+				continuedQueryOperation.recordFetchedBlock = perRecordBlock
+				continuedQueryOperation.queryCompletionBlock = queryCompletionBlock
 				
 				self.publicDatabase.addOperation(continuedQueryOperation)
 				
@@ -120,6 +121,7 @@ class CloudKitManager {
 				completion?(records: fetchedRecords, error: error)
 			}
 		}
+		queryOperation.queryCompletionBlock = queryCompletionBlock
 		
 		self.publicDatabase.addOperation(queryOperation)
 	}
