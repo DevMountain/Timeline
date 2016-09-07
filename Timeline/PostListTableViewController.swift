@@ -96,7 +96,8 @@ class PostListTableViewController: UITableViewController, UISearchResultsUpdatin
             searchTerm = searchController.searchBar.text?.lowercaseString {
 			
 			let posts = PostController.sharedController.posts
-            resultsViewController.resultsArray = posts.filter({$0.matchesSearchTerm(searchTerm)})
+			let filteredPosts = posts.filter { $0.matchesSearchTerm(searchTerm) }.map { $0 as SearchableRecord }
+            resultsViewController.resultsArray = filteredPosts
             resultsViewController.tableView.reloadData()
         }
     }
