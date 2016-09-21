@@ -15,7 +15,6 @@
 		682FA4F71CF5427500B81932 /* TimelineUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 682FA4F61CF5427500B81932 /* TimelineUITests.swift */; };
 		68402B571CF93CB000EECEF3 /* CloudKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68402B561CF93CB000EECEF3 /* CloudKitManager.swift */; };
 		6857CAA11CF5F00F0072C237 /* PostController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6857CAA01CF5F00F0072C237 /* PostController.swift */; };
-		68658B591CF8A9E30016C5CD /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 68658B571CF8A9E30016C5CD /* Model.xcdatamodeld */; };
 		68658B661CF8B8730016C5CD /* PostTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68658B651CF8B8730016C5CD /* PostTableViewCell.swift */; };
 		68658B681CF8F3280016C5CD /* SearchResultsTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68658B671CF8F3280016C5CD /* SearchResultsTableViewController.swift */; };
 		68658B6A1CF8F3820016C5CD /* SearchableRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68658B691CF8F3820016C5CD /* SearchableRecord.swift */; };
@@ -62,7 +61,6 @@
 		682FA4F81CF5427500B81932 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		68402B561CF93CB000EECEF3 /* CloudKitManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CloudKitManager.swift; sourceTree = "<group>"; };
 		6857CAA01CF5F00F0072C237 /* PostController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PostController.swift; sourceTree = "<group>"; };
-		68658B581CF8A9E30016C5CD /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
 		68658B5B1CF8AC4B0016C5CD /* Post.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Post.swift; sourceTree = "<group>"; };
 		68658B5D1CF8AC4B0016C5CD /* Comment.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Comment.swift; sourceTree = "<group>"; };
 		68658B651CF8B8730016C5CD /* PostTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PostTableViewCell.swift; sourceTree = "<group>"; };
@@ -198,7 +196,6 @@
 			isa = PBXGroup;
 			children = (
 				9D6CD0251CFC8F6E0002C64B /* Storyboards */,
-				68658B571CF8A9E30016C5CD /* Model.xcdatamodeld */,
 				68199A871D007F96001C6FAE /* Timeline.entitlements */,
 				682FA4DD1CF5427500B81932 /* Assets.xcassets */,
 				682FA4E21CF5427500B81932 /* Info.plist */,
@@ -390,7 +387,6 @@
 				682FA4D71CF5427500B81932 /* AppDelegate.swift in Sources */,
 				9D3CACB11D4FB8DF00ED537B /* Comment.swift in Sources */,
 				68AA93251CF68A1A0006A751 /* AddPostTableViewController.swift in Sources */,
-				68658B591CF8A9E30016C5CD /* Model.xcdatamodeld in Sources */,
 				68658B6A1CF8F3820016C5CD /* SearchableRecord.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -647,19 +643,6 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
-/* Begin XCVersionGroup section */
-		68658B571CF8A9E30016C5CD /* Model.xcdatamodeld */ = {
-			isa = XCVersionGroup;
-			children = (
-				68658B581CF8A9E30016C5CD /* Model.xcdatamodel */,
-			);
-			currentVersion = 68658B581CF8A9E30016C5CD /* Model.xcdatamodel */;
-			path = Model.xcdatamodeld;
-			sourceTree = "<group>";
-			versionGroupType = wrapper.xcdatamodel;
-		};
-/* End XCVersionGroup section */
 	};
 	rootObject = 682FA4CB1CF5427500B81932 /* Project object */;
 }
