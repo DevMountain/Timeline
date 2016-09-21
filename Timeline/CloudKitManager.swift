@@ -168,6 +168,8 @@ class CloudKitManager {
 		operation.savePolicy = .IfServerRecordUnchanged
 		
 		operation.modifyRecordsCompletionBlock = completion
+        
+        publicDatabase.addOperation(operation)
 	}
 	
 	
