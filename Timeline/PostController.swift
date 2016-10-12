@@ -31,7 +31,7 @@ class PostController {
 		}
 	}
 	
-	func createPost(image: UIImage, caption: String, completion: ((Post) -> Void)?) {
+	func createPost(_ image: UIImage, caption: String, completion: ((Post) -> Void)?) {
 		guard let data = UIImageJPEGRepresentation(image, 0.8) else { return }
 		
 		let post = Post(photoData: data)
@@ -67,7 +67,7 @@ class PostController {
 		}
 	}
 	
-	func addCommentToPost(text: String, post: Post, completion: ((Comment) -> Void)? = nil) -> Comment {
+	@discardableResult func addCommentToPost(_ text: String, post: Post, completion: ((Comment) -> Void)? = nil) -> Comment {
 		
 		let comment = Comment(post: post, text: text)
 		post.comments.append(comment)
@@ -81,9 +81,9 @@ class PostController {
 			completion?(comment)
 		}
 		
-		dispatch_async(dispatch_get_main_queue()) {
-			let nc = NSNotificationCenter.defaultCenter()
-			nc.postNotificationName(PostController.PostCommentsChangedNotification, object: post)
+		DispatchQueue.main.async {
+			let nc = NotificationCenter.default
+			nc.post(name: Notification.Name(rawValue: PostController.PostCommentsChangedNotification), object: post)
 		}
 		
 		return comment
@@ -92,7 +92,7 @@ class PostController {
 	
 	// MARK: - Helper Fetches
 	
-	private func recordsOfType(type: String) -> [CloudKitSyncable] {
+	fileprivate func recordsOfType(_ type: String) -> [CloudKitSyncable] {
 		switch type {
 		case "Post":
 			return posts.flatMap { $0 as CloudKitSyncable }
@@ -103,17 +103,17 @@ class PostController {
 		}
 	}
 	
-	func syncedRecords(type: String) -> [CloudKitSyncable] {
+	func syncedRecords(_ type: String) -> [CloudKitSyncable] {
 		return recordsOfType(type).filter { $0.isSynced }
 	}
 	
-	func unsyncedRecords(type: String) -> [CloudKitSyncable] {
+	func unsyncedRecords(_ type: String) -> [CloudKitSyncable] {
 		return recordsOfType(type).filter { !$0.isSynced }
 	}
 	
 	// MARK: - Sync
 	
-	func performFullSync(completion: (() -> Void)? = nil) {
+	func performFullSync(_ completion: (() -> Void)? = nil) {
 		
 		guard !isSyncing else {
 			completion?()
@@ -137,7 +137,7 @@ class PostController {
 		
 	}
 	
-	func fetchNewRecords(type: String, completion: (() -> Void)? = nil) {
+	func fetchNewRecords(_ type: String, completion: (() -> Void)? = nil) {
 		
 		var referencesToExclude = [CKReference]()
 		var predicate: NSPredicate!
@@ -157,8 +157,8 @@ class PostController {
 				}
 			case Comment.typeKey:
 				guard let postReference = record[Comment.postKey] as? CKReference,
-					postIndex = self.posts.indexOf({ $0.cloudKitRecordID == postReference.recordID }),
-					comment = Comment(record: record) else { return }
+					let postIndex = self.posts.index(where: { $0.cloudKitRecordID == postReference.recordID }),
+					let comment = Comment(record: record) else { return }
 				let post = self.posts[postIndex]
 				post.comments.append(comment)
 				comment.post = post
@@ -176,7 +176,7 @@ class PostController {
 		}
 	}
 	
-	func pushChangesToCloudKit(completion: ((success: Bool, error: NSError?) -> Void)?) {
+	func pushChangesToCloudKit(_ completion: ((_ success: Bool, _ error: Error?) -> Void)?) {
 		
 		let unsavedPosts = unsyncedRecords(Post.typeKey) as? [Post] ?? []
 		let unsavedComments = unsyncedRecords(Comment.typeKey) as? [Comment] ?? []
@@ -200,60 +200,60 @@ class PostController {
 		}) { (records, error) in
 			
 			let success = records != nil
-			completion?(success: success, error: error)
+			completion?(success, error)
 		}
 	}
 	
 	
 	// MARK: - Subscriptions
 	
-	func subscribeToNewPosts(completion: ((success: Bool, error: NSError?) -> Void)?) {
+	func subscribeToNewPosts(_ completion: ((_ success: Bool, _ error: Error?) -> Void)?) {
 		
 		let predicate = NSPredicate(value: true)
 		
-		cloudKitManager.subscribe(Post.typeKey, predicate: predicate, subscriptionID: "allPosts", contentAvailable: true, options: .FiresOnRecordCreation) { (subscription, error) in
+		cloudKitManager.subscribe(Post.typeKey, predicate: predicate, subscriptionID: "allPosts", contentAvailable: true, options: .firesOnRecordCreation) { (subscription, error) in
 			
 			if let completion = completion {
 				
 				let success = subscription != nil
-				completion(success: success, error: error)
+				completion(success, error)
 			}
 		}
 	}
 	
-	func checkSubscriptionToPostComments(post: Post, completion: ((subscribed: Bool) -> Void)?) {
+	func checkSubscriptionToPostComments(_ post: Post, completion: ((_ subscribed: Bool) -> Void)?) {
 		
 		guard let subscriptionID = post.cloudKitRecordID?.recordName else {
-			completion?(subscribed: false)
+			completion?(false)
 			return
 		}
 		
 		cloudKitManager.fetchSubscription(subscriptionID) { (subscription, error) in
 			let subscribed = subscription != nil
-			completion?(subscribed: subscribed)
+			completion?(subscribed)
 		}
 	}
 	
-	func addSubscriptionToPostComments(post: Post, alertBody: String?, completion: ((success: Bool, error: NSError?) -> Void)?) {
+	func addSubscriptionToPostComments(_ post: Post, alertBody: String?, completion: ((_ success: Bool, _ error: Error?) -> Void)?) {
 		
 		guard let recordID = post.cloudKitRecordID else { fatalError("Unable to create CloudKit reference for subscription.") }
 		
 		let predicate = NSPredicate(format: "post == %@", argumentArray: [recordID])
 		
-		cloudKitManager.subscribe(Comment.typeKey, predicate: predicate, subscriptionID: recordID.recordName, contentAvailable: true, alertBody: alertBody, desiredKeys: [Comment.textKey, Comment.postKey], options: .FiresOnRecordCreation) { (subscription, error) in
+		cloudKitManager.subscribe(Comment.typeKey, predicate: predicate, subscriptionID: recordID.recordName, contentAvailable: true, alertBody: alertBody, desiredKeys: [Comment.textKey, Comment.postKey], options: .firesOnRecordCreation) { (subscription, error) in
 			
 			if let completion = completion {
 				
 				let success = subscription != nil
-				completion(success: success, error: error)
+				completion(success, error)
 			}
 		}
 	}
 	
-	func removeSubscriptionToPostComments(post: Post, completion: ((success: Bool, error: NSError?) -> Void)?) {
+	func removeSubscriptionToPostComments(_ post: Post, completion: ((_ success: Bool, _ error: Error?) -> Void)?) {
 		
 		guard let subscriptionID = post.cloudKitRecordID?.recordName else {
-			completion?(success: true, error: nil)
+			completion?(true, nil)
 			return
 		}
 		
@@ -262,15 +262,15 @@ class PostController {
 			if let completion = completion {
 				
 				let success = subscriptionID != nil && error == nil
-				completion(success: success, error: error)
+				completion(success, error)
 			}
 		}
 	}
 	
-	func togglePostCommentSubscription(post: Post, completion: ((success: Bool, isSubscribed: Bool, error: NSError?) -> Void)?) {
+	func togglePostCommentSubscription(_ post: Post, completion: ((_ success: Bool, _ isSubscribed: Bool, _ error: Error?) -> Void)?) {
 		
 		guard let subscriptionID = post.cloudKitRecordID?.recordName else {
-			completion?(success: false, isSubscribed: false, error: nil)
+			completion?(false, false, nil)
 			return
 		}
 		
@@ -280,14 +280,14 @@ class PostController {
 				self.removeSubscriptionToPostComments(post, completion: { (success, error) in
 					
 					if let completion = completion {
-						completion(success: success, isSubscribed: false, error: error)
+						completion(success, false, error)
 					}
 				})
 			} else {
 				self.addSubscriptionToPostComments(post, alertBody: "Someone commented on a post you follow! 👍", completion: { (success, error) in
 					
 					if let completion = completion {
-						completion(success: true, isSubscribed: true, error: error)
+						completion(true, true, error)
 					}
 				})
 			}
@@ -302,14 +302,14 @@ class PostController {
 	
 	var posts = [Post]() {
 		didSet {
-			dispatch_async(dispatch_get_main_queue()) {
-				let nc = NSNotificationCenter.defaultCenter()
-				nc.postNotificationName(PostController.PostsChangedNotification, object: self)
+			DispatchQueue.main.async {
+				let nc = NotificationCenter.default
+				nc.post(name: Notification.Name(rawValue: PostController.PostsChangedNotification), object: self)
 			}
 		}
 	}
 	var sortedPosts: [Post] {
-		return posts.sort { return $0.timestamp.compare($1.timestamp) == .OrderedAscending }
+		return posts.sorted { return $0.timestamp.compare($1.timestamp as Date) == .orderedAscending }
 	}
 	var comments: [Comment] {
 		return posts.flatMap { $0.comments }

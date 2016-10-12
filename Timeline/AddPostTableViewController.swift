@@ -19,36 +19,36 @@ class AddPostTableViewController: UITableViewController {
 		
 	}
 	
-	@IBAction func addPostTapped(sender: AnyObject) {
+	@IBAction func addPostTapped(_ sender: AnyObject) {
 		
 		if let image = image,
 			let caption = captionTextField.text {
 			
 			PostController.sharedController.createPost(image, caption: caption) { (_) in
-				self.dismissViewControllerAnimated(true, completion: nil)
+				self.dismiss(animated: true, completion: nil)
 			}
 			
 		} else {
 			
-			let alertController = UIAlertController(title: "Missing Post Information", message: "Check your image and caption and try again.", preferredStyle: .Alert)
-			alertController.addAction(UIAlertAction(title: "Ok", style: .Cancel, handler: nil))
+			let alertController = UIAlertController(title: "Missing Post Information", message: "Check your image and caption and try again.", preferredStyle: .alert)
+			alertController.addAction(UIAlertAction(title: "Ok", style: .cancel, handler: nil))
 			
-			presentViewController(alertController, animated: true, completion: nil)
+			present(alertController, animated: true, completion: nil)
 		}
 	}
 	
-	@IBAction func cancelButtonTapped(sender: AnyObject) {
+	@IBAction func cancelButtonTapped(_ sender: AnyObject) {
 		
-		dismissViewControllerAnimated(true, completion: nil)
+		dismiss(animated: true, completion: nil)
 	}
 	
 	// MARK: - Navigation
 	
-	override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+	override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
 		
 		if segue.identifier == "embedPhotoSelect" {
 			
-			let embedViewController = segue.destinationViewController as? PhotoSelectViewController
+			let embedViewController = segue.destination as? PhotoSelectViewController
 			embedViewController?.delegate = self
 		}
 	}
@@ -56,7 +56,7 @@ class AddPostTableViewController: UITableViewController {
 
 extension AddPostTableViewController: PhotoSelectViewControllerDelegate {
 	
-	func photoSelectViewControllerSelected(image: UIImage) {
+	func photoSelectViewControllerSelected(_ image: UIImage) {
 		
 		self.image = image
 	}
