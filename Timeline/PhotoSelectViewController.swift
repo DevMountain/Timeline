@@ -9,18 +9,9 @@
 import UIKit
 
 class PhotoSelectViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
-
-    @IBOutlet weak var addPhotoButton: UIButton!
-    @IBOutlet weak var imageView: UIImageView!
-    
-    weak var delegate: PhotoSelectViewControllerDelegate?
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-
-        // Do any additional setup after loading the view.
-    }
-    
+	
+	// MARK: Actions
+	
     @IBAction func selectPhotoButtonTapped() {
         let imagePicker = UIImagePickerController()
         imagePicker.delegate = self
@@ -45,6 +36,8 @@ class PhotoSelectViewController: UIViewController, UIImagePickerControllerDelega
         
         present(alert, animated: true, completion: nil)
     }
+	
+	// MARK: UIImagePickerControllerDelegate
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
         picker.dismiss(animated: true, completion: nil)
@@ -56,7 +49,16 @@ class PhotoSelectViewController: UIViewController, UIImagePickerControllerDelega
             imageView.image = image
         }
     }
+	
+	// MARK: Properties
+	
+	weak var delegate: PhotoSelectViewControllerDelegate?
+	
+	@IBOutlet weak var addPhotoButton: UIButton!
+	@IBOutlet weak var imageView: UIImageView!
 }
+
+// MARK: -
 
 protocol PhotoSelectViewControllerDelegate: class {
     

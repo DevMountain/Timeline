@@ -46,7 +46,7 @@ class Comment: CloudKitSyncable {
 // MARK: -
 
 extension Comment: SearchableRecord {
-	func matchesSearchTerm(_ searchTerm: String) -> Bool {
+	func matches(searchTerm: String) -> Bool {
 		return text.contains(searchTerm)
 	}
 }

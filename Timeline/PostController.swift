@@ -33,13 +33,13 @@ class PostController {
 		}
 	}
 	
-	func createPost(_ image: UIImage, caption: String, completion: ((Post) -> Void)?) {
+	func createPostWith(image: UIImage, caption: String, completion: ((Post) -> Void)?) {
 		guard let data = UIImageJPEGRepresentation(image, 0.8) else { return }
 		
 		let post = Post(photoData: data)
 		posts.append(post)
-		let captionComment = addCommentToPost(caption, post: post)
-	
+		let captionComment = addComment(toPost: post, commentText: caption)
+		
 		cloudKitManager.saveRecord(CKRecord(post)) { (record, error) in
 			guard let record = record else {
 				if let error = error {
@@ -60,27 +60,29 @@ class PostController {
 				captionComment.cloudKitRecordID = record?.recordID
 				completion?(post)
 			}
-
-			self.addSubscriptionToPostComments(post, alertBody: "Someone commented on your post! 👍") { (success, error) in
+			
+			self.addSubscriptionTo(commentsForPost: post, alertBody: "Someone commented on your post! 👍") { (success, error) in
 				if let error = error {
-					print("Unable to save comment subscription: \(error.localizedDescription)")
+					NSLog("Unable to save comment subscription: \(error)")
 				}
 			}
 		}
 	}
 	
-	@discardableResult func addCommentToPost(_ text: String, post: Post, completion: ((Comment) -> Void)? = nil) -> Comment {
+	@discardableResult func addComment(toPost post: Post,
+	                                   commentText: String,
+	                                   completion: @escaping ((Comment) -> Void) = { _ in }) -> Comment {
 		
-		let comment = Comment(post: post, text: text)
+		let comment = Comment(post: post, text: commentText)
 		post.comments.append(comment)
 		
-		self.cloudKitManager.saveRecord(CKRecord(comment)) { (record, error) in
+		cloudKitManager.saveRecord(CKRecord(comment)) { (record, error) in
 			if let error = error {
 				NSLog("Error saving new comment to CloudKit: \(error)")
 				return
 			}
 			comment.cloudKitRecordID = record?.recordID
-			completion?(comment)
+			completion(comment)
 		}
 		
 		DispatchQueue.main.async {
@@ -94,7 +96,7 @@ class PostController {
 	
 	// MARK: - Helper Fetches
 	
-	fileprivate func recordsOfType(_ type: String) -> [CloudKitSyncable] {
+	private func recordsOf(type: String) -> [CloudKitSyncable] {
 		switch type {
 		case "Post":
 			return posts.flatMap { $0 as CloudKitSyncable }
@@ -105,20 +107,20 @@ class PostController {
 		}
 	}
 	
-	func syncedRecords(_ type: String) -> [CloudKitSyncable] {
-		return recordsOfType(type).filter { $0.isSynced }
+	func syncedRecordsOf(type: String) -> [CloudKitSyncable] {
+		return recordsOf(type: type).filter { $0.isSynced }
 	}
 	
-	func unsyncedRecords(_ type: String) -> [CloudKitSyncable] {
-		return recordsOfType(type).filter { !$0.isSynced }
+	func unsyncedRecordsOf(type: String) -> [CloudKitSyncable] {
+		return recordsOf(type: type).filter { !$0.isSynced }
 	}
 	
 	// MARK: - Sync
 	
-	func performFullSync(_ completion: (() -> Void)? = nil) {
+	func performFullSync(completion: @escaping (() -> Void) = { _ in }) {
 		
 		guard !isSyncing else {
-			completion?()
+			completion()
 			return
 		}
 		
@@ -126,24 +128,24 @@ class PostController {
 		
 		pushChangesToCloudKit { (success) in
 			
-			self.fetchNewRecords(Post.typeKey) {
+			self.fetchNewRecordsOf(type: Post.typeKey) {
 				
-				self.fetchNewRecords(Comment.typeKey) {
+				self.fetchNewRecordsOf(type: Comment.typeKey) {
 					
 					self.isSyncing = false
 					
-					completion?()
+					completion()
 				}
 			}
 		}
 		
 	}
 	
-	func fetchNewRecords(_ type: String, completion: (() -> Void)? = nil) {
+	func fetchNewRecordsOf(type: String, completion: @escaping (() -> Void) = { _ in }) {
 		
 		var referencesToExclude = [CKReference]()
 		var predicate: NSPredicate!
-		referencesToExclude = self.syncedRecords(type).flatMap({ $0.cloudKitReference })
+		referencesToExclude = self.syncedRecordsOf(type: type).flatMap { $0.cloudKitReference }
 		predicate = NSPredicate(format: "NOT(recordID IN %@)", argumentArray: [referencesToExclude])
 		
 		if referencesToExclude.isEmpty {
@@ -174,14 +176,14 @@ class PostController {
 				NSLog("Error fetching CloudKit records of type \(type): \(error)")
 			}
 			
-			completion?()
+			completion()
 		}
 	}
 	
-	func pushChangesToCloudKit(_ completion: ((_ success: Bool, _ error: Error?) -> Void)?) {
+	func pushChangesToCloudKit(completion: @escaping ((_ success: Bool, _ error: Error?) -> Void) = { _,_ in }) {
 		
-		let unsavedPosts = unsyncedRecords(Post.typeKey) as? [Post] ?? []
-		let unsavedComments = unsyncedRecords(Comment.typeKey) as? [Comment] ?? []
+		let unsavedPosts = unsyncedRecordsOf(type: Post.typeKey) as? [Post] ?? []
+		let unsavedComments = unsyncedRecordsOf(type: Comment.typeKey) as? [Comment] ?? []
 		var unsavedObjectsByRecord = [CKRecord: CloudKitSyncable]()
 		for post in unsavedPosts {
 			let record = CKRecord(post)
@@ -202,41 +204,40 @@ class PostController {
 		}) { (records, error) in
 			
 			let success = records != nil
-			completion?(success, error)
+			completion(success, error)
 		}
 	}
 	
 	
 	// MARK: - Subscriptions
 	
-	func subscribeToNewPosts(_ completion: ((_ success: Bool, _ error: Error?) -> Void)?) {
+	func subscribeToNewPosts(completion: @escaping ((_ success: Bool, _ error: Error?) -> Void) = { _,_ in }) {
 		
 		let predicate = NSPredicate(value: true)
 		
 		cloudKitManager.subscribe(Post.typeKey, predicate: predicate, subscriptionID: "allPosts", contentAvailable: true, options: .firesOnRecordCreation) { (subscription, error) in
 			
-			if let completion = completion {
-				
-				let success = subscription != nil
-				completion(success, error)
-			}
+			let success = subscription != nil
+			completion(success, error)
 		}
 	}
 	
-	func checkSubscriptionToPostComments(_ post: Post, completion: ((_ subscribed: Bool) -> Void)?) {
+	func checkSubscriptionTo(commentsForPost post: Post, completion: @escaping ((_ subscribed: Bool) -> Void) = { _ in }) {
 		
 		guard let subscriptionID = post.cloudKitRecordID?.recordName else {
-			completion?(false)
+			completion(false)
 			return
 		}
 		
 		cloudKitManager.fetchSubscription(subscriptionID) { (subscription, error) in
 			let subscribed = subscription != nil
-			completion?(subscribed)
+			completion(subscribed)
 		}
 	}
 	
-	func addSubscriptionToPostComments(_ post: Post, alertBody: String?, completion: ((_ success: Bool, _ error: Error?) -> Void)?) {
+	func addSubscriptionTo(commentsForPost post: Post,
+	                       alertBody: String?,
+	                       completion: @escaping ((_ success: Bool, _ error: Error?) -> Void) = { _,_ in }) {
 		
 		guard let recordID = post.cloudKitRecordID else { fatalError("Unable to create CloudKit reference for subscription.") }
 		
@@ -244,54 +245,43 @@ class PostController {
 		
 		cloudKitManager.subscribe(Comment.typeKey, predicate: predicate, subscriptionID: recordID.recordName, contentAvailable: true, alertBody: alertBody, desiredKeys: [Comment.textKey, Comment.postKey], options: .firesOnRecordCreation) { (subscription, error) in
 			
-			if let completion = completion {
-				
-				let success = subscription != nil
-				completion(success, error)
-			}
+			let success = subscription != nil
+			completion(success, error)
 		}
 	}
 	
-	func removeSubscriptionToPostComments(_ post: Post, completion: ((_ success: Bool, _ error: Error?) -> Void)?) {
+	func removeSubscriptionTo(commentsForPost post: Post,
+	                          completion: @escaping ((_ success: Bool, _ error: Error?) -> Void) = { _,_ in }) {
 		
 		guard let subscriptionID = post.cloudKitRecordID?.recordName else {
-			completion?(true, nil)
+			completion(true, nil)
 			return
 		}
 		
 		cloudKitManager.unsubscribe(subscriptionID) { (subscriptionID, error) in
-			
-			if let completion = completion {
-				
-				let success = subscriptionID != nil && error == nil
-				completion(success, error)
-			}
+			let success = subscriptionID != nil && error == nil
+			completion(success, error)
 		}
 	}
 	
-	func togglePostCommentSubscription(_ post: Post, completion: ((_ success: Bool, _ isSubscribed: Bool, _ error: Error?) -> Void)?) {
+	func toggleSubscriptionTo(commentsForPost post: Post,
+	                          completion: @escaping ((_ success: Bool, _ isSubscribed: Bool, _ error: Error?) -> Void) = { _,_,_ in }) {
 		
 		guard let subscriptionID = post.cloudKitRecordID?.recordName else {
-			completion?(false, false, nil)
+			completion(false, false, nil)
 			return
 		}
 		
 		cloudKitManager.fetchSubscription(subscriptionID) { (subscription, error) in
 			
 			if subscription != nil {
-				self.removeSubscriptionToPostComments(post, completion: { (success, error) in
-					
-					if let completion = completion {
+				self.removeSubscriptionTo(commentsForPost: post) { (success, error) in
 						completion(success, false, error)
-					}
-				})
+				}
 			} else {
-				self.addSubscriptionToPostComments(post, alertBody: "Someone commented on a post you follow! 👍", completion: { (success, error) in
-					
-					if let completion = completion {
-						completion(true, true, error)
-					}
-				})
+				self.addSubscriptionTo(commentsForPost: post, alertBody: "Someone commented on a post you follow! 👍") { (success, error) in
+						completion(success, true, error)
+				}
 			}
 		}
 	}

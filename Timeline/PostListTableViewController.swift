@@ -9,9 +9,7 @@
 import UIKit
 
 class PostListTableViewController: UITableViewController, UISearchResultsUpdating {
-
-    var searchController: UISearchController?
-    
+	
     override func viewDidLoad() {
         
         super.viewDidLoad()
@@ -28,6 +26,8 @@ class PostListTableViewController: UITableViewController, UISearchResultsUpdatin
 		let nc = NotificationCenter.default
 		nc.addObserver(self, selector: #selector(postsChanged(_:)), name: PostController.PostsChangedNotification, object: nil)
     }
+	
+	// MARK: Actions
     
     @IBAction func refreshControlActivated(_ sender: UIRefreshControl) {
         
@@ -35,8 +35,10 @@ class PostListTableViewController: UITableViewController, UISearchResultsUpdatin
             self.refreshControl?.endRefreshing()
         }
     }
+	
+	// MARK: Private
     
-    func requestFullSync(_ completion: (() -> Void)? = nil) {
+    private func requestFullSync(_ completion: (() -> Void)? = nil) {
         
         UIApplication.shared.isNetworkActivityIndicatorVisible = true
         
@@ -44,19 +46,11 @@ class PostListTableViewController: UITableViewController, UISearchResultsUpdatin
             
             UIApplication.shared.isNetworkActivityIndicatorVisible = false
             
-            if let completion = completion {
-                completion()
-            }
+			completion?()
         }
     }
 	
-	// MARK: - Notifications
-	
-	func postsChanged(_ notification: Notification) {
-		tableView.reloadData()
-	}
-	
-    // MARK: - Table view data source
+    // MARK: - UITableViewDataSource
 	
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
        return PostController.sharedController.posts.count
@@ -67,17 +61,15 @@ class PostListTableViewController: UITableViewController, UISearchResultsUpdatin
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "postCell", for: indexPath) as? PostTableViewCell else { return PostTableViewCell() }
 		
 		let posts = PostController.sharedController.posts
-		let post = posts[indexPath.row]
+		cell.post = posts[indexPath.row]
 		
-        cell.updateWithPost(post)
-        
         return cell
     }
 	
     
-    // MARK: - Search Controller
+    // MARK: Search Controller
     
-    func setUpSearchController() {
+    private func setUpSearchController() {
         
         let resultsController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "SearchResultsTableViewController")
         
@@ -96,14 +88,19 @@ class PostListTableViewController: UITableViewController, UISearchResultsUpdatin
             let searchTerm = searchController.searchBar.text?.lowercased() {
 			
 			let posts = PostController.sharedController.posts
-			let filteredPosts = posts.filter { $0.matchesSearchTerm(searchTerm) }.map { $0 as SearchableRecord }
+			let filteredPosts = posts.filter { $0.matches(searchTerm: searchTerm) }.map { $0 as SearchableRecord }
             resultsViewController.resultsArray = filteredPosts
             resultsViewController.tableView.reloadData()
         }
     }
-
+	
+	// MARK: Notifications
+	
+	func postsChanged(_ notification: Notification) {
+		tableView.reloadData()
+	}
     
-    // MARK: - Navigation
+    // MARK: Navigation
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         
@@ -123,11 +120,15 @@ class PostListTableViewController: UITableViewController, UISearchResultsUpdatin
                 let selectedIndexPath = (searchController?.searchResultsController as? SearchResultsTableViewController)?.tableView.indexPath(for: sender),
                 let searchTerm = searchController?.searchBar.text?.lowercased() {
 				
-				let posts = PostController.sharedController.posts.filter({ $0.matchesSearchTerm(searchTerm) })
+				let posts = PostController.sharedController.posts.filter({ $0.matches(searchTerm: searchTerm) })
                 let post = posts[selectedIndexPath.row]
                 
                 detailViewController.post = post
             }
         }
     }
+	
+	// MARK: Properties
+	
+	 var searchController: UISearchController?
 }

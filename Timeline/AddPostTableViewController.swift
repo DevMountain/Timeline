@@ -9,22 +9,15 @@
 import UIKit
 
 class AddPostTableViewController: UITableViewController {
-	
-	var image: UIImage?
-	
-	@IBOutlet weak var captionTextField: UITextField!
-	
-	override func viewDidLoad() {
-		super.viewDidLoad()
-		
-	}
+
+	// MARK: Actions
 	
 	@IBAction func addPostTapped(_ sender: AnyObject) {
 		
 		if let image = image,
 			let caption = captionTextField.text {
 			
-			PostController.sharedController.createPost(image, caption: caption) { (_) in
+			PostController.sharedController.createPostWith(image: image, caption: caption) { (_) in
 				self.dismiss(animated: true, completion: nil)
 			}
 			
@@ -42,7 +35,7 @@ class AddPostTableViewController: UITableViewController {
 		dismiss(animated: true, completion: nil)
 	}
 	
-	// MARK: - Navigation
+	// MARK: Navigation
 	
 	override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
 		
@@ -52,6 +45,12 @@ class AddPostTableViewController: UITableViewController {
 			embedViewController?.delegate = self
 		}
 	}
+	
+	// MARK: Properties
+
+	var image: UIImage?
+	
+	@IBOutlet weak var captionTextField: UITextField!
 }
 
 extension AddPostTableViewController: PhotoSelectViewControllerDelegate {

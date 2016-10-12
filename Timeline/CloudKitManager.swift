@@ -21,7 +21,6 @@ class CloudKitManager {
 	let privateDatabase = CKContainer.default().privateCloudDatabase
 	
 	init() {
-		
 		checkCloudKitAvailability()
 	}
 	
