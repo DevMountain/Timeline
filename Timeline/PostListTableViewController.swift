@@ -26,7 +26,7 @@ class PostListTableViewController: UITableViewController, UISearchResultsUpdatin
         }
 		
 		let nc = NotificationCenter.default
-		nc.addObserver(self, selector: #selector(postsChanged(_:)), name: NSNotification.Name(rawValue: PostController.PostsChangedNotification), object: nil)
+		nc.addObserver(self, selector: #selector(postsChanged(_:)), name: PostController.PostsChangedNotification, object: nil)
     }
     
     @IBAction func refreshControlActivated(_ sender: UIRefreshControl) {

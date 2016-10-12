@@ -10,12 +10,14 @@ import UIKit
 import CoreData
 import CloudKit
 
+extension PostController {
+	static let PostsChangedNotification = Notification.Name("PostsChangedNotification")
+	static let PostCommentsChangedNotification = Notification.Name("PostCommentsChangedNotification")
+}
+
 class PostController {
 	
 	static let sharedController = PostController()
-	
-	static let PostsChangedNotification = "PostsChangedNotification"
-	static let PostCommentsChangedNotification = "PostCommentsChangedNotification"
 	
 	init() {
 		
@@ -83,7 +85,7 @@ class PostController {
 		
 		DispatchQueue.main.async {
 			let nc = NotificationCenter.default
-			nc.post(name: Notification.Name(rawValue: PostController.PostCommentsChangedNotification), object: post)
+			nc.post(name: PostController.PostCommentsChangedNotification, object: post)
 		}
 		
 		return comment
@@ -304,7 +306,7 @@ class PostController {
 		didSet {
 			DispatchQueue.main.async {
 				let nc = NotificationCenter.default
-				nc.post(name: Notification.Name(rawValue: PostController.PostsChangedNotification), object: self)
+				nc.post(name: PostController.PostsChangedNotification, object: self)
 			}
 		}
 	}

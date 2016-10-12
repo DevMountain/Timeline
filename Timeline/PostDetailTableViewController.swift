@@ -21,7 +21,7 @@ class PostDetailTableViewController: UITableViewController {
 		}
 		
 		let nc = NotificationCenter.default
-		nc.addObserver(self, selector: #selector(postCommentsChanged(_:)), name: NSNotification.Name(rawValue: PostController.PostCommentsChangedNotification), object: nil)
+		nc.addObserver(self, selector: #selector(postCommentsChanged(_:)), name: PostController.PostCommentsChangedNotification, object: nil)
 	}
 	
 	func updateWithPost(_ post: Post) {
