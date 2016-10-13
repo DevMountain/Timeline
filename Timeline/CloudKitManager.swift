@@ -38,39 +38,49 @@ class CloudKitManager {
 			if let recordID = recordID,
 				let completion = completion {
 				
-				self.fetchRecordWithID(recordID, completion: { (record, error) in
-					completion(record, error)
-				})
+				self.fetchRecord(withID: recordID, completion: completion)
 			}
 		}
 	}
 	
-	func fetchUsernameFromRecordID(_ recordID: CKRecordID, completion: ((_ givenName: String?, _ familyName: String?) -> Void)?) {
+	func fetchUsername(for recordID: CKRecordID,
+	                   completion: @escaping ((_ givenName: String?, _ familyName: String?) -> Void) = { _,_ in }) {
 		
-		let operation = CKDiscoverUserInfosOperation(emailAddresses: nil, userRecordIDs: [recordID])
+		let recordInfo = CKUserIdentityLookupInfo(userRecordID: recordID)
+		let operation = CKDiscoverUserIdentitiesOperation(userIdentityLookupInfos: [recordInfo])
 		
-		operation.discoverUserInfosCompletionBlock = { (emailsToUserInfos, userRecordIDsToUserInfos, operationError) -> Void in
-			
-			if let userRecordIDsToUserInfos = userRecordIDsToUserInfos,
-				let userInfo = userRecordIDsToUserInfos[recordID] {
-				
-				completion?(userInfo.displayContact?.givenName, userInfo.displayContact?.familyName)
-				
-			} else {
-				completion?(nil, nil)
+		var userIdenties = [CKUserIdentity]()
+		operation.userIdentityDiscoveredBlock = { (userIdentity, _) in
+			userIdenties.append(userIdentity)
+		}
+		operation.discoverUserIdentitiesCompletionBlock = { (error) in
+			if let error = error {
+				NSLog("Error getting username from record ID: \(error)")
+				completion(nil, nil)
+				return
 			}
+			
+			let nameComponents = userIdenties.first?.nameComponents
+			completion(nameComponents?.givenName, nameComponents?.familyName)
 		}
 		
 		CKContainer.default().add(operation)
 	}
 	
-	func fetchAllDiscoverableUsers(_ completion: ((_ userInfoRecords: [CKDiscoveredUserInfo]?) -> Void)?) {
+	func fetchAllDiscoverableUsers(completion: @escaping ((_ userInfoRecords: [CKUserIdentity]?) -> Void) = { _ in }) {
 		
-		let operation = CKDiscoverAllContactsOperation()
+		let operation = CKDiscoverAllUserIdentitiesOperation()
 		
-		operation.discoverAllContactsCompletionBlock = { (discoveredUserInfos, error) -> Void in
+		var userIdenties = [CKUserIdentity]()
+		operation.userIdentityDiscoveredBlock = { userIdenties.append($0) }
+		operation.discoverAllUserIdentitiesCompletionBlock = { error in
+			if let error = error {
+				NSLog("Error discovering all user identies: \(error)")
+				completion(nil)
+				return
+			}
 			
-			completion?(discoveredUserInfos)
+			completion(userIdenties)
 		}
 		
 		CKContainer.default().add(operation)
@@ -79,7 +89,7 @@ class CloudKitManager {
 	
 	// MARK: - Fetch Records
 	
-	func fetchRecordWithID(_ recordID: CKRecordID, completion: ((_ record: CKRecord?, _ error: Error?) -> Void)?) {
+	func fetchRecord(withID recordID: CKRecordID, completion: ((_ record: CKRecord?, _ error: Error?) -> Void)?) {
 		
 		publicDatabase.fetch(withRecordID: recordID) { (record, error) in
 			
@@ -167,8 +177,8 @@ class CloudKitManager {
 		operation.savePolicy = .ifServerRecordUnchanged
 		
 		operation.modifyRecordsCompletionBlock = completion
-        
-        publicDatabase.add(operation)
+		
+		publicDatabase.add(operation)
 	}
 	
 	
@@ -184,7 +194,7 @@ class CloudKitManager {
 		publicDatabase.save(record, completionHandler: { (record, error) in
 			
 			completion?(record, error)
-		}) 
+		})
 	}
 	
 	func modifyRecords(_ records: [CKRecord], perRecordCompletion: ((_ record: CKRecord?, _ error: Error?) -> Void)?, completion: ((_ records: [CKRecord]?, _ error: Error?) -> Void)?) {
@@ -206,9 +216,16 @@ class CloudKitManager {
 	
 	// MARK: - Subscriptions
 	
-	func subscribe(_ type: String, predicate: NSPredicate, subscriptionID: String, contentAvailable: Bool, alertBody: String? = nil, desiredKeys: [String]? = nil, options: CKSubscriptionOptions, completion: ((_ subscription: CKSubscription?, _ error: Error?) -> Void)?) {
+	func subscribe(_ type: String,
+	               predicate: NSPredicate,
+	               subscriptionID: String,
+	               contentAvailable: Bool,
+	               alertBody: String? = nil,
+	               desiredKeys: [String]? = nil,
+	               options: CKQuerySubscriptionOptions,
+	               completion: ((_ subscription: CKSubscription?, _ error: Error?) -> Void)?) {
 		
-		let subscription = CKSubscription(recordType: type, predicate: predicate, subscriptionID: subscriptionID, options: options)
+		let subscription = CKQuerySubscription(recordType: type, predicate: predicate, subscriptionID: subscriptionID, options: options)
 		
 		let notificationInfo = CKNotificationInfo()
 		notificationInfo.alertBody = alertBody
@@ -220,7 +237,7 @@ class CloudKitManager {
 		publicDatabase.save(subscription, completionHandler: { (subscription, error) in
 			
 			completion?(subscription, error)
-		}) 
+		})
 	}
 	
 	func unsubscribe(_ subscriptionID: String, completion: ((_ subscriptionID: String?, _ error: Error?) -> Void)?) {
