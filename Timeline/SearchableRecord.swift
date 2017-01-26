@@ -10,5 +10,5 @@ import Foundation
 
 protocol SearchableRecord {
     
-    func matchesSearchTerm(searchTerm: String) -> Bool
+    func matches(searchTerm: String) -> Bool
 }

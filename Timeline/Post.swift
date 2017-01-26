@@ -18,14 +18,14 @@ class Post: CloudKitSyncable {
     static let photoDataKey = "photoData"
     static let timestampKey = "timestamp"
     
-	init(photoData: NSData?, timestamp: NSDate = NSDate(), comments: [Comment] = []) {
+	init(photoData: Data?, timestamp: Date = Date(), comments: [Comment] = []) {
 		self.timestamp = timestamp
         self.photoData = photoData
 		self.comments = comments
     }
 	
-	let timestamp: NSDate
-	let photoData: NSData?
+	let timestamp: Date
+	let photoData: Data?
 	var photo: UIImage? {
 		guard let photoData = self.photoData else { return nil }
 		return UIImage(data: photoData)
@@ -37,22 +37,22 @@ class Post: CloudKitSyncable {
 	convenience required init?(record: CKRecord) {
 		
 		guard let timestamp = record.creationDate,
-			photoAsset = record[Post.photoDataKey] as? CKAsset else { return nil }
+			let photoAsset = record[Post.photoDataKey] as? CKAsset else { return nil }
 		
-		let photoData = NSData(contentsOfURL: photoAsset.fileURL)
+		let photoData = try? Data(contentsOf: photoAsset.fileURL)
 		self.init(photoData: photoData, timestamp: timestamp)
 		cloudKitRecordID = record.recordID
 	}
 	
-	private var temporaryPhotoURL: NSURL {
+	fileprivate var temporaryPhotoURL: URL {
 		
 		// Must write to temporary directory to be able to pass image file path url to CKAsset
 		
 		let temporaryDirectory = NSTemporaryDirectory()
-		let temporaryDirectoryURL = NSURL(fileURLWithPath: temporaryDirectory)
-		let fileURL = temporaryDirectoryURL.URLByAppendingPathComponent(NSUUID().UUIDString).URLByAppendingPathExtension("jpg")
+		let temporaryDirectoryURL = URL(fileURLWithPath: temporaryDirectory)
+		let fileURL = temporaryDirectoryURL.appendingPathComponent(UUID().uuidString).appendingPathExtension("jpg")
 		
-		photoData?.writeToURL(fileURL, atomically: true)
+		try? photoData?.write(to: fileURL, options: [.atomic])
 		
 		return fileURL
 	}
@@ -64,8 +64,8 @@ class Post: CloudKitSyncable {
 // MARK: -
 
 extension Post: SearchableRecord {
-	func matchesSearchTerm(searchTerm: String) -> Bool {
-		let matchingComments = comments.filter { $0.matchesSearchTerm(searchTerm) }
+	func matches(searchTerm: String) -> Bool {
+		let matchingComments = comments.filter { $0.matches(searchTerm: searchTerm) }
 		return !matchingComments.isEmpty
 	}
 }
@@ -74,10 +74,10 @@ extension Post: SearchableRecord {
 
 extension CKRecord {
 	convenience init(_ post: Post) {
-		let recordID = CKRecordID(recordName: NSUUID().UUIDString)
+		let recordID = CKRecordID(recordName: UUID().uuidString)
 		self.init(recordType: post.recordType, recordID: recordID)
 		
-		self[Post.timestampKey] = post.timestamp
+		self[Post.timestampKey] = post.timestamp as CKRecordValue?
 		self[Post.photoDataKey] = CKAsset(fileURL: post.temporaryPhotoURL)
 	}
 }

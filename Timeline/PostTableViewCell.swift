@@ -9,16 +9,21 @@
 import UIKit
 
 class PostTableViewCell: UITableViewCell {
-    
+	
+	// MARK: Private
+	
+	private func updateViews() {
+		postImageView.image = post?.photo
+	}
+	
+	
+	// MARK: Properties
+	
+	var post: Post? {
+		didSet {
+			updateViews()
+		}
+	}
+	
     @IBOutlet weak var postImageView: UIImageView!
-    
-    override func awakeFromNib() {
-        super.awakeFromNib()
-        // Initialization code
-    }
-    
-    func updateWithPost(post: Post) {
-        
-        postImageView.image = post.photo
-    }
 }

@@ -18,13 +18,13 @@ class Comment: CloudKitSyncable {
     static let postKey = "post"
     static let timestampKey = "timestamp"
     
-    init(post: Post?, text: String, timestamp: NSDate = NSDate()) {
+    init(post: Post?, text: String, timestamp: Date = Date()) {
         self.text = text
         self.timestamp = timestamp
         self.post = post
     }
 	
-	let timestamp: NSDate
+	let timestamp: Date
 	let text: String
 	var post: Post?
 
@@ -46,8 +46,8 @@ class Comment: CloudKitSyncable {
 // MARK: -
 
 extension Comment: SearchableRecord {
-	func matchesSearchTerm(searchTerm: String) -> Bool {
-		return text.containsString(searchTerm)
+	func matches(searchTerm: String) -> Bool {
+		return text.contains(searchTerm)
 	}
 }
 
@@ -57,12 +57,12 @@ extension CKRecord {
 	convenience init(_ comment: Comment) {
 		guard let post = comment.post else { fatalError("Comment does not have a Post relationship") }
 		let postRecordID = post.cloudKitRecordID ?? CKRecord(post).recordID
-		let recordID = CKRecordID(recordName: NSUUID().UUIDString)
+		let recordID = CKRecordID(recordName: UUID().uuidString)
 		
 		self.init(recordType: comment.recordType, recordID: recordID)
 		
-		self[Comment.timestampKey] = comment.timestamp
-		self[Comment.textKey] = comment.text
-		self[Comment.postKey] = CKReference(recordID: postRecordID, action: .DeleteSelf)
+		self[Comment.timestampKey] = comment.timestamp as CKRecordValue?
+		self[Comment.textKey] = comment.text as CKRecordValue?
+		self[Comment.postKey] = CKReference(recordID: postRecordID, action: .deleteSelf)
 	}
 }

@@ -16,45 +16,55 @@ class PostDetailTableViewController: UITableViewController {
 		tableView.rowHeight = UITableViewAutomaticDimension
 		tableView.estimatedRowHeight = 40
 		
-		if let post = post {
-			updateWithPost(post)
-		}
+		updateViews()
 		
-		let nc = NSNotificationCenter.defaultCenter()
+		let nc = NotificationCenter.default
 		nc.addObserver(self, selector: #selector(postCommentsChanged(_:)), name: PostController.PostCommentsChangedNotification, object: nil)
 	}
 	
-	func updateWithPost(post: Post) {
-		guard isViewLoaded() else { return }
+	// MARK: Actions
+	
+	@IBAction func commentButtonTapped(_ sender: AnyObject) {
 		
-		imageView.image = post.photo
-		tableView.reloadData()
-		PostController.sharedController.checkSubscriptionToPostComments(post) { (subscribed) in
-			
-			dispatch_async(dispatch_get_main_queue(), {
-				self.followPostButton.title = subscribed ? "Unfollow Post" : "Follow Post"
-			})
+		presentCommentAlert()
+	}
+	
+	@IBAction func shareButtonTapped(_ sender: AnyObject) {
+		
+		presentActivityViewController()
+	}
+	
+	@IBAction func followPostButtonTapped(_ sender: AnyObject) {
+		
+		guard let post = post else { return }
+		PostController.sharedController.toggleSubscriptionTo(commentsForPost: post) { (_, _, _) in
+			self.updateViews()
 		}
 	}
 	
-	// MARK: - Notifications
-	
-	func postCommentsChanged(notification: NSNotification) {
-		guard let notificationPost = notification.object as? Post,
-			post = post
-			where notificationPost === post else { return } // Not our post
-		updateWithPost(post)
+	// MARK: Private
+	private func updateViews() {
+		guard let post = post, isViewLoaded else { return }
+		
+		imageView.image = post.photo
+		tableView.reloadData()
+		PostController.sharedController.checkSubscriptionTo(commentsForPost: post) { (subscribed) in
+			
+			DispatchQueue.main.async {
+				self.followPostButton.title = subscribed ? "Unfollow Post" : "Follow Post"
+			}
+		}
 	}
 	
-	// MARK: - Table view data source
+	// MARK: UITAbleViewDataSource
 	
-	override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+	override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
 		return post?.comments.count ?? 0
 	}
 	
-	override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
+	override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
 		
-		let cell = tableView.dequeueReusableCellWithIdentifier("commentCell", forIndexPath: indexPath)
+		let cell = tableView.dequeueReusableCell(withIdentifier: "commentCell", for: indexPath)
 		guard let post = post else { return cell }
 		let comment = post.comments[indexPath.row]
 		
@@ -64,68 +74,56 @@ class PostDetailTableViewController: UITableViewController {
 		return cell
 	}
 	
-	
-	// MARK: - Post Actions
-	
-	@IBAction func commentButtonTapped(sender: AnyObject) {
-		
-		presentCommentAlert()
-	}
-	
-	@IBAction func shareButtonTapped(sender: AnyObject) {
-		
-		presentActivityViewController()
-	}
-	
-	@IBAction func followPostButtonTapped(sender: AnyObject) {
-		
-		guard let post = post else { return }
-		PostController.sharedController.togglePostCommentSubscription(post) { (success, isSubscribed, error) in
-			
-			self.updateWithPost(post)
-		}
-	}
+	// MARK: Alerts, etc.
 	
 	func presentCommentAlert() {
 		
-		let alertController = UIAlertController(title: "Add Comment", message: nil, preferredStyle: .Alert)
+		let alertController = UIAlertController(title: "Add Comment", message: nil, preferredStyle: .alert)
 		
-		alertController.addTextFieldWithConfigurationHandler { (textField) in
+		alertController.addTextField { (textField) in
 			
 			textField.placeholder = "Nice shot!"
 		}
 		
-		let addCommentAction = UIAlertAction(title: "Add Comment", style: .Default) { (action) in
+		let addCommentAction = UIAlertAction(title: "Add Comment", style: .default) { (action) in
 			
 			guard let commentText = alertController.textFields?.first?.text,
 				let post = self.post else { return }
 			
-			PostController.sharedController.addCommentToPost(commentText, post: post, completion:nil)
+			PostController.sharedController.addComment(toPost: post, commentText: commentText)
 		}
 		alertController.addAction(addCommentAction)
 		
-		let cancelAction = UIAlertAction(title: "Cancel", style: .Cancel, handler: nil)
+		let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
 		alertController.addAction(cancelAction)
 		
-		presentViewController(alertController, animated: true, completion: nil)
+		present(alertController, animated: true, completion: nil)
 	}
 	
 	func presentActivityViewController() {
 		
 		guard let photo = post?.photo,
-			comment = post?.comments.first else { return }
+			let comment = post?.comments.first else { return }
 		
 		let text = comment.text
 		let activityViewController = UIActivityViewController(activityItems: [photo, text], applicationActivities: nil)
 		
-		presentViewController(activityViewController, animated: true, completion: nil)
+		present(activityViewController, animated: true, completion: nil)
+	}
+	
+	// MARK: Notifications
+	
+	func postCommentsChanged(_ notification: Notification) {
+		guard let notificationPost = notification.object as? Post,
+			let post = post, notificationPost === post else { return } // Not our post
+		updateViews()
 	}
 	
 	// MARK: Properties
 	
 	var post: Post? {
 		didSet {
-			if let post = post { updateWithPost(post) }
+			updateViews()
 		}
 	}
 	
