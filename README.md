@@ -73,7 +73,7 @@ While you will not implement sync in this portion of the project, it is importan
 Create a `Post` model object that will hold image data and comments.
 
 1. Add a new `Post` class to your project.
-2. Add a `photoData` property of type `NSData?`, a `timestamp` `NSDate` property, and a `comments` property of type `[Comment]`.
+2. Add a `photoData` property of type `Data?`, a `timestamp` `Date` property, and a `comments` property of type `[Comment]`.
 3. Add a computed property, `photo` that returns a `UIImage` initialized using the data in `photoData`.
 4. Add an initializer that accepts photoData, timestamp, and comments array. Provide default values for the `timestamp` and `comments` arguments, so they can be ommitted if desired.
 
@@ -82,7 +82,7 @@ Create a `Post` model object that will hold image data and comments.
 Create a `Comment` model object that will hold user-submitted text comments for a specific `Post`.
 
 1. Add a new `Comment` class to your project.
-2. Add a `text` property of type `String`, a `timestamp` `NSDate` property, and a `post` property of type `Post`.
+2. Add a `text` property of type `String`, a `timestamp` `Date` property, and a `post` property of type `Post`.
 3. Add an initializer that accepts text, timestamp, and a post. Provide a default values for the `timestamp` argument, so it can be ommitted if desired.
 
 ### Model Object Controller
@@ -92,10 +92,10 @@ Add and implement the `PostController` class that will be used for CRUD operatio
 1. Add a new `PostController` class file.
 2. Add a `sharedController` singleton property.
 3. Add a `posts` property.
-4. Add a `createPost` function that takes an image parameter as a `UIImage` and a caption as a `String`.
-5. Implement the `createPost` function to initialize a `Post` with the image and a `Comment` with the caption text.
-6. Add a `addCommentToPost` function that takes a `text` parameter as a `String`, and a `Post` parameter.
-7. Implement the `addCommentToPost` function to call the appropriate `Comment` initializer and adds the comment to the appropriate post.
+4. Add a `createPostWith(image: ...)` function that takes an image parameter as a `UIImage` and a caption as a `String`.
+5. Implement the `createPostWith(image: ...)` function to initialize a `Post` with the image and a `Comment` with the caption text.
+6. Add a `addComment(toPost: ...)` function that takes a `text` parameter as a `String`, and a `Post` parameter.
+7. Implement the `addComment(toPost: ...)` function to call the appropriate `Comment` initializer and adds the comment to the appropriate post.
 
 ### Wire Up Views
 
@@ -104,11 +104,11 @@ Add and implement the `PostController` class that will be used for CRUD operatio
 Implement the Post List Table View Controller. You will use a similar cell to display posts in multiple scenes in your application. Create a custom `PostTableViewCell` that can be reused in different scenes.
 
 1. Implement the scene in Interface Builder by creating a custom cell with an image view that fills the cell. 
-2. Create a `PostTableViewCell` class, add and implement an `updateWithPost` to the `PostTableViewCell` to update the image view with the `Post`'s photo.
+2. Create a `PostTableViewCell` class, add a `post` variable, and implement an `updateViews` function to the `PostTableViewCell` to update the image view with the `Post`'s photo. Call the function in the didSet of the `post` variable'
 3. Choose a height that will be used for your image cells. To avoid worrying about resizing images or dynamic cell heights, you may want to use a consistent height for all of the image views in the app.
 4. Implement the `UITableViewDataSource` functions
     * note: The final app does not need to support any editing styles, but you may want to include support for editing while developing early stages of the app.
-5. Implement the `prepareForSegue` function to check the segue identifier, capture the detail view controller, index path, selected post, and assign the selected post to the detail view controller.
+5. Implement the `prepare(for segue: ...)` function to check the segue identifier, capture the detail view controller, index path, selected post, and assign the selected post to the detail view controller.
     * note: You may need to quickly add a `post` property to the `PostDetailTableViewController`.
 
 #### Post Detail Scene
@@ -119,14 +119,14 @@ Use the table view's header view to display the photo and a toolbar that allows 
 
 1. Add a vertical `UIStackView` to the Header of the table view. Add a `UIImageView` and a `UIToolbar` to the stack view. Add 'Comment', 'Share', and 'Follow Post' `UIBarButtonItem`s to the toolbar. Set up your constraints so that the image view is the height you chose previously for displaying images within your app.
 2. Update the cell to support comments that span multiple lines without truncating them. Set the `UITableViewCell` to the subtitle style. Set the number of lines to zero. Implement dynamic heights by setting the `tableView.rowHeight` and `tableView.estimatedRowHeight` in the `viewDidLoad`.
-3. Add an `updateWithPost` function that will update the scene with the details of the post. Implement the function by setting the `imageView.image` and reloading the table view if needed.
+3. Add an `updateViews` function that will update the scene with the details of the post. Implement the function by setting the `imageView.image` and reloading the table view if needed.
 4. Implement the `UITableViewDataSource` functions.
     * note: The final app does not need to support any editing styles, but you may want to include support for editing while developing early stages of the app.
 5. Add an IBAction for the 'Comment' button. Implement the IBAction by presenting a `UIAlertController` with a text field, a Cancel action, and an 'OK' action. Implement the 'OK' action to initialize a new `Comment` via the `PostController` and reload the table view to display it.
     * note: Do not create a new `Comment` if the user has not added text.
 6. Add an IBAction for the 'Share' and 'Follow' buttons. You will implement these two actions in future steps.
 
-#### Add Post Scene
+#### Add Post Scenes
 
 Implement the Add Post Table View Controller. You will use a static table view to create a simple form for adding a new post. Use three sections for the form:
 
@@ -183,14 +183,14 @@ Build functionality that will allow the user to search for posts with comments t
 Add a `SearchableRecord` protocol that requires a `matchesSearchTerm` function. Update the `Post` and `Comment` objects to conform to the protocol.
 
 1. Add a new `SearchableRecord.swift` file.
-2. Define a `SearchableRecord` protocol with a required `matchesSearchTerm` function that takes a `searchTerm` parameter as a `String` and returns a `Bool`.
+2. Define a `SearchableRecord` protocol with a required `matches(searchTerm: String)` function that takes a `searchTerm` parameter as a `String` and returns a `Bool`.
 
 Consider how each model object will match to a specific search term. What searchable text is there on a `Comment`? What searchable text is there on a `Post`?
 
 3. Update the `Comment` class to conform to the `SearchableRecord` protocol. Return `true` if `text` contains the search term, otherwise return `false`.
 4. Update the `Post` class to conform to the `SearchableRecord` protocol. Return `true` if any of the `Post` `comments` match, otherwise return `false`.
 
-Use a Playground to test your `SearchableRecord` and `matchesSearchTerm` functionality and understand what you are implementing.
+Use a Playground to test your `SearchableRecord` and `matches(searchTerm: String)` functionality and understand what you are implementing.
 
 #### Search Results Controller
 
@@ -200,13 +200,13 @@ Understanding Search Controllers requires you to understand that the main view c
 
 1. Create a `SearchResultsTableViewController` subclass of `UITableViewController` and assign it to the scene in Interface Builder.
 2. Add a `resultsArray` property that contains a list of `SearchableRecords`
-3. Implement the `UITableViewDatasource` functions to display the search results.   
+3. Implement the `UITableViewDataSource` functions to display the search results.   
     * note: For now you will only display `Post` objects as a result of a search. Use the `PostTableViewCell` to do so.
 
 #### Update Timeline Scene
 
 1. Add a function `setUpSearchController` that captures the `resultsController` from the Storyboard, instantiates the `UISearchController`, sets the `searchResultsUpdater` to self, and adds the `searchController`'s `searchBar` as the table's header view.
-2. Implement the `UISearchResultsUpdating` protocol `updateSearchResultsforSearchController` function. The function should capture the `resultsViewController` and the search text from the `searchController`'s `searchBar`, filter the local `posts` array for posts that match, assign the filtered results to the `resultsViewController`'s `resultsArray`, and reload the `resultsViewController`'s `tableView`.
+2. Implement the `UISearchResultsUpdating` protocol `updateSearchResults(for searchController: UISearchController)` function. The function should capture the `resultsViewController` and the search text from the `searchController`'s `searchBar`, filter the local `posts` array for posts that match, assign the filtered results to the `resultsViewController`'s `resultsArray`, and reload the `resultsViewController`'s `tableView`.
     * note: Consider the communication that is happening here between two separate view controllers. Be sure that you understand this relationship.
 
 ##### Segue to Post Detail View
@@ -215,11 +215,11 @@ Remember that even though the Timeline view and the Search Results view are disp
 
 The segue from a `Post` should take the user to the Post Detail scene, regardless of whether that is from the Timeline view or the Search Results view.
 
-To do so, implement the `UITableViewDelegate` `didSelectRow` function on the Search Results scene to manually call the `toPostDetail` segue _from the Search scene_.
+To do so, implement the `UITableViewDelegate` `didSelectRowAt indexPath` function on the Search Results scene to manually call the `toPostDetail` segue _from the Search scene_.
 
-1. Adopt the `UITableViewDelegate` on the Search Results scene and add the `didSelectRowAtIndexPath` function. Implement the function by capturing the sending cell and telling the Search Result scene's `presentingViewController` to `performSegueWithIdentifier` and send the selected cell so that the Search scene can get the selected `Post`.
+1. Adopt the `UITableViewDelegate` on the Search Results scene and add the `didSelectRowAt indexPath` delegate function. Implement the function by capturing the sending cell and telling the Search Result scene's `presentingViewController` to `performSegue(withIdentifier: String...)` and send the selected cell so that the Search scene can get the selected `Post`.
     * note: Every view controller class has an optional `presentingViewController` reference to the view controller that presented it. In this case, the presenting view controller of the Search Results scene is the Timeline scene. So this step will manually call the `performSegueWithIdentifier` on the Search scene.
-2. Update the `prepareForSegue` function on the Search Scene to capture and segue to the Post Detail scene with the correct post. Try to do so without looking at the solution code.
+2. Update the `performSegue(withIdentifier: String...)` function on the Search Scene to capture and segue to the Post Detail scene with the correct post. Try to do so without looking at the solution code.
     * note: You must check if the `tableView` can get an `indexPath` for the sender. If it can, that means that the cell was from the Search scene's `tableView`. If it can't, that means the cell is from the Search Result scene's `tableView` and that the user tapped a search result. If that is the case, capture the `Post` from the `resultsArray` on the `searchResultscontroller`.
     * note: You can access the `searchResultsController` by calling `(searchController.searchResultsController as? SearchResultsTableViewController)`
 
@@ -265,7 +265,7 @@ You now have two views that reference the same scene as a child view controller.
 
 Your child view controller needs a way to communicate events to it's parent view controller. This is most commonly done through delegation. Define a child view controller delegate, adopt it in the parent view controller, and set up the relationship via the embed segue.
 
-1. Define a new `PhotoSelectViewControllerDelegate` protocol in the `PhotoSelectViewController` file with a required `photoSelectViewControllerSelectedImage` function that takes a `UIImage` parameter to pass the image that was selected.
+1. Define a new `PhotoSelectViewControllerDelegate` protocol in the `PhotoSelectViewController` file with a required `photoSelectViewControllerSelected(image: UIImage)` function that takes a `UIImage` parameter to pass the image that was selected.
     * note: This function will tell the assigned delegate (the parent view controller, in this example) what image the user selected.
 2. Add a weak optional delegate property.
 3. Call the delegate function in the `didFinishPickingMediaWithInfo` function, passing the selected media to the delegate.
@@ -277,7 +277,7 @@ Note the use of the delegate pattern. You have encapsulated the Photo Selection 
 You have declared a protocol, adopted the protocol, but you now must assign the delegate property on the instance of the child view controller so that the `PhotoSelectViewController` can communicate with it's parent view controller. This is done by using the embed segue, which is called when the Container View is initialized from the Storyboard, which occurs when the view loads.
 
 1. Assign segue identifiers to the embed segues in the Storyboard file
-2. Update the `prepareForSegue` function in the Add Post scene to check for the segue identifier, capture the `destinationViewController` as a `PhotoSelectViewController`, and assign `self` as the child view controller's delegate.
+2. Update the `prepare(forSegue: ...)` function in the Add Post scene to check for the segue identifier, capture the `destinationViewController` as a `PhotoSelectViewController`, and assign `self` as the child view controller's delegate.
 
 ### Post Detail View Controller Share Sheet
 
@@ -324,56 +324,58 @@ Add a CloudKit Manager that abstracts your CloudKit code into a single helper cl
 
     // MARK: - User Info Discovery
 
-    func fetchLoggedInUserRecord(completion: ((record: CKRecord?, error: NSError?) -> Void)?)
+    func fetchLoggedInUserRecord(_ completion: ((_ record: CKRecord?, _ error: Error? ) -> Void)?)
 
-    func fetchUsernameFromRecordID(recordID: CKRecordID, completion: ((givenName: String?, familyName: String?) -> Void)?)
+    func fetchUsername(for recordID: CKRecordID,
+                    completion: @escaping ((_ givenName: String?, _ familyName: String?) -> Void) = { _,_ in }) 
 
-    func fetchAllDiscoverableUsers(completion: ((userInfoRecords: [CKDiscoveredUserInfo]?) -> Void)?)
-
+	func fetchAllDiscoverableUsers(completion: @escaping ((_ userInfoRecords: [CKUserIdentity]?) -> Void) = { _ in })
 
     // MARK: - Fetch Records
 
-    func fetchRecordWithID(recordID: CKRecordID, completion: ((record: CKRecord?, error: NSError?) -> Void)?)
+	func fetchRecord(withID recordID: CKRecordID, completion: ((_ record: CKRecord?, _ error: Error?) -> Void)?)
 
-    func fetchRecordsWithType(type: String, predicate: NSPredicate = default, recordFetchedBlock: ((record: CKRecord) -> Void)?, completion: ((records: [CKRecord]?, error: NSError?) -> Void)?)
+    func fetchRecordsWithType(_ type: String,
+                              predicate: NSPredicate = NSPredicate(value: true),
+                              recordFetchedBlock: ((_ record: CKRecord) -> Void)?,
+                              completion: ((_ records: [CKRecord]?, _ error: Error?) -> Void)?)
 
-    func fetchCurrentUserRecords(type: String, completion: ((records: [CKRecord]?, error: NSError?) -> Void)?)
+	func fetchCurrentUserRecords(_ type: String, completion: ((_ records: [CKRecord]?, _ error: Error?) -> Void)?)
 
-    func fetchRecordsFromDateRange(type: String, recordType: String, fromDate: NSDate, toDate: NSDate, completion: ((records: [CKRecord]?, error: NSError?) -> Void)?)
-
+	func fetchRecordsFromDateRange(_ type: String, recordType: String, fromDate: Date, toDate: Date, completion: ((_ records: [CKRecord]?, _ error: Error?) -> Void)?)
 
     // MARK: - Delete Records
 
-    func deleteRecordWithID(recordID: CKRecordID, completion: ((recordID: CKRecordID?, error: NSError?) -> Void)?)
+    func deleteRecordWithID(_ recordID: CKRecordID, completion: ((_ recordID: CKRecordID?, _ error: Error?) -> Void)?) {
 
-    func deleteRecordsWithID(recordIDs: [CKRecordID], completion: ((records: [CKRecord]?, recordIDs: [CKRecordID]?, error: NSError?) -> Void)?)
+    func deleteRecordsWithID(_ recordIDs: [CKRecordID], completion: ((_ records: [CKRecord]?, _ recordIDs: [CKRecordID]?, _ error: Error?) -> Void)?)
 
 
     // MARK: - Save Records
 
-    func saveRecords(records: [CKRecord], perRecordCompletion: ((record: CKRecord?, error: NSError?) -> Void)?, completion: ((records: [CKRecord]?, error: NSError?) -> Void)?)
+    func saveRecords(_ records: [CKRecord], perRecordCompletion: ((_ record: CKRecord?, _ error: Error?) -> Void)?, completion: ((_ records: [CKRecord]?, _ error: Error?) -> Void)?) 
 
-    func saveRecord(record: CKRecord, completion: ((record: CKRecord?, error: NSError?) -> Void)?)
+    func saveRecord(_ record: CKRecord, completion: ((_ record: CKRecord?, _ error: Error?) -> Void)?) 
 
-    func modifyRecords(records: [CKRecord], perRecordCompletion: ((record: CKRecord?, error: NSError?) -> Void)?, completion: ((records: [CKRecord]?, error: NSError?) -> Void)?)
+    func modifyRecords(_ records: [CKRecord], perRecordCompletion: ((_ record: CKRecord?, _ error: Error?) -> Void)?, completion: ((_ records: [CKRecord]?, _ error: Error?) -> Void)?) 
 
 
     // MARK: - CloudKit Availability
 
     func checkCloudKitAvailability()
 
-    func handleCloudKitUnavailable(accountStatus: CKAccountStatus, error: NSError?)
+    func handleCloudKitUnavailable(_ accountStatus: CKAccountStatus, error:Error?) 
 
-    func displayCloudKitNotAvailableError(errorText: String)
+    func displayCloudKitNotAvailableError(_ errorText: String) 
 
 
     // MARK: - CloudKit User Discoverability
 
     func requestDiscoverabilityPermission()
 
-    func handleCloudKitPermissionStatus(permissionStatus: CKApplicationPermissionStatus, error: NSError?)
+    func handleCloudKitPermissionStatus(_ permissionStatus: CKApplicationPermissionStatus, error:Error?) 
 
-    func displayCloudKitPermissionsNotGrantedError(errorText: String)
+    func displayCloudKitPermissionsNotGrantedError(_ errorText: String)
 ```
 
 3. Using the documentation for CloudKit, fulfill the contract of each function signature. Using the data passed in as a parameter, write code that will return the requested information. When it makes sense to do so using the NSOperation subclasses, try to use them over the convenience functions.
@@ -436,21 +438,21 @@ You must initialize a `CKAsset` with a file path URL. You will need to create a 
 4. Implement the computed property by getting the path of the temporary directory, initializing an NSURL with that path, initializing a file URL that uses a unique name with jpg as the file extension. Write `self.photoData` to that file URL, and then return the file URL.
 
 ```swift
-private var temporaryPhotoURL: NSURL {
+private var temporaryPhotoURL: URL {
 	
 	// Must write to temporary directory to be able to pass image file path url to CKAsset
 	
 	let temporaryDirectory = NSTemporaryDirectory()
-	let temporaryDirectoryURL = NSURL(fileURLWithPath: temporaryDirectory)
-	let fileURL = temporaryDirectoryURL.URLByAppendingPathComponent(NSUUID().UUIDString).URLByAppendingPathExtension("jpg")
+	let temporaryDirectoryURL = URL(fileURLWithPath: temporaryDirectory)
+	let fileURL = temporaryDirectoryURL.appendingPathComponent(UUID().uuidString).appendingPathExtension("jpg")
 	
-	photoData?.writeToURL(fileURL, atomically: true)
+	try? photoData?.write(to: fileURL, options: [.atomic])
 	
 	return fileURL
 }
 ```
 
-5. Add the convenience initializer `init?(record: CKRecord)`.
+5. Add the required convenience initializer `init?(record: CKRecord)`.
 6. Implement the convenience initializer by guarding for the timestamp and photo data, calling the designated initializer, then setting the `cloudKitRecordID` property.
 
 #### Update Comment for Sync Functionality
@@ -460,7 +462,7 @@ Adopt the `CloudKitSyncable` protocol in the `Comment` class.
 1. Add a computed property `recordType` and return the type you would like used to identify 'Comment' objects in CloudKit.
 2. Add an extension to `CKRecord` that implements a convenience initializer to create a `CKRecord` using a `Comment` object. It should be initialized to include the `timestamp`, `text`, and a `CKReference` to the `Comment`'s `Post`'s `CKRecord`.
     * note: You will need to guard for the `Comment`'s `Post` and the `Post`'s `cloudKitRecord` to be able to initialize the `CKReference`.
-3. Add the convenience initializer `init?(record: CKRecord)`.
+3. Add the required convenience initializer `init?(record: CKRecord)`.
 4. Implement the convenience initializer by guarding for the timestamp and post reference, calling the designated initializer, then setting the `cloudKitRecordID` property.
 
 Remember that a `Comment` should not exist without a `Post`. When a `Comment` is created from a `CKRecord`, you will also need to set the new comment's `Post` property. Consider how you would approach this. We will address it in the next section.
@@ -581,13 +583,21 @@ Build functionality into your `CloudKitManager` that can be used to manage subsc
 
     // MARK: - Subscriptions
     
-    func subscribe(type: String, predicate: NSPredicate, subscriptionID: String, contentAvailable: Bool, alertBody: String? = nil, desiredKeys: [String]? = nil, options: CKSubscriptionOptions, completion: ((subscription: CKSubscription?, error: NSError?) -> Void)?) 
-    
-    func unsubscribe(subscriptionID: String, completion: ((subscriptionID: String?, error: NSError?) -> Void)?)
-    
-    func fetchSubscriptions(completion: ((subscriptions: [CKSubscription]?, error: NSError?) -> Void)?)
-    
-    func fetchSubscription(subscriptionID: String, completion: ((subscription: CKSubscription?, error: NSError?) -> Void)?)
+    func subscribe(_ type: String,
+                    predicate: NSPredicate,
+                    subscriptionID: String,
+                    contentAvailable: Bool,
+                    alertBody: String? = nil,
+                    desiredKeys: [String]? = nil,
+                    options: CKQuerySubscriptionOptions,
+                    completion: ((_ subscription: CKSubscription?, _ error: Error?) -> Void)?)
+
+    func unsubscribe(_ subscriptionID: String, completion: ((_ subscriptionID: String?, _ error: Error?) -> Void)?) 
+
+    func fetchSubscriptions(_ completion: ((_ subscriptions: [CKSubscription]?, _ error: Error?) -> Void)?)
+
+
+    func fetchSubscription(_ subscriptionID: String, completion: ((_ subscription: CKSubscription?, _ error: Error?) -> Void)?)
 ```
 
 2. Using the documentation for CloudKit, fulfill the contract of each function signature. Using the data passed in as a paremeter, write code that will return the requested information. When it makes sense to do so using the NSOperation subclasses, try to use them over the convenience functions.
@@ -611,7 +621,7 @@ Create and save a subscription for all new `Post` records.
 
 Create and save a subscription for all new `Comment` records that point to a given `Post`
 
-1. Add a function `addSubscriptionToPostComments` that takes a `Post` parameter, an optional `alertBody` `String` parameter, and an optional completion closure with `success` `Bool` and `error` `NSError` parameters.
+1. Add a function `addSubscriptionTo(commentsForPost post: ...)` that takes a `Post` parameter, an optional `alertBody` `String` parameter, and an optional completion closure with `success` `Bool` and `error` `Error` parameters.
 2. Implement the function by using the `CloudKitManager` to subscribe to newly created `Comment` records that point to the `post` parameter. Run the completion closure, passing a successful result if the subscription is successfully saved.
     * note: You will need to be able to identify this subscription later if you choose to delete it. Use a unique identifier on the `Post` as the identifier for the subscription so you can manage the matching subscription as needed.
     * note: You will need an NSPredicate that checks if the `Comment`'s `post` is equal to the `post` parameter's `CKRecordID`
@@ -620,20 +630,20 @@ Create and save a subscription for all new `Comment` records that point to a giv
 
 The Post Detail scene allows users to follow and unfollow new `Comment`s on a given `Post`. Add a function for removing a subscription, and another function that will toggle a subscription for a given `Post`.
 
-1. Add a function `removeSubscriptionToPostcomments` that takes a `Post` parameter and an optional completion closure with `success` and `error` parameters.
+1. Add a function `removeSubscriptionTo(commentsForPost post: ...)` that takes a `Post` parameter and an optional completion closure with `success` and `error` parameters.
 2. Implement the function by using the `CloudKitManager` to unsubscribe to the subscription for that `Post`.
     * note: Use the unique identifier you used to save the subscription above. Most likely this will be your unique `recordName` for the `Post`.
 3. Add a function `checkSubscriptionToPostComments` that takes a `Post` parameter and an optional completion closure with a `subscribed` `Bool` parameter.
 4. Implement the function by using the `CloudKitManager` to fetch a subscription with the `post.recordName` as an identifier. If the subscription is not nil, the user is subscribed. If the subscription is nil, the user is not subscribed. Run the completion closure with the appropriate parameters.
-5. Add a function `togglePostCommentSubscription` that takes a `Post` parameter and an optional completion closure with `success`, `isSubscribed`, and `error` parameters.
+5. Add a function `toggleSubscriptionTo(commentsForPost post: ...)` that takes a `Post` parameter and an optional completion closure with `success`, `isSubscribed`, and `error` parameters.
 6. Implement the function by using the `CloudKitManager` to fetch subscriptions, check for a subscription that matches the `Post`, removes it if it exists, or adds it if it does not exist. Run the optional completion closure with the appropriate parameters.
 
 ### Update User Interface
 
 Update the Post Detail scene's `Follow Post` button to display the correct text based on the current user's subscription. Update the outlet to toggle subscriptions for new comments on a `Post`.
 
-1. Update the `updateWithPost` function to call the `checkSubscriptionToPostcomments` on the `PostController` and set appropriate text for the button based on the response.
-2. Implement the `Follow Post` button's IBAction to call the `togglePostcommentSubscription` function on the `PostController` and update the `Follow Post` button's text based on the new subscription state.
+1. Update the `updateViews` function to call the `checkSubscriptionTo(commentsForPost: ...)` on the `PostController` and set appropriate text for the button based on the response.
+2. Implement the `Follow Post` button's IBAction to call the `toggleSubscriptionTo(commentsForPost: ...)` function on the `PostController` and update the `Follow Post` button's text based on the new subscription state.
 
 ### Add Permissions
 
@@ -649,14 +659,14 @@ Update the Info.plist to declare backgrounding support for responding to remote 
 ```
 
 2. Request the user's permission to display notifications in the `AppDelegate` `didFinishLaunchingWithOptions` function.
-    * note: Use the `registerUserNotificationSettings` function.
+    * note: Use the `requestAuthorization` function that is a part of UNUserNotificationCenter.
 
 ### Handle Received Push Notifications
 
 At this point the application will save subscriptions to the CloudKit database, and when new `Post` or `Comment` records are created that match those subscriptions, the CloudKit database will deliver a push notification to the application with the record data.
 
 Handle the push notification by serializing the data into a `Post` or `Comment` object. If the user is actively using the application, the user interface will be updated in response to notifications posted by the `PostController`.
-
+s
 1. Add the `didReceiveRemoteNotification` delegate function to the `AppDelegate`.
 2. Implement the function by telling the `PostController` to perform a full sync, which will fetch all new `Post`s and all new `Comment`s. Run the completion handler by passing in the `UIBackgroundFetchResult.NewData` response.
     * note: Fetch _all_ new posts and comments here is somewhat inefficient, since we really only want the new record that triggered the push notification. However, it has the advantage of being very simple, and most of the time there will only be one new record anyway.
