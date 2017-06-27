@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="11542" systemVersion="16C67" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="Wjq-MM-JzB">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13122.17" systemVersion="16F73" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="Trh-GN-HMn">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11524"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13104.14"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -49,14 +49,9 @@
                         </connections>
                     </tableView>
                     <tabBarItem key="tabBarItem" title="Item" id="khd-gn-aXP"/>
-                    <navigationItem key="navigationItem" title="Timeline" id="deT-A6-ZRe">
-                        <barButtonItem key="rightBarButtonItem" systemItem="add" id="yNp-Op-9FN">
-                            <connections>
-                                <segue destination="Pmc-3g-uM2" kind="presentation" id="5Us-vT-co3"/>
-                            </connections>
-                        </barButtonItem>
-                    </navigationItem>
+                    <navigationItem key="navigationItem" title="Timeline" id="deT-A6-ZRe"/>
                     <refreshControl key="refreshControl" opaque="NO" multipleTouchEnabled="YES" contentMode="center" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" id="LuN-bq-w46">
+                        <rect key="frame" x="0.0" y="0.0" width="1000" height="1000"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <connections>
                             <action selector="refreshControlActivated:" destination="gK2-fp-nri" eventType="valueChanged" id="YYF-zw-srz"/>
@@ -79,7 +74,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <view key="tableHeaderView" contentMode="scaleToFill" id="lbZ-DI-M7Q">
-                            <rect key="frame" x="0.0" y="64" width="375" height="370"/>
+                            <rect key="frame" x="0.0" y="0.0" width="375" height="370"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <subviews>
                                 <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="euj-8x-WPa">
@@ -133,14 +128,14 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="bBG-jm-rm1">
-                                            <rect key="frame" x="15" y="6" width="31.5" height="19.5"/>
+                                            <rect key="frame" x="16" y="6" width="31.5" height="19.5"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="16"/>
                                             <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                             <nil key="highlightedColor"/>
                                         </label>
                                         <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Subtitle" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="oLh-DI-Tt8">
-                                            <rect key="frame" x="15" y="25.5" width="40.5" height="13.5"/>
+                                            <rect key="frame" x="16" y="25.5" width="40.5" height="13.5"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="11"/>
                                             <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -271,7 +266,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="gFv-bJ-EKB" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2808" y="1780"/>
+            <point key="canvasLocation" x="2041" y="1782"/>
         </scene>
         <!--Search Results Table View Controller-->
         <scene sceneID="e7m-39-IS3">
@@ -313,7 +308,25 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="iCa-FA-REP" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1230" y="1780"/>
+            <point key="canvasLocation" x="2041" y="350"/>
+        </scene>
+        <!--Tab Bar Controller-->
+        <scene sceneID="wdy-OK-YWp">
+            <objects>
+                <tabBarController id="Trh-GN-HMn" sceneMemberID="viewController">
+                    <tabBar key="tabBar" contentMode="scaleToFill" id="LSG-lq-O2e">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="49"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                    </tabBar>
+                    <connections>
+                        <segue destination="Wjq-MM-JzB" kind="relationship" relationship="viewControllers" id="RQK-Xt-ysT"/>
+                        <segue destination="Pmc-3g-uM2" kind="relationship" relationship="viewControllers" id="ucX-bp-BRB"/>
+                    </connections>
+                </tabBarController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Ro1-Gt-ARc" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="140" y="1395"/>
         </scene>
         <!--Timeline-->
         <scene sceneID="9Nc-OV-JXo">
@@ -353,7 +366,7 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="BpP-z5-cNh" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2042" y="1780"/>
+            <point key="canvasLocation" x="1230" y="1782"/>
         </scene>
         <!--Photo Select View Controller-->
         <scene sceneID="bRo-7J-rcZ">
@@ -397,7 +410,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="p8a-fl-aOK" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2808" y="2333"/>
+            <point key="canvasLocation" x="2041" y="2335"/>
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>
