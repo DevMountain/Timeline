@@ -24,6 +24,9 @@
 		9D3CACAE1D4FB2DC00ED537B /* Post.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68658B5B1CF8AC4B0016C5CD /* Post.swift */; };
 		9D3CACB01D4FB60C00ED537B /* CloudKitSyncable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D3CACAF1D4FB60C00ED537B /* CloudKitSyncable.swift */; };
 		9D3CACB11D4FB8DF00ED537B /* Comment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68658B5D1CF8AC4B0016C5CD /* Comment.swift */; };
+		9DC8D7B91F044B710071953D /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DC8D7B81F044B710071953D /* Theme.swift */; };
+		9DC8D7BC1F04528D0071953D /* Appearance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DC8D7BB1F04528D0071953D /* Appearance.swift */; };
+		9DC8D7BE1F0458840071953D /* Scriptorama Tradeshow JF Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9DC8D7BD1F0457800071953D /* Scriptorama Tradeshow JF Regular.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -47,6 +50,9 @@
 		68AA932A1CF68ECD0006A751 /* PhotoSelectViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotoSelectViewController.swift; sourceTree = "<group>"; };
 		68B4B04B1D05BD7A00EE2D88 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
 		9D3CACAF1D4FB60C00ED537B /* CloudKitSyncable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CloudKitSyncable.swift; sourceTree = "<group>"; };
+		9DC8D7B81F044B710071953D /* Theme.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		9DC8D7BB1F04528D0071953D /* Appearance.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Appearance.swift; sourceTree = "<group>"; };
+		9DC8D7BD1F0457800071953D /* Scriptorama Tradeshow JF Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Scriptorama Tradeshow JF Regular.ttf"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -89,6 +95,7 @@
 				68658B631CF8AC7F0016C5CD /* View Controllers */,
 				68658B641CF8AC960016C5CD /* Other Controllers */,
 				68658B6B1CF8F3EB0016C5CD /* Protocols */,
+				9DC8D7BA1F0452800071953D /* Appearance */,
 			);
 			name = Sources;
 			path = Timeline;
@@ -137,6 +144,7 @@
 				9D6CD0251CFC8F6E0002C64B /* Storyboards */,
 				68199A871D007F96001C6FAE /* Timeline.entitlements */,
 				682FA4DD1CF5427500B81932 /* Assets.xcassets */,
+				9DC8D7BD1F0457800071953D /* Scriptorama Tradeshow JF Regular.ttf */,
 				682FA4E21CF5427500B81932 /* Info.plist */,
 			);
 			name = Resources;
@@ -175,6 +183,15 @@
 				6857CAA01CF5F00F0072C237 /* PostController.swift */,
 			);
 			name = "Model Controllers";
+			sourceTree = "<group>";
+		};
+		9DC8D7BA1F0452800071953D /* Appearance */ = {
+			isa = PBXGroup;
+			children = (
+				9DC8D7B81F044B710071953D /* Theme.swift */,
+				9DC8D7BB1F04528D0071953D /* Appearance.swift */,
+			);
+			name = Appearance;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -243,6 +260,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9DC8D7BE1F0458840071953D /* Scriptorama Tradeshow JF Regular.ttf in Resources */,
 				682FA4E11CF5427500B81932 /* LaunchScreen.storyboard in Resources */,
 				682FA4DE1CF5427500B81932 /* Assets.xcassets in Resources */,
 				682FA4DC1CF5427500B81932 /* Main.storyboard in Resources */,
@@ -266,9 +284,11 @@
 				68402B571CF93CB000EECEF3 /* CloudKitManager.swift in Sources */,
 				6857CAA11CF5F00F0072C237 /* PostController.swift in Sources */,
 				682FA4D71CF5427500B81932 /* AppDelegate.swift in Sources */,
+				9DC8D7BC1F04528D0071953D /* Appearance.swift in Sources */,
 				9D3CACB11D4FB8DF00ED537B /* Comment.swift in Sources */,
 				68AA93251CF68A1A0006A751 /* AddPostTableViewController.swift in Sources */,
 				68658B6A1CF8F3820016C5CD /* SearchableRecord.swift in Sources */,
+				9DC8D7B91F044B710071953D /* Theme.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

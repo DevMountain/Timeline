@@ -45,6 +45,10 @@
 	</array>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Timeline needs access to your photo library if you would like to post photos to your timeline.</string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Scriptorama Tradeshow JF Regular.ttf</string>
+	</array>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>remote-notification</string>
