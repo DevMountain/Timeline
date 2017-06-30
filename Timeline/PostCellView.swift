@@ -57,16 +57,22 @@ class PostCellView: UIView {
 		let spacingView = UIView()
 		spacingView.setContentHuggingPriority(UILayoutPriorityDefaultLow, for: .horizontal)
 		spacingView.setContentCompressionResistancePriority(UILayoutPriorityDefaultLow, for: .horizontal)
+		
 		let bottomStackView = UIStackView(arrangedSubviews: [buttonsStackView, spacingView, timestampStackView])
 		bottomStackView.axis = .horizontal
 		bottomStackView.alignment = .fill
 		bottomStackView.distribution = .fill
 		
-		let mainStackView = UIStackView(arrangedSubviews: [imageView, bottomStackView])
+		// Caption
+		let captionLabel = UILabel()
+		captionLabel.font = .appCommentFont
+		captionLabel.textColor = .appSlateGrey
+		
+		// Main stack view
+		let mainStackView = UIStackView(arrangedSubviews: [imageView, bottomStackView, captionLabel])
 		mainStackView.translatesAutoresizingMaskIntoConstraints = false
 		mainStackView.axis = .vertical
 		mainStackView.spacing = 8.0
-		
 		addSubview(mainStackView)
 		
 		self.leftAnchor.constraint(equalTo: mainStackView.leftAnchor, constant: -16.0).isActive = true
@@ -74,9 +80,11 @@ class PostCellView: UIView {
 		self.topAnchor.constraint(equalTo: mainStackView.topAnchor, constant: -16.0).isActive = true
 		self.bottomAnchor.constraint(equalTo: mainStackView.bottomAnchor, constant: 16.0).isActive = true
 		
+		// Set properties
 		self.postImageView = imageView
 		self.favoriteButton = favButton
 		self.timestampLabel = timestampLabel
+		self.captionLabel = captionLabel
 	}
 	
 	private func updateViews() {
@@ -87,6 +95,7 @@ class PostCellView: UIView {
 		}
 		postImageView.image = post.photo
 		timestampLabel.text = timestampFormatter.string(from: Date().timeIntervalSince(post.timestamp))
+		captionLabel.text = post.comments.first?.text
 	}
 	
 	
@@ -101,6 +110,7 @@ class PostCellView: UIView {
     @IBOutlet weak var postImageView: UIImageView!
 	@IBOutlet var favoriteButton: UIButton!
 	@IBOutlet var timestampLabel: UILabel!
+	@IBOutlet var captionLabel: UILabel!
 	
 	private lazy var timestampFormatter: DateComponentsFormatter = {
 		let formatter = DateComponentsFormatter()
