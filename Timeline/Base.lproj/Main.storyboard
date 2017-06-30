@@ -25,20 +25,9 @@
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="LL4-td-Qft" id="Gjg-qI-sqV">
                                     <rect key="frame" x="0.0" y="0.0" width="375" height="300"/>
                                     <autoresizingMask key="autoresizingMask"/>
-                                    <subviews>
-                                        <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Ub1-wS-DCB">
-                                            <rect key="frame" x="0.0" y="0.0" width="375" height="300"/>
-                                        </imageView>
-                                    </subviews>
-                                    <constraints>
-                                        <constraint firstItem="Ub1-wS-DCB" firstAttribute="leading" secondItem="Gjg-qI-sqV" secondAttribute="leading" id="2F5-ze-enk"/>
-                                        <constraint firstAttribute="bottom" secondItem="Ub1-wS-DCB" secondAttribute="bottom" id="DoB-ky-xLi"/>
-                                        <constraint firstAttribute="trailing" secondItem="Ub1-wS-DCB" secondAttribute="trailing" id="YKT-eX-FG5"/>
-                                        <constraint firstItem="Ub1-wS-DCB" firstAttribute="top" secondItem="Gjg-qI-sqV" secondAttribute="top" id="vHR-r5-E0A"/>
-                                    </constraints>
                                 </tableViewCellContentView>
+                                <inset key="separatorInset" minX="15" minY="0.0" maxX="0.0" maxY="0.0"/>
                                 <connections>
-                                    <outlet property="postImageView" destination="Ub1-wS-DCB" id="xyT-9q-FLe"/>
                                     <segue destination="e8t-4a-dJD" kind="show" identifier="toPostDetail" id="EvV-aO-22l"/>
                                 </connections>
                             </tableViewCell>
@@ -63,7 +52,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="m46-f1-him" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2042" y="1075"/>
+            <point key="canvasLocation" x="2040.8" y="1074.5127436281859"/>
         </scene>
         <!--Post Detail-->
         <scene sceneID="gKi-vZ-Bgw">
@@ -336,7 +325,7 @@
                         <offsetWrapper key="titlePositionAdjustment" horizontal="0.0" vertical="0.0"/>
                     </tabBarItem>
                     <toolbarItems/>
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="Vfp-Yk-U5j">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" misplaced="YES" id="Vfp-Yk-U5j">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
@@ -355,7 +344,7 @@
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="Pmc-3g-uM2" sceneMemberID="viewController">
                     <tabBarItem key="tabBarItem" title="Add Post" id="HoY-E5-3mC"/>
                     <toolbarItems/>
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="UdO-nU-wMk">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" misplaced="YES" id="UdO-nU-wMk">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>

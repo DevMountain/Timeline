@@ -48,6 +48,7 @@
 	<key>UIAppFonts</key>
 	<array>
 		<string>Scriptorama Tradeshow JF Regular.ttf</string>
+		<string>Cabin-Regular.otf</string>
 	</array>
 	<key>UIBackgroundModes</key>
 	<array>

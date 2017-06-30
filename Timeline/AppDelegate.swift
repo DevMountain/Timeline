@@ -29,7 +29,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         UIApplication.shared.registerForRemoteNotifications()
 		
 		Appearance.configure()
-        
+		
         return true
     }
     

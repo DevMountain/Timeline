@@ -16,7 +16,7 @@ extension UIColor {
 	}
 	
 	class var appSlateGrey: UIColor {
-		return UIColor.purple//(red: 105.0 / 255.0, green: 111.0 / 255.0, blue: 114.0 / 255.0, alpha: 1.0)
+		return UIColor(red: 105.0 / 255.0, green: 111.0 / 255.0, blue: 114.0 / 255.0, alpha: 1.0)
 	}
 	
 	class var appBlack: UIColor {
@@ -73,5 +73,9 @@ extension UIFont {
 	
 	static var timelineTitleFont: UIFont {
 		return UIFont(name: "ScriptoramaTradeshowJF", size: 30.0)!
+	}
+	
+	static var appTimestampFont: UIFont {
+		return UIFont(name: "Cabin-Regular", size: 13.0)!
 	}
 }
