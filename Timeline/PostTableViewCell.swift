@@ -14,10 +14,13 @@ class PostTableViewCell: UITableViewCell {
         super.awakeFromNib()
 	
 		let cellView = PostCellView(frame: bounds)
+		cellView.frame.size.height -= 8.0
 		cellView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
 		cellView.translatesAutoresizingMaskIntoConstraints = true
 		contentView.addSubview(cellView)
 		self.cellView = cellView
+	
+		self.backgroundColor = .clear
     }
 	
 	private var cellView: PostCellView!

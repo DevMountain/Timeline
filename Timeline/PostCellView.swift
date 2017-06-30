@@ -13,12 +13,14 @@ class PostCellView: UIView {
 	override init(frame: CGRect) {
 		super.init(frame: frame)
 		
+		self.backgroundColor = .white
 		createSubviews()
 	}
 	
 	required init?(coder: NSCoder) {
 		super.init(coder: coder)
 		
+		self.backgroundColor = .white
 		createSubviews()
 	}
 	
@@ -69,8 +71,8 @@ class PostCellView: UIView {
 		
 		self.leftAnchor.constraint(equalTo: mainStackView.leftAnchor, constant: -16.0).isActive = true
 		self.rightAnchor.constraint(equalTo: mainStackView.rightAnchor, constant: 16.0).isActive = true
-		self.layoutMarginsGuide.topAnchor.constraint(equalTo: mainStackView.topAnchor).isActive = true
-		self.layoutMarginsGuide.bottomAnchor.constraint(equalTo: mainStackView.bottomAnchor).isActive = true
+		self.topAnchor.constraint(equalTo: mainStackView.topAnchor, constant: -16.0).isActive = true
+		self.bottomAnchor.constraint(equalTo: mainStackView.bottomAnchor, constant: 16.0).isActive = true
 		
 		self.postImageView = imageView
 		self.favoriteButton = favButton

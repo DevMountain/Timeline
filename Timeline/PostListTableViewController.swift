@@ -14,8 +14,8 @@ class PostListTableViewController: UITableViewController, UISearchResultsUpdatin
 		
 		super.viewDidLoad()
 		
+		setupAppearance()
 		setUpSearchController()
-		
 		requestFullSync()
 		
 		// hides search bar
@@ -39,6 +39,20 @@ class PostListTableViewController: UITableViewController, UISearchResultsUpdatin
 	}
 	
 	// MARK: Private
+	
+	private func setupAppearance() {
+		let gradientView = UIView(frame: tableView.bounds)
+		let gradientLayer = CAGradientLayer()
+		gradientLayer.frame = gradientView.bounds
+		let startColor = UIColor(red: 232.0/255.0, green: 244.0/255.0, blue: 250.0/255.0, alpha: 1.0)
+		let endColor = UIColor(red: 200.0/255.0, green: 209.0/255.0, blue: 221.0/255.0, alpha: 1.0)
+		gradientLayer.colors = [startColor.cgColor, endColor.cgColor]
+		gradientLayer.locations = [0.0, 1.0]
+		gradientView.layer.insertSublayer(gradientLayer, at: 0)
+		tableView.backgroundView = gradientView
+		
+		tableView.separatorStyle = .none
+	}
 	
 	private func requestFullSync(_ completion: (() -> Void)? = nil) {
 		
