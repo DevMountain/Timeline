@@ -62,14 +62,19 @@ class PostCellView: UIView {
 		bottomStackView.axis = .horizontal
 		bottomStackView.alignment = .fill
 		bottomStackView.distribution = .fill
+		bottomStackView.layoutMargins = UIEdgeInsets(top: 0.0, left: 12.0, bottom: 0.0, right: 12.0)
+		bottomStackView.isLayoutMarginsRelativeArrangement = true
 		
 		// Caption
 		let captionLabel = UILabel()
 		captionLabel.font = .appCommentFont
 		captionLabel.textColor = .appSlateGrey
+		let captionStackView = UIStackView(arrangedSubviews: [captionLabel]) // Just to get margins
+		captionStackView.isLayoutMarginsRelativeArrangement = true
+		captionStackView.layoutMargins = UIEdgeInsets(top: 0.0, left: 12.0, bottom: 0.0, right: 12.0)
 		
 		// Main stack view
-		let mainStackView = UIStackView(arrangedSubviews: [imageView, bottomStackView, captionLabel])
+		let mainStackView = UIStackView(arrangedSubviews: [imageView, bottomStackView, captionStackView])
 		mainStackView.translatesAutoresizingMaskIntoConstraints = false
 		mainStackView.axis = .vertical
 		mainStackView.spacing = 8.0
