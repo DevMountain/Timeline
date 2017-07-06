@@ -224,13 +224,23 @@ class PostController {
 	
 	func checkSubscriptionTo(commentsForPost post: Post, completion: @escaping ((_ subscribed: Bool) -> Void) = { _ in }) {
 		
+		guard !post.hasCheckedFavoriteStatus else { completion(post.isFavorite); return }
 		guard let subscriptionID = post.cloudKitRecordID?.recordName else {
+			post.isFavorite = false
 			completion(false)
 			return
 		}
 		
 		cloudKitManager.fetchSubscription(subscriptionID) { (subscription, error) in
+			if let error = error,
+				let ckError = error as? CKError,
+				ckError.code != .unknownItem {
+				NSLog("Error checking comment subscription for \(post): \(error)")
+				return
+			}
+			post.hasCheckedFavoriteStatus = true
 			let subscribed = subscription != nil
+			post.isFavorite = subscribed
 			completion(subscribed)
 		}
 	}
@@ -243,9 +253,12 @@ class PostController {
 		
 		let predicate = NSPredicate(format: "post == %@", argumentArray: [recordID])
 		
+		post.isFavorite = true // Set this back to false later if subscribing fails
+		
 		cloudKitManager.subscribe(Comment.typeKey, predicate: predicate, subscriptionID: recordID.recordName, contentAvailable: true, alertBody: alertBody, desiredKeys: [Comment.textKey, Comment.postKey], options: .firesOnRecordCreation) { (subscription, error) in
 			
 			let success = subscription != nil
+			post.isFavorite = success
 			completion(success, error)
 		}
 	}
@@ -258,8 +271,11 @@ class PostController {
 			return
 		}
 		
+		post.isFavorite = false // Set this back to true later if subscribing fails
+		
 		cloudKitManager.unsubscribe(subscriptionID) { (subscriptionID, error) in
 			let success = subscriptionID != nil && error == nil
+			post.isFavorite = !success
 			completion(success, error)
 		}
 	}
@@ -276,11 +292,11 @@ class PostController {
 			
 			if subscription != nil {
 				self.removeSubscriptionTo(commentsForPost: post) { (success, error) in
-						completion(success, false, error)
+					completion(success, false, error)
 				}
 			} else {
 				self.addSubscriptionTo(commentsForPost: post, alertBody: "Someone commented on a post you follow! 👍") { (success, error) in
-						completion(success, true, error)
+					completion(success, true, error)
 				}
 			}
 		}

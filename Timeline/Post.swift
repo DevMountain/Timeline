@@ -31,6 +31,8 @@ class Post: CloudKitSyncable {
 		return UIImage(data: photoData)
 	}
 	var comments: [Comment]
+	var isFavorite = false
+	var hasCheckedFavoriteStatus = false
 
 	// MARK: CloudKitSyncable
 	

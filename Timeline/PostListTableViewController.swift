@@ -8,7 +8,7 @@
 
 import UIKit
 
-class PostListTableViewController: UITableViewController, UISearchResultsUpdating {
+class PostListTableViewController: UITableViewController, UISearchResultsUpdating, PostActionHandler {
 	
 	override func viewDidLoad() {
 		
@@ -36,6 +36,50 @@ class PostListTableViewController: UITableViewController, UISearchResultsUpdatin
 				self.refreshControl?.endRefreshing()
 			}
 		}
+	}
+	
+	@IBAction func toggleFavorite(_ sender: Any) {
+		guard let button = sender as? UIButton,
+			let (post, indexPath) = post(forTableSubview: button) else { return }
+		
+		let controller = PostController.sharedController
+		controller.checkSubscriptionTo(commentsForPost: post) { (subscribed) in
+			let reloadRow = {
+				DispatchQueue.main.async {
+					self.tableView.reloadRows(at: [indexPath], with: .none)
+				}
+			}
+			if subscribed {
+				reloadRow()
+				controller.removeSubscriptionTo(commentsForPost: post) { (_, _) in
+					reloadRow()
+				}
+			} else {
+				reloadRow()
+				controller.addSubscriptionTo(commentsForPost: post, alertBody: "Someone commented on your post! 👍") { (_, _) in
+					reloadRow()
+				}
+			}
+		}
+	}
+	
+	@IBAction func addComment(_ sender: Any) {
+		guard let button = sender as? UIButton,
+			let _ = post(forTableSubview: button)?.post else { return }
+		
+		// FIXME: Implement commenting here
+	}
+	
+	@IBAction func share(_ sender: Any) {
+		guard let button = sender as? UIButton,
+			let post = post(forTableSubview: button)?.post,
+			let photo = post.photo,
+			let comment = post.comments.first else { return }
+		
+		let text = comment.text
+		let activityViewController = UIActivityViewController(activityItems: [photo, text], applicationActivities: nil)
+		
+		present(activityViewController, animated: true, completion: nil)
 	}
 	
 	// MARK: Private
@@ -68,6 +112,12 @@ class PostListTableViewController: UITableViewController, UISearchResultsUpdatin
 		}
 	}
 	
+	private func post(forTableSubview view: UIView) -> (post: Post, indexPath: IndexPath)? {
+		let point = view.convert(CGPoint.zero, to: tableView)
+		guard let indexPath = tableView.indexPathForRow(at: point) else { return nil }
+		return (PostController.sharedController.posts[indexPath.row], indexPath)
+	}
+	
 	// MARK: - UITableViewDataSource
 	
 	override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -79,7 +129,15 @@ class PostListTableViewController: UITableViewController, UISearchResultsUpdatin
 		guard let cell = tableView.dequeueReusableCell(withIdentifier: "postCell", for: indexPath) as? PostTableViewCell else { return PostTableViewCell() }
 		
 		let posts = PostController.sharedController.posts
-		cell.post = posts[indexPath.row]
+		let post = posts[indexPath.row]
+		cell.post = post
+		
+		if !post.hasCheckedFavoriteStatus { // Update isFavorited property
+			let controller = PostController.sharedController
+			controller.checkSubscriptionTo(commentsForPost: post) { (_) in
+				DispatchQueue.main.async { self.tableView.reloadRows(at: [indexPath], with: .none) }
+			}
+		}
 		
 		return cell
 	}
