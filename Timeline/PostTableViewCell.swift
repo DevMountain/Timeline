@@ -1,32 +1,46 @@
 //
 //  PostTableViewCell.swift
-//  Timeline
+//  AutosizingTest
 //
-//  Created by Andrew Madsen on 6/30/17.
-//  Copyright © 2017 DevMountain. All rights reserved.
+//  Created by Andrew R Madsen on 7/27/17.
+//  Copyright © 2017 Andrew R Madsen. All rights reserved.
 //
 
 import UIKit
 
 class PostTableViewCell: UITableViewCell {
 
-    override func awakeFromNib() {
-        super.awakeFromNib()
-	
-		let cellView = PostCellView(frame: bounds)
-		cellView.frame.size.height -= 8.0
-		cellView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-		cellView.translatesAutoresizingMaskIntoConstraints = true
-		contentView.addSubview(cellView)
-		self.cellView = cellView
-	
-		self.backgroundColor = .clear
+    private func commonInit() {
+        self.backgroundColor = .white
+        createSubviews()
     }
-	
-	private var cellView: PostCellView!
-	
-	var post: Post? {
-		get { return cellView.post }
-		set { cellView.post = newValue }
-	}
+    
+    override init(style: UITableViewCellStyle, reuseIdentifier: String?) {
+        super.init(style: style, reuseIdentifier: reuseIdentifier)
+        commonInit()
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+        commonInit()
+    }
+    
+    private func createSubviews() {
+        
+        contentView.addSubview(postCellView)
+        let views = ["postCellView": postCellView]
+        let hConstraints = NSLayoutConstraint.constraints(withVisualFormat: "|[postCellView]|", options: [], metrics: nil, views: views)
+        let vConstraints = NSLayoutConstraint.constraints(withVisualFormat: "V:|[postCellView]-4-|", options: [], metrics: nil, views: views)
+        postCellView.translatesAutoresizingMaskIntoConstraints = false
+        contentView.addConstraints(hConstraints)
+        contentView.addConstraints(vConstraints)
+    }
+    
+    var post: Post? {
+        didSet {
+            postCellView.post = post
+        }
+    }
+    
+    let postCellView = PostCellView(frame: .zero)
 }

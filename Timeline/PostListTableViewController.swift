@@ -22,6 +22,8 @@ class PostListTableViewController: UITableViewController, UISearchResultsUpdatin
 		if tableView.numberOfRows(inSection: 0) > 0 {
 			tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: false)
 		}
+        tableView.rowHeight = UITableViewAutomaticDimension
+        tableView.estimatedRowHeight = 330
 		
 		let nc = NotificationCenter.default
 		nc.addObserver(self, selector: #selector(postsChanged(_:)), name: PostController.PostsChangedNotification, object: nil)

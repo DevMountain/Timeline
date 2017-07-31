@@ -12,7 +12,7 @@ import CoreData
 import CloudKit
 
 
-class Post: CloudKitSyncable {
+class Post: NSObject, CloudKitSyncable {
     
     static let typeKey = "Post"
     static let photoDataKey = "photoData"
@@ -31,7 +31,7 @@ class Post: CloudKitSyncable {
 		return UIImage(data: photoData)
 	}
 	var comments: [Comment]
-	var isFavorite = false
+	dynamic var isFavorite = false
 	var hasCheckedFavoriteStatus = false
 
 	// MARK: CloudKitSyncable
