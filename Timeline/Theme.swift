@@ -60,7 +60,7 @@ extension UIFont {
 	}
 	
 	static var appCommentFont: UIFont {
-		return UIFont.systemFont(ofSize: 13.0, weight: UIFontWeightRegular)
+		return UIFont(name: "Cabin-Regular", size: 13.0)!
 	}
 	
 	static var appActionSheetDescriptionFont: UIFont {

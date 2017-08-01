@@ -20,6 +20,8 @@ class PostDetailTableViewController: UITableViewController, PostActionHandler {
         tableView.register(PostTableViewCell.self, forCellReuseIdentifier: "PostDetailCell")
         tableView.rowHeight = UITableViewAutomaticDimension
         tableView.estimatedRowHeight = 350.0
+        tableView.sectionHeaderHeight = UITableViewAutomaticDimension
+        tableView.estimatedSectionHeaderHeight = 24.0
     }
     
     // MARK: Actions
@@ -27,7 +29,7 @@ class PostDetailTableViewController: UITableViewController, PostActionHandler {
     func addComment(_ sender: Any) {
         presentCommentAlert()
     }
-        
+    
     func share(_ sender: Any) {
         presentActivityViewController()
     }
@@ -70,11 +72,38 @@ class PostDetailTableViewController: UITableViewController, PostActionHandler {
             guard let post = post else { return cell }
             let comment = post.comments[indexPath.row+1]
             
+            cell.textLabel?.numberOfLines = 0
+            cell.textLabel?.font = .appCommentFont
             cell.textLabel?.text = comment.text
-            cell.detailTextLabel?.text = comment.cloudKitRecordID?.recordName
+            cell.detailTextLabel?.text = dateFormatter.string(from: comment.timestamp)
+            cell.detailTextLabel?.font = UIFont.appTimestampFont.withSize(9)
             
             return cell
         }
+    }
+    
+    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return section == 1 ? UITableViewAutomaticDimension : 0.0
+    }
+    
+    override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        
+        if section != 1 { return nil }
+        
+        let label = UILabel(frame: .zero)
+        label.font = .appTimestampFont
+        label.textColor = .appLipstick
+        label.text = NSLocalizedString("Comments", comment: "Comments").uppercased()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        
+        let view = UIView(frame: .zero)
+        view.backgroundColor = .white
+        view.addSubview(label)
+        label.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 14.0).isActive = true
+        label.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+        label.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+        
+        return view
     }
     
     // MARK: Alerts, etc.
@@ -129,4 +158,12 @@ class PostDetailTableViewController: UITableViewController, PostActionHandler {
             tableView?.reloadData()
         }
     }
+    
+    private var dateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .full
+        formatter.timeStyle = .short
+        formatter.doesRelativeDateFormatting = true
+        return formatter
+    }()
 }
