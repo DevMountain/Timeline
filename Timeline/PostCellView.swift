@@ -49,14 +49,23 @@ class PostCellView: UIView {
         buttonsStackView.distribution = .fillEqually
         buttonsStackView.spacing = 24.0
         
+        // Timestamp label
+        timestampLabel.font = .appTimestampFont
+        timestampLabel.textColor = .appPurpleyGrey
         timestampLabel.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .vertical)
         timestampLabel.setContentHuggingPriority(UILayoutPriorityDefaultLow+1, for: .horizontal)
+        let clockImageView = UIImageView(image: #imageLiteral(resourceName: "clock"))
+        let timestampStackView = UIStackView(arrangedSubviews: [clockImageView, timestampLabel])
+        timestampStackView.axis = .horizontal
+        timestampStackView.alignment = .center
+        timestampStackView.distribution = .fill
+        timestampStackView.spacing = 4.0
         
         let spacingView = UIView()
         spacingView.setContentHuggingPriority(UILayoutPriorityDefaultLow, for: .horizontal)
         spacingView.setContentCompressionResistancePriority(UILayoutPriorityDefaultLow, for: .horizontal)
         
-        let bottomStackView = UIStackView(arrangedSubviews: [buttonsStackView, spacingView, timestampLabel])
+        let bottomStackView = UIStackView(arrangedSubviews: [buttonsStackView, spacingView, timestampStackView])
         bottomStackView.axis = .horizontal
         bottomStackView.alignment = .fill
         bottomStackView.distribution = .fill
