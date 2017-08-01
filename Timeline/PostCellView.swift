@@ -81,7 +81,7 @@ class PostCellView: UIView {
         addSubview(mainStackView)
         let views = ["mainStackView": mainStackView]
         let hConstraints = NSLayoutConstraint.constraints(withVisualFormat: "|[mainStackView]|", options: [], metrics: nil, views: views)
-        let vConstraints = NSLayoutConstraint.constraints(withVisualFormat: "V:|-[mainStackView]-|", options: [], metrics: nil, views: views)
+        let vConstraints = NSLayoutConstraint.constraints(withVisualFormat: "V:|[mainStackView]-|", options: [], metrics: nil, views: views)
         mainStackView.translatesAutoresizingMaskIntoConstraints = false
         addConstraints(hConstraints)
         addConstraints(vConstraints)
