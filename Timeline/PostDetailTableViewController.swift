@@ -27,7 +27,8 @@ class PostDetailTableViewController: UITableViewController, PostActionHandler {
     // MARK: Actions
     
     func addComment(_ sender: Any) {
-        presentCommentAlert()
+        //presentCommentAlert()
+        performSegue(withIdentifier: "AddComment", sender: sender)
     }
     
     func share(_ sender: Any) {
@@ -37,6 +38,10 @@ class PostDetailTableViewController: UITableViewController, PostActionHandler {
     func toggleFavorite(_ sender: Any) {
         guard let post = post else { return }
         PostController.sharedController.toggleSubscriptionTo(commentsForPost: post)
+    }
+    
+    @IBAction func unwindToPostDetail(segue: UIStoryboardSegue) {
+        
     }
     
     // MARK: Private
@@ -104,6 +109,19 @@ class PostDetailTableViewController: UITableViewController, PostActionHandler {
         label.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
         
         return view
+    }
+    
+    // MARK: Navigation
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "AddComment" {
+            guard let navController = segue.destination as? UINavigationController,
+                let addCommentVC = navController.topViewController as? AddCommentViewController else {
+                return
+            }
+            
+            addCommentVC.post = post
+        }
     }
     
     // MARK: Alerts, etc.
