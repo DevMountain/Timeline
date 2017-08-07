@@ -115,10 +115,7 @@ class PostDetailTableViewController: UITableViewController, PostActionHandler {
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "AddComment" {
-            guard let navController = segue.destination as? UINavigationController,
-                let addCommentVC = navController.topViewController as? AddCommentViewController else {
-                return
-            }
+            guard let addCommentVC = segue.destination as? AddCommentViewController else { return }
             
             addCommentVC.post = post
         }

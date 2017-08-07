@@ -8,7 +8,7 @@
 
 import UIKit
 
-class AddCommentViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+class AddCommentViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UINavigationBarDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -66,6 +66,12 @@ class AddCommentViewController: UIViewController, UITableViewDataSource, UITable
         cell.detailTextLabel?.font = UIFont.appTimestampFont.withSize(9)
         
         return cell
+    }
+    
+    // UINavigationBarDelegate
+    
+    func position(for bar: UIBarPositioning) -> UIBarPosition {
+        return .topAttached
     }
     
     // MARK: Private

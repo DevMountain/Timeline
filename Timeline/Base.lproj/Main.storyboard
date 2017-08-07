@@ -95,7 +95,7 @@
                         </connections>
                     </tableView>
                     <connections>
-                        <segue destination="dr6-8Z-2cC" kind="presentation" identifier="AddComment" id="xfx-Rf-Cq2"/>
+                        <segue destination="cdY-ZA-iID" kind="presentation" identifier="AddComment" id="AiF-cC-dqj"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="5rV-F4-XEG" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -348,18 +348,36 @@
                                     </label>
                                 </subviews>
                             </stackView>
+                            <navigationBar contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="qLG-b2-W62">
+                                <rect key="frame" x="0.0" y="20" width="375" height="44"/>
+                                <items>
+                                    <navigationItem title="Timeline" id="18o-7M-nmZ">
+                                        <barButtonItem key="leftBarButtonItem" systemItem="done" id="TlB-Fm-puY">
+                                            <connections>
+                                                <segue destination="oTg-7Z-h4H" kind="unwind" unwindAction="unwindToPostDetailWithSegue:" id="UCg-bO-mNr"/>
+                                            </connections>
+                                        </barButtonItem>
+                                    </navigationItem>
+                                </items>
+                                <connections>
+                                    <outlet property="delegate" destination="cdY-ZA-iID" id="tvu-gE-eaM"/>
+                                </connections>
+                            </navigationBar>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstItem="6Y2-GF-VUc" firstAttribute="leading" secondItem="4gm-FT-PDv" secondAttribute="leading" id="0RR-mf-yZO"/>
                             <constraint firstAttribute="trailing" secondItem="6Y2-GF-VUc" secondAttribute="trailing" id="6eG-A6-hLL"/>
+                            <constraint firstAttribute="trailing" secondItem="qLG-b2-W62" secondAttribute="trailing" id="Elx-eN-LwT"/>
+                            <constraint firstItem="qLG-b2-W62" firstAttribute="leading" secondItem="4gm-FT-PDv" secondAttribute="leading" id="Kib-fj-x84"/>
                             <constraint firstItem="6Y2-GF-VUc" firstAttribute="top" secondItem="ZQN-gs-Yy2" secondAttribute="bottom" constant="8" id="MSb-KJ-9Vk"/>
                             <constraint firstItem="ZQN-gs-Yy2" firstAttribute="leading" secondItem="4gm-FT-PDv" secondAttribute="leading" id="NDN-tP-WOS"/>
                             <constraint firstItem="FRC-dZ-TRi" firstAttribute="leading" secondItem="4gm-FT-PDv" secondAttribute="leadingMargin" id="WNr-Sw-UCv"/>
+                            <constraint firstItem="qLG-b2-W62" firstAttribute="top" secondItem="QNi-m2-ZDL" secondAttribute="bottom" id="Yce-Io-FsK"/>
                             <constraint firstItem="ZQN-gs-Yy2" firstAttribute="top" secondItem="FRC-dZ-TRi" secondAttribute="bottom" constant="16" id="b3I-j6-c0b"/>
+                            <constraint firstItem="FRC-dZ-TRi" firstAttribute="top" secondItem="qLG-b2-W62" secondAttribute="bottom" constant="8" id="bhE-Xl-hBG"/>
                             <constraint firstAttribute="trailingMargin" secondItem="FRC-dZ-TRi" secondAttribute="trailing" id="dBL-zi-QxJ"/>
                             <constraint firstAttribute="trailing" secondItem="ZQN-gs-Yy2" secondAttribute="trailing" id="dJC-5I-jcV"/>
-                            <constraint firstItem="FRC-dZ-TRi" firstAttribute="top" secondItem="QNi-m2-ZDL" secondAttribute="bottom" constant="8" id="gDh-Hf-lbi"/>
                             <constraint firstItem="l3P-Uz-xvd" firstAttribute="top" secondItem="6Y2-GF-VUc" secondAttribute="bottom" id="lvH-r8-pNp"/>
                         </constraints>
                     </view>
@@ -379,8 +397,9 @@
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="lxT-Fg-Fgf" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <exit id="oTg-7Z-h4H" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
-            <point key="canvasLocation" x="3840.8000000000002" y="348.57571214392806"/>
+            <point key="canvasLocation" x="2902" y="379"/>
         </scene>
         <!--Tab Bar Controller-->
         <scene sceneID="wdy-OK-YWp">
@@ -487,24 +506,6 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="p8a-fl-aOK" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="2041" y="2335"/>
-        </scene>
-        <!--Navigation Controller-->
-        <scene sceneID="KA5-Ah-4TY">
-            <objects>
-                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="dr6-8Z-2cC" sceneMemberID="viewController">
-                    <toolbarItems/>
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" misplaced="YES" id="KvC-ae-oVd">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
-                        <autoresizingMask key="autoresizingMask"/>
-                    </navigationBar>
-                    <nil name="viewControllers"/>
-                    <connections>
-                        <segue destination="cdY-ZA-iID" kind="relationship" relationship="rootViewController" id="vjX-3n-evL"/>
-                    </connections>
-                </navigationController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="wt8-MD-gJu" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="2901.5999999999999" y="348.57571214392806"/>
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>
