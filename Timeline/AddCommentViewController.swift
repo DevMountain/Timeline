@@ -13,6 +13,9 @@ class AddCommentViewController: UIViewController, UITableViewDataSource, UITable
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        photoView.layer.cornerRadius = photoView.frame.width / 2.0
+        photoView.layer.masksToBounds = true
+        
         commentsTableView.rowHeight = UITableViewAutomaticDimension
         commentsTableView.estimatedRowHeight = 350.0
         

@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="12121" systemVersion="16F2073" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="Trh-GN-HMn">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
     <dependencies>
+        <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12089"/>
         <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
@@ -212,19 +216,19 @@
             <objects>
                 <tableViewController storyboardIdentifier="SearchResultsTableViewController" id="YP2-6k-kcS" customClass="SearchResultsTableViewController" customModule="Timeline" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="300" sectionHeaderHeight="28" sectionFooterHeight="28" id="Jf2-dO-ihd">
-                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <prototypes>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="resultCell" rowHeight="300" id="mp2-Zg-AE9" customClass="PostTableViewCell" customModule="Timeline" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="28" width="600" height="300"/>
+                                <rect key="frame" x="0.0" y="28" width="375" height="300"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="mp2-Zg-AE9" id="aPP-4Z-hw7">
-                                    <rect key="frame" x="0.0" y="0.0" width="600" height="299.5"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="375" height="299.5"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="UG0-ex-oTe">
-                                            <rect key="frame" x="0.0" y="0.0" width="600" height="300"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="300"/>
                                         </imageView>
                                     </subviews>
                                     <constraints>
@@ -258,18 +262,18 @@
                         <viewControllerLayoutGuide type="bottom" id="l3P-Uz-xvd"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="4gm-FT-PDv">
-                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="ZQN-gs-Yy2">
-                                <rect key="frame" x="0.0" y="218.5" width="600" height="327.5"/>
+                                <rect key="frame" x="0.0" y="218.5" width="375" height="394.5"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="CommentCell" textLabel="lVP-I0-VlJ" detailTextLabel="pnA-CF-p5C" style="IBUITableViewCellStyleSubtitle" id="YsO-zH-vBp">
-                                        <rect key="frame" x="0.0" y="28" width="600" height="44"/>
+                                        <rect key="frame" x="0.0" y="28" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="YsO-zH-vBp" id="FcU-7S-Xza">
-                                            <rect key="frame" x="0.0" y="0.0" width="600" height="43.5"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="lVP-I0-VlJ">
@@ -296,19 +300,19 @@
                                 </connections>
                             </tableView>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="6Y2-GF-VUc">
-                                <rect key="frame" x="0.0" y="554" width="600" height="46"/>
+                                <rect key="frame" x="0.0" y="621" width="375" height="46"/>
                                 <subviews>
                                     <stackView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="1000" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="hb2-fb-552">
-                                        <rect key="frame" x="0.0" y="0.0" width="600" height="46"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="375" height="46"/>
                                         <subviews>
                                             <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="dri-Gh-3hI">
-                                                <rect key="frame" x="12" y="8" width="528" height="30"/>
+                                                <rect key="frame" x="12" y="8" width="303" height="30"/>
                                                 <nil key="textColor"/>
                                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                                 <textInputTraits key="textInputTraits"/>
                                             </textField>
                                             <button opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="U26-SO-TTb">
-                                                <rect key="frame" x="548" y="8" width="40" height="30"/>
+                                                <rect key="frame" x="323" y="8" width="40" height="30"/>
                                                 <state key="normal" title="POST"/>
                                                 <connections>
                                                     <action selector="postComment:" destination="cdY-ZA-iID" eventType="touchUpInside" id="cyX-2H-wcl"/>
@@ -327,9 +331,9 @@
                                 </constraints>
                             </view>
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="top" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="FRC-dZ-TRi">
-                                <rect key="frame" x="20" y="72" width="560" height="130.5"/>
+                                <rect key="frame" x="16" y="72" width="343" height="130.5"/>
                                 <subviews>
-                                    <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="rhU-g0-UcI">
+                                    <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="rhU-g0-UcI">
                                         <rect key="frame" x="0.0" y="0.0" width="100" height="100"/>
                                         <constraints>
                                             <constraint firstAttribute="width" secondItem="rhU-g0-UcI" secondAttribute="height" multiplier="1:1" id="CWp-YL-ROp"/>
@@ -406,7 +410,7 @@
                     <toolbarItems/>
                     <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
                     <size key="freeformSize" width="375" height="667"/>
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="Vfp-Yk-U5j">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" misplaced="YES" id="Vfp-Yk-U5j">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
@@ -427,7 +431,7 @@
                     <toolbarItems/>
                     <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
                     <size key="freeformSize" width="375" height="667"/>
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="UdO-nU-wMk">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" misplaced="YES" id="UdO-nU-wMk">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
@@ -489,7 +493,7 @@
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="dr6-8Z-2cC" sceneMemberID="viewController">
                     <toolbarItems/>
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="KvC-ae-oVd">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" misplaced="YES" id="KvC-ae-oVd">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
