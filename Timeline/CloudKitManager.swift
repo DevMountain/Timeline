@@ -99,17 +99,19 @@ class CloudKitManager {
 	
 	func fetchRecordsWithType(_ type: String,
 	                          predicate: NSPredicate = NSPredicate(value: true),
-	                          recordFetchedBlock: ((_ record: CKRecord) -> Void)?,
+	                          sortDescriptors: [NSSortDescriptor]? = nil,
+	                          recordFetchedBlock: @escaping (_ record: CKRecord) -> Void = { _ in },
 	                          completion: ((_ records: [CKRecord]?, _ error: Error?) -> Void)?) {
 		
 		var fetchedRecords: [CKRecord] = []
 		
 		let query = CKQuery(recordType: type, predicate: predicate)
+        query.sortDescriptors = sortDescriptors
 		let queryOperation = CKQueryOperation(query: query)
 		
 		let perRecordBlock = { (fetchedRecord: CKRecord) -> Void in
 			fetchedRecords.append(fetchedRecord)
-			recordFetchedBlock?(fetchedRecord)
+			recordFetchedBlock(fetchedRecord)
 		}
 		queryOperation.recordFetchedBlock = perRecordBlock
 		
@@ -143,7 +145,7 @@ class CloudKitManager {
 				
 				let predicate = NSPredicate(format: "%K == %@", argumentArray: [CreatorUserRecordIDKey, record.recordID])
 				
-				self.fetchRecordsWithType(type, predicate: predicate, recordFetchedBlock: nil, completion: completion)
+				self.fetchRecordsWithType(type, predicate: predicate, completion: completion)
 			}
 		}
 	}
@@ -155,7 +157,7 @@ class CloudKitManager {
 		let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [startDatePredicate, endDatePredicate])
 		
 		
-		self.fetchRecordsWithType(type, predicate: predicate, recordFetchedBlock: nil) { (records, error) in
+		self.fetchRecordsWithType(type, predicate: predicate) { (records, error) in
 			
 			completion?(records, error)
 		}

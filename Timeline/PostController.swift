@@ -152,31 +152,43 @@ class PostController {
 			predicate = NSPredicate(value: true)
 		}
 		
-		cloudKitManager.fetchRecordsWithType(type, predicate: predicate, recordFetchedBlock: { (record) in
+        let sortDescriptors: [NSSortDescriptor]?
+        switch type {
+        case Post.typeKey:
+            let sortDescriptor = NSSortDescriptor(key: "timestamp", ascending: false)
+            sortDescriptors = [sortDescriptor]
+        case Comment.typeKey:
+            let sortDescriptor = NSSortDescriptor(key: "timestamp", ascending: true)
+            sortDescriptors = [sortDescriptor]
+        default:
+            sortDescriptors = nil
+        }
+        
+        cloudKitManager.fetchRecordsWithType(type, predicate: predicate, sortDescriptors: sortDescriptors) { (records, error) in
+            
+            defer { completion() }
+            if let error = error {
+                NSLog("Error fetching CloudKit records of type \(type): \(error)")
+                return
+            }
+            guard let records = records else { return }
 			
 			switch type {
 			case Post.typeKey:
-				if let post = Post(record: record) {
-					self.posts.append(post)
-				}
+                let posts = records.flatMap { Post(record: $0) }
+                self.posts.append(contentsOf: posts)
 			case Comment.typeKey:
+                for record in records {
 				guard let postReference = record[Comment.postKey] as? CKReference,
 					let postIndex = self.posts.index(where: { $0.cloudKitRecordID == postReference.recordID }),
-					let comment = Comment(record: record) else { return }
+                        let comment = Comment(record: record) else { continue }
 				let post = self.posts[postIndex]
 				post.comments.append(comment)
 				comment.post = post
+                }
 			default:
 				return
 			}
-			
-		}) { (records, error) in
-			
-			if let error = error {
-				NSLog("Error fetching CloudKit records of type \(type): \(error)")
-			}
-			
-			completion()
 		}
 	}
 	
