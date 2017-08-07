@@ -33,7 +33,9 @@ class Comment: CloudKitSyncable {
 	convenience required init?(record: CKRecord) {
 		
 		guard let timestamp = record.creationDate,
-			let text = record[Comment.textKey] as? String else { return nil }
+			let text = record[Comment.textKey] as? String else {
+                return nil
+        }
 		
 		self.init(post: nil, text: text, timestamp: timestamp)
 		cloudKitRecordID = record.recordID
