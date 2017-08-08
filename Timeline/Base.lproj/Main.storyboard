@@ -95,7 +95,7 @@
                         </connections>
                     </tableView>
                     <connections>
-                        <segue destination="cdY-ZA-iID" kind="presentation" identifier="AddComment" id="AiF-cC-dqj"/>
+                        <segue destination="cdY-ZA-iID" kind="presentation" identifier="AddComment" customClass="ImageShrinkSegue" customModule="Timeline" customModuleProvider="target" id="AiF-cC-dqj"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="5rV-F4-XEG" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -333,11 +333,11 @@
                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="top" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="FRC-dZ-TRi">
                                 <rect key="frame" x="16" y="72" width="343" height="130.5"/>
                                 <subviews>
-                                    <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="rhU-g0-UcI">
+                                    <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="rhU-g0-UcI" customClass="RoundImageView" customModule="Timeline" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="0.0" width="100" height="100"/>
                                         <constraints>
-                                            <constraint firstAttribute="width" secondItem="rhU-g0-UcI" secondAttribute="height" multiplier="1:1" id="CWp-YL-ROp"/>
-                                            <constraint firstAttribute="height" constant="100" id="fKY-mH-hiQ"/>
+                                            <constraint firstAttribute="width" secondItem="rhU-g0-UcI" secondAttribute="height" multiplier="1:1" priority="999" id="CWp-YL-ROp"/>
+                                            <constraint firstAttribute="height" priority="999" constant="100" id="fKY-mH-hiQ"/>
                                         </constraints>
                                     </imageView>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="T2K-q2-7iC">

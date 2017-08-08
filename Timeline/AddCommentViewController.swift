@@ -8,7 +8,7 @@
 
 import UIKit
 
-class AddCommentViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UINavigationBarDelegate {
+class AddCommentViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UINavigationBarDelegate, PostImageDisplaying {
     
     override func viewDidLoad() {
         super.viewDidLoad()

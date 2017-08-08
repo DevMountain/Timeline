@@ -30,7 +30,8 @@
 		9DC8D7BC1F04528D0071953D /* Appearance.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DC8D7BB1F04528D0071953D /* Appearance.swift */; };
 		9DC8D7BE1F0458840071953D /* Scriptorama Tradeshow JF Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9DC8D7BD1F0457800071953D /* Scriptorama Tradeshow JF Regular.ttf */; };
 		9DE4C5F91F337E120083C561 /* AddCommentViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DE4C5F81F337E120083C561 /* AddCommentViewController.swift */; };
-		9DE4C5FB1F39093B0083C561 /* ImageShrinkSegue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DE4C5FA1F39093B0083C561 /* ImageShrinkSegue.swift */; };
+		9DE4C5FB1F39093B0083C561 /* ImageShrinkAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DE4C5FA1F39093B0083C561 /* ImageShrinkAnimation.swift */; };
+		9DE4C5FD1F391FAE0083C561 /* RoundImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DE4C5FC1F391FAE0083C561 /* RoundImageView.swift */; };
 		9DF767241F2FB7E2004CDA78 /* PostDetailTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68AA93221CF68A020006A751 /* PostDetailTableViewController.swift */; };
 /* End PBXBuildFile section */
 
@@ -62,7 +63,8 @@
 		9DC8D7BB1F04528D0071953D /* Appearance.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Appearance.swift; sourceTree = "<group>"; };
 		9DC8D7BD1F0457800071953D /* Scriptorama Tradeshow JF Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Scriptorama Tradeshow JF Regular.ttf"; sourceTree = "<group>"; };
 		9DE4C5F81F337E120083C561 /* AddCommentViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddCommentViewController.swift; sourceTree = "<group>"; };
-		9DE4C5FA1F39093B0083C561 /* ImageShrinkSegue.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageShrinkSegue.swift; sourceTree = "<group>"; };
+		9DE4C5FA1F39093B0083C561 /* ImageShrinkAnimation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageShrinkAnimation.swift; sourceTree = "<group>"; };
+		9DE4C5FC1F391FAE0083C561 /* RoundImageView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RoundImageView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -186,6 +188,7 @@
 			children = (
 				9D9CB48D1F2BB4F600A96A8F /* PostTableViewCell.swift */,
 				9D9CB48F1F2BB4F600A96A8F /* PostCellView.swift */,
+				9DE4C5FC1F391FAE0083C561 /* RoundImageView.swift */,
 			);
 			name = Views;
 			sourceTree = "<group>";
@@ -212,7 +215,7 @@
 			children = (
 				9DC8D7B81F044B710071953D /* Theme.swift */,
 				9DC8D7BB1F04528D0071953D /* Appearance.swift */,
-				9DE4C5FA1F39093B0083C561 /* ImageShrinkSegue.swift */,
+				9DE4C5FA1F39093B0083C561 /* ImageShrinkAnimation.swift */,
 			);
 			name = Design;
 			sourceTree = "<group>";
@@ -303,9 +306,10 @@
 			files = (
 				9D3CACB01D4FB60C00ED537B /* CloudKitSyncable.swift in Sources */,
 				9DF767241F2FB7E2004CDA78 /* PostDetailTableViewController.swift in Sources */,
-				9DE4C5FB1F39093B0083C561 /* ImageShrinkSegue.swift in Sources */,
+				9DE4C5FB1F39093B0083C561 /* ImageShrinkAnimation.swift in Sources */,
 				68658B681CF8F3280016C5CD /* SearchResultsTableViewController.swift in Sources */,
 				68AA932B1CF68ECD0006A751 /* PhotoSelectViewController.swift in Sources */,
+				9DE4C5FD1F391FAE0083C561 /* RoundImageView.swift in Sources */,
 				9D3CACAE1D4FB2DC00ED537B /* Post.swift in Sources */,
 				9D9CB4921F2BB4F600A96A8F /* PostCellView.swift in Sources */,
 				68AA93211CF689F30006A751 /* PostListTableViewController.swift in Sources */,

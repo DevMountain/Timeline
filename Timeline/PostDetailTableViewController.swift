@@ -8,7 +8,7 @@
 
 import UIKit
 
-class PostDetailTableViewController: UITableViewController, PostActionHandler {
+class PostDetailTableViewController: UITableViewController, PostActionHandler, PostImageDisplaying {
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -172,6 +172,13 @@ class PostDetailTableViewController: UITableViewController, PostActionHandler {
         didSet {
             tableView?.reloadData()
         }
+    }
+    
+    var photoView: UIImageView! {
+        guard let cell = tableView.cellForRow(at: IndexPath(row: 0, section: 0)) as? PostTableViewCell else {
+            return UIImageView()
+        }
+        return cell.postCellView.postImageView
     }
     
     private var dateFormatter: DateFormatter = {
