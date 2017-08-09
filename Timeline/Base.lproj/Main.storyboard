@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13122.17" systemVersion="16F73" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="Trh-GN-HMn">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="12121" systemVersion="16F2073" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="Trh-GN-HMn">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13104.14"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12089"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -81,33 +81,35 @@
                                     <rect key="frame" x="0.0" y="0.0" width="375" height="370"/>
                                     <subviews>
                                         <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="cAt-7x-6hA">
-                                            <rect key="frame" x="0.0" y="0.0" width="375" height="326"/>
+                                            <rect key="frame" x="0.0" y="0.0" width="375" height="323"/>
                                         </imageView>
-                                        <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="oRi-cP-VGf">
-                                            <rect key="frame" x="0.0" y="326" width="375" height="44"/>
-                                            <constraints>
-                                                <constraint firstAttribute="height" constant="44" id="CXO-aH-jt9"/>
-                                            </constraints>
-                                            <items>
-                                                <barButtonItem title="Comment" id="yic-g3-UJ5">
+                                        <stackView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="iJf-mJ-4mH">
+                                            <rect key="frame" x="0.0" y="323" width="375" height="47"/>
+                                            <subviews>
+                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="VQj-6d-BpH">
+                                                    <rect key="frame" x="16" y="0.0" width="67" height="47"/>
+                                                    <state key="normal" title="Comment"/>
                                                     <connections>
-                                                        <action selector="commentButtonTapped:" destination="e8t-4a-dJD" id="w1k-JR-K0M"/>
+                                                        <action selector="commentButtonTapped:" destination="e8t-4a-dJD" eventType="touchUpInside" id="EUd-kE-HKk"/>
                                                     </connections>
-                                                </barButtonItem>
-                                                <barButtonItem style="plain" systemItem="flexibleSpace" id="Kgb-5I-6mk"/>
-                                                <barButtonItem title="Share" id="D8v-Oz-X9v">
+                                                </button>
+                                                <button opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="249" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="fIc-gn-MS6">
+                                                    <rect key="frame" x="83" y="0.0" width="197" height="47"/>
+                                                    <state key="normal" title="Share"/>
                                                     <connections>
-                                                        <action selector="shareButtonTapped:" destination="e8t-4a-dJD" id="EM9-1K-e0c"/>
+                                                        <action selector="shareButtonTapped:" destination="e8t-4a-dJD" eventType="touchUpInside" id="jOJ-7U-W5r"/>
                                                     </connections>
-                                                </barButtonItem>
-                                                <barButtonItem style="plain" systemItem="flexibleSpace" id="mC9-gQ-Nzk"/>
-                                                <barButtonItem title="Follow Post" id="o1n-TB-pWz">
+                                                </button>
+                                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Y1x-Tg-AD2">
+                                                    <rect key="frame" x="280" y="0.0" width="79" height="47"/>
+                                                    <state key="normal" title="Follow Post"/>
                                                     <connections>
-                                                        <action selector="followPostButtonTapped:" destination="e8t-4a-dJD" id="UBg-2S-O66"/>
+                                                        <action selector="followPostButtonTapped:" destination="e8t-4a-dJD" eventType="touchUpInside" id="yvu-HA-Fku"/>
                                                     </connections>
-                                                </barButtonItem>
-                                            </items>
-                                        </toolbar>
+                                                </button>
+                                            </subviews>
+                                            <edgeInsets key="layoutMargins" top="0.0" left="16" bottom="0.0" right="16"/>
+                                        </stackView>
                                     </subviews>
                                 </stackView>
                             </subviews>
@@ -128,14 +130,14 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="bBG-jm-rm1">
-                                            <rect key="frame" x="16" y="6" width="31.5" height="19.5"/>
+                                            <rect key="frame" x="15" y="6" width="31.5" height="19.5"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="16"/>
                                             <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                             <nil key="highlightedColor"/>
                                         </label>
                                         <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Subtitle" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="oLh-DI-Tt8">
-                                            <rect key="frame" x="16" y="25.5" width="40.5" height="13.5"/>
+                                            <rect key="frame" x="15" y="25.5" width="40.5" height="13.5"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="11"/>
                                             <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -152,13 +154,13 @@
                     </tableView>
                     <navigationItem key="navigationItem" title="Post Detail" id="h5p-Bv-fXe"/>
                     <connections>
-                        <outlet property="followPostButton" destination="o1n-TB-pWz" id="V8y-be-Zlq"/>
+                        <outlet property="followPostButton" destination="Y1x-Tg-AD2" id="cVL-xE-dA3"/>
                         <outlet property="imageView" destination="cAt-7x-6hA" id="U3c-1F-Fns"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Yaz-k3-uLQ" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2808" y="1075"/>
+            <point key="canvasLocation" x="2807.1999999999998" y="1074.5127436281859"/>
         </scene>
         <!--Add Post-->
         <scene sceneID="swr-eU-mAz">

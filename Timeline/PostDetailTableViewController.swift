@@ -127,6 +127,6 @@ class PostDetailTableViewController: UITableViewController {
 		}
 	}
 	
-	@IBOutlet weak var followPostButton: UIBarButtonItem!
+	@IBOutlet weak var followPostButton: UIButton!
 	@IBOutlet weak var imageView: UIImageView!
 }
