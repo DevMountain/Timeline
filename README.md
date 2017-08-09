@@ -117,7 +117,7 @@ Implement the Post Detail View Controller. This scene will be used for viewing p
 
 Use the table view's header view to display the photo and a toolbar that allows the user to comment, share, or follow. Use the table view cells to display comments.
 
-1. Add a vertical `UIStackView` to the Header of the table view. Add a `UIImageView` and a `UIToolbar` to the stack view. Add 'Comment', 'Share', and 'Follow Post' `UIBarButtonItem`s to the toolbar. Set up your constraints so that the image view is the height you chose previously for displaying images within your app.
+1. Add a UIView as the header of the table view. Within it, add a vertical `UIStackView`. Add a `UIImageView` and a `UIToolbar` to the stack view. Add 'Comment', 'Share', and 'Follow Post' `UIBarButtonItem`s to the toolbar. Set up your constraints so that the image view is the height you chose previously for displaying images within your app.
 2. Update the cell to support comments that span multiple lines without truncating them. Set the `UITableViewCell` to the subtitle style. Set the number of lines to zero. Implement dynamic heights by setting the `tableView.rowHeight` and `tableView.estimatedRowHeight` in the `viewDidLoad`.
 3. Add an `updateViews` function that will update the scene with the details of the post. Implement the function by setting the `imageView.image` and reloading the table view if needed.
 4. Implement the `UITableViewDataSource` functions.
