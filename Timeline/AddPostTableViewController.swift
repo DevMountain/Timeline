@@ -30,11 +30,6 @@ class AddPostTableViewController: UITableViewController {
 		}
 	}
 	
-	@IBAction func cancelButtonTapped(_ sender: AnyObject) {
-		
-		dismiss(animated: true, completion: nil)
-	}
-	
 	// MARK: Navigation
 	
 	override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
