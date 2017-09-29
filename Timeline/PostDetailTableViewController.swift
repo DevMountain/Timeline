@@ -51,7 +51,7 @@ class PostDetailTableViewController: UITableViewController {
 		PostController.sharedController.checkSubscriptionTo(commentsForPost: post) { (subscribed) in
 			
 			DispatchQueue.main.async {
-				self.followPostButton.title = subscribed ? "Unfollow Post" : "Follow Post"
+				self.followPostButton.setTitle(subscribed ? "Unfollow Post" : "Follow Post", for: .normal) 
 			}
 		}
 	}
@@ -113,7 +113,7 @@ class PostDetailTableViewController: UITableViewController {
 	
 	// MARK: Notifications
 	
-	func postCommentsChanged(_ notification: Notification) {
+	@objc func postCommentsChanged(_ notification: Notification) {
 		guard let notificationPost = notification.object as? Post,
 			let post = post, notificationPost === post else { return } // Not our post
 		updateViews()
