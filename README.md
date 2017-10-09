@@ -4,7 +4,7 @@
 
 Timeline is a simple photo sharing service. Students will bring in many concepts that they have learned, and add more complex data modeling, Image Picker, CloudKit, and protocol-oriented programming to make a Capstone Level project spanning multiple days and concepts.
 
-Most concepts will be covered during class, others are introduced during the project. Not every instruction will outline each line of code to write, but lead the student to the solution. 
+Most concepts will be covered during class, others are introduced during the project. Not every instruction will outline each line of code to write, but lead the student to the solution.
 
 Students who complete this project independently are able to:
 
@@ -45,11 +45,16 @@ Follow the development plan included with the project to build out the basic vie
 
 ### View Hierarchy
 
-Implement the view hierarchy in Storyboards. The app will have a Timeline tableview that will also use a Search Controller to display search results. Both the Timeline view and the Search Results view will display a list of `Post` objects and segue to a `Post` detail view.
+Implement the view hierarchy in Storyboards. The app will have a tab bar controller as the initial controller. The tab bar controller will have two tabs.
 
-The Navigation Controller should have a Plus (+) button that presents a modal Add Post scene that will allow the user to select a photo, add a caption, and submit the photo.
+The first is a navigation controller that has a PostListTableViewController that will display the list of posts, and will also use a UISearchController to display search results. Both the PostListTableViewController and the SearchResultsTableViewController (from the UISearchController) will display a list of `Post` objects and segue to a `Post` detail view.
 
-1. Add a `UITableViewController` Timeline scene, embed it in a `UINavigationController`, add a Plus (+) button as the right bar button. 
+The second tab is a separate navigation controller that will hold a view controller to add new posts. We will talk about the second tab later.
+
+
+The first navigation controller should have a Plus (+) button that presents a modal Add Post scene that will allow the user to select a photo, add a caption, and submit the photo.
+
+1. Add a `UITableViewController` Timeline scene, embed it in a `UINavigationController`, add a Plus (+) button as the right bar button.
 2. Add a `PostListTableViewController` subclass of `UITableViewController` and assign it to the Timeline scene
 3. Add a `UITableViewController` Post Detail scene, add a segue to it from the Timeline scene
 4. Add a `PostDetailTableViewController` subclass of `UITableViewController` and assign it to the Post Detail scene
@@ -62,7 +67,7 @@ The Navigation Controller should have a Plus (+) button that presents a modal Ad
 
 ### Implement Model
 
-Timeline will use a simple, non-persistent data model to locally represent data stored on CloudKit. 
+Timeline will use a simple, non-persistent data model to locally represent data stored on CloudKit.
 
 Start by creating model objects. You will want to save `Post` objects that hold the image data, and `Comment` objects that hold text. A `Post` should own an array of `Comment` objects.
 
@@ -87,7 +92,7 @@ Create a `Comment` model object that will hold user-submitted text comments for 
 
 ### Model Object Controller
 
-Add and implement the `PostController` class that will be used for CRUD operations. 
+Add and implement the `PostController` class that will be used for CRUD operations.
 
 1. Add a new `PostController` class file.
 2. Add a `sharedController` singleton property.
@@ -103,7 +108,7 @@ Add and implement the `PostController` class that will be used for CRUD operatio
 
 Implement the Post List Table View Controller. You will use a similar cell to display posts in multiple scenes in your application. Create a custom `PostTableViewCell` that can be reused in different scenes.
 
-1. Implement the scene in Interface Builder by creating a custom cell with an image view that fills the cell. 
+1. Implement the scene in Interface Builder by creating a custom cell with an image view that fills the cell.
 2. Create a `PostTableViewCell` class, add a `post` variable, and implement an `updateViews` function to the `PostTableViewCell` to update the image view with the `Post`'s photo. Call the function in the didSet of the `post` variable'
 3. Choose a height that will be used for your image cells. To avoid worrying about resizing images or dynamic cell heights, you may want to use a consistent height for all of the image views in the app.
 4. Implement the `UITableViewDataSource` functions
@@ -140,7 +145,7 @@ Until you implement the `UIImagePickerController`, you will use a staged static 
 1. Assign the table view to use static cells. Adopt the 'Grouped' cell style. Add three sections.
 2. Build the first section by creating a tall image selection/preview cell. Add a 'Select Image' `UIButton` that fills the cell. Add an empty `UIImageView` that also fills the cell. Make sure that the button is on top of the image view so it can properly recognize tap events.
 3. Build the second section by adding a `UITextField` that fills the cell. Assign placeholder text so the user recognizes what the text field is for.
-4. Build the third section by adding a 'Add Post' `UIButton` that fills the cell. 
+4. Build the third section by adding a 'Add Post' `UIButton` that fills the cell.
 5. Add an IBAction to the 'Select Image' `UIButton` that assigns a static image to the image view (add a sample image to the Assets.xcassets that you can use for prototyping this feature), and removes the title text from the button.
     * note: It is important to remove the title text so that the user no longer sees that a button is there, but do not remove the entire button, that way the user can tap again to select a different image.
 6. Add an IBAction to the 'Add Post' `UIButton` that checks for an `image` and `caption`. If there is an `image` and a `caption`, use the `PostController` to create a new `Post` and dismiss the view controller. If either the image or a caption is missing, present an alert directing the user to check their information and try again.
@@ -154,11 +159,11 @@ Avoiding repetition is an important way to become a better developer and maintai
 
 Imagine a scenario where you have three classes with similar functionality. Each time you fix a bug or add a feature to any of those classes, you must go and repeat that in all three places. This commonly leads to differences, which leads to bugs.
 
-You will refactor the Photo Selection functionality (selecting and assigning an image) into a reusable child view controller in Part 2. 
+You will refactor the Photo Selection functionality (selecting and assigning an image) into a reusable child view controller in Part 2.
 
 ### Polish Rough Edges
 
-At this point you should be able view added post images in the Timeline Post List scene, add new `Post` objects from the Add Post Scene, add new `Comment` objects from the Post Detail Scene, and persist and use user profile information provided by the current user. 
+At this point you should be able view added post images in the Timeline Post List scene, add new `Post` objects from the Add Post Scene, add new `Comment` objects from the Post Detail Scene, and persist and use user profile information provided by the current user.
 
 Use the app and polish any rough edges. Check table view cell selection. Check text fields. Check proper view hierarchy and navigation models.
 
@@ -212,7 +217,7 @@ Understanding Search Controllers requires you to understand that the main view c
 
 ##### Segue to Post Detail View
 
-Remember that even though the Timeline view and the Search Results view are displaying similar cells and model objects, you are working with separate view controllers with separate cells and instances of table views. 
+Remember that even though the Timeline view and the Search Results view are displaying similar cells and model objects, you are working with separate view controllers with separate cells and instances of table views.
 
 The segue from a `Post` should take the user to the Post Detail scene, regardless of whether that is from the Timeline view or the Search Results view.
 
@@ -233,12 +238,12 @@ Try to work through the Search segue without looking at the solution code. Under
 
 Implement the Image Picker Controller in place of the prototype functionality you built previously.
 
-1. Update the 'Select Image' IBAction to present a `UIImagePickerController`. Give the user the option to select from their Photo Library or from the device's camera if their device has one. 
+1. Update the 'Select Image' IBAction to present a `UIImagePickerController`. Give the user the option to select from their Photo Library or from the device's camera if their device has one.
 2. Implement the `UIImagePickerControllerDelegate` function to capture the selected image and assign it to the image view.
 
 ### Reduce Code Repetition
 
-Refactor the photo selection functionality from the Add Post scene into a child view controller. 
+Refactor the photo selection functionality from the Add Post scene into a child view controller.
 
 Child view controllers control views that are a subview of another view controller. It is a great way to encapsulate functionality into one class that can be reused in multiple places. This is a great tool for any time you want a similar view to be present in multiple places.
 
@@ -273,7 +278,7 @@ Your child view controller needs a way to communicate events to it's parent view
 4. Adopt the `PhotoSelectViewControllerDelegate` protocol in the Add Post class file, implement the `photoSelectViewControllerSelectedImage` function to capture a reference to the selected image.
     * note: In the Add Post scene, you will use that captured reference to create a new post.
 
-Note the use of the delegate pattern. You have encapsulated the Photo Selection workflow in one class, but by implementing the delegate pattern,  each parent view controller can implement it's own response to when a photo was selected. 
+Note the use of the delegate pattern. You have encapsulated the Photo Selection workflow in one class, but by implementing the delegate pattern,  each parent view controller can implement it's own response to when a photo was selected.
 
 You have declared a protocol, adopted the protocol, but you now must assign the delegate property on the instance of the child view controller so that the `PhotoSelectViewController` can communicate with it's parent view controller. This is done by using the embed segue, which is called when the Container View is initialized from the Storyboard, which occurs when the view loads.
 
@@ -312,7 +317,7 @@ You will implement push notifications, subscriptions, and basic automatic sync f
 Add a CloudKit Manager that abstracts your CloudKit code into a single helper class that implements basic CloudKit functionality. You will not necessarily use all of the `CloudKitManager` functionality in this application, but this will be a great reusable class for CloudKit applications that you build in the future.
 
 1. Add a `CloudKitManager` helper class.
-2. Add the following properties and function signatures that perform basic CloudKit functionality. 
+2. Add the following properties and function signatures that perform basic CloudKit functionality.
 
 ```swift
 
@@ -328,7 +333,7 @@ Add a CloudKit Manager that abstracts your CloudKit code into a single helper cl
     func fetchLoggedInUserRecord(_ completion: ((_ record: CKRecord?, _ error: Error? ) -> Void)?)
 
     func fetchUsername(for recordID: CKRecordID,
-                    completion: @escaping ((_ givenName: String?, _ familyName: String?) -> Void) = { _,_ in }) 
+                    completion: @escaping ((_ givenName: String?, _ familyName: String?) -> Void) = { _,_ in })
 
 	func fetchAllDiscoverableUsers(completion: @escaping ((_ userInfoRecords: [CKUserIdentity]?) -> Void) = { _ in })
 
@@ -354,27 +359,27 @@ Add a CloudKit Manager that abstracts your CloudKit code into a single helper cl
 
     // MARK: - Save Records
 
-    func saveRecords(_ records: [CKRecord], perRecordCompletion: ((_ record: CKRecord?, _ error: Error?) -> Void)?, completion: ((_ records: [CKRecord]?, _ error: Error?) -> Void)?) 
+    func saveRecords(_ records: [CKRecord], perRecordCompletion: ((_ record: CKRecord?, _ error: Error?) -> Void)?, completion: ((_ records: [CKRecord]?, _ error: Error?) -> Void)?)
 
-    func saveRecord(_ record: CKRecord, completion: ((_ record: CKRecord?, _ error: Error?) -> Void)?) 
+    func saveRecord(_ record: CKRecord, completion: ((_ record: CKRecord?, _ error: Error?) -> Void)?)
 
-    func modifyRecords(_ records: [CKRecord], perRecordCompletion: ((_ record: CKRecord?, _ error: Error?) -> Void)?, completion: ((_ records: [CKRecord]?, _ error: Error?) -> Void)?) 
+    func modifyRecords(_ records: [CKRecord], perRecordCompletion: ((_ record: CKRecord?, _ error: Error?) -> Void)?, completion: ((_ records: [CKRecord]?, _ error: Error?) -> Void)?)
 
 
     // MARK: - CloudKit Availability
 
     func checkCloudKitAvailability()
 
-    func handleCloudKitUnavailable(_ accountStatus: CKAccountStatus, error:Error?) 
+    func handleCloudKitUnavailable(_ accountStatus: CKAccountStatus, error:Error?)
 
-    func displayCloudKitNotAvailableError(_ errorText: String) 
+    func displayCloudKitNotAvailableError(_ errorText: String)
 
 
     // MARK: - CloudKit User Discoverability
 
     func requestDiscoverabilityPermission()
 
-    func handleCloudKitPermissionStatus(_ permissionStatus: CKApplicationPermissionStatus, error:Error?) 
+    func handleCloudKitPermissionStatus(_ permissionStatus: CKApplicationPermissionStatus, error:Error?)
 
     func displayCloudKitPermissionsNotGrantedError(_ errorText: String)
 ```
@@ -385,14 +390,14 @@ Add a CloudKit Manager that abstracts your CloudKit code into a single helper cl
 
 Write a protocol that will define how the app will work with CloudKit and our model objects. Add a protocol extension that adds predefined convenience functionality to each object that adopts that protocol.
 
-The `CloudKitSyncable` protocol will define the required properties and functions that our `Post` and `Comment` objects will need. 
+The `CloudKitSyncable` protocol will define the required properties and functions that our `Post` and `Comment` objects will need.
 
 The protocol extension will add some shared functionality that our `Post` and `Comment` objects will need.
 
 #### Protocol
 
 ```swift
-    
+
 init?(record: CKRecord)
 
 var cloudKitRecordID: CKRecordID? { get set }
@@ -412,7 +417,7 @@ The `CloudKitSyncable` types will need to have a way to tie instances to a parti
 
     var isSynced: Bool // helper variable to determine if a CloudKitSyncable has a CKRecordID, which we can use to say that the record has been saved to the server
     var cloudKitReference: CKReference? // a computed property that returns a CKReference to the object in CloudKit
-    
+
 ```
 
 5. Add a protocol extension for the `CloudKitSyncable`
@@ -435,20 +440,20 @@ Adopt the `CloudKitSyncable` protocol in the `Post` class.
 
 You must initialize a `CKAsset` with a file path URL. You will need to create a variable `temporaryPhotoURL` that copies the contents of the `photoData: NSData?` property to a file in a temporary directory and returns the URL to the file.
 
-3. Add a `temporaryPhotoURL` computed property that returns an `NSURL` reference to the data the `CKAsset` should upload. 
+3. Add a `temporaryPhotoURL` computed property that returns an `NSURL` reference to the data the `CKAsset` should upload.
 4. Implement the computed property by getting the path of the temporary directory, initializing an NSURL with that path, initializing a file URL that uses a unique name with jpg as the file extension. Write `self.photoData` to that file URL, and then return the file URL.
 
 ```swift
 private var temporaryPhotoURL: URL {
-	
+
 	// Must write to temporary directory to be able to pass image file path url to CKAsset
-	
+
 	let temporaryDirectory = NSTemporaryDirectory()
 	let temporaryDirectoryURL = URL(fileURLWithPath: temporaryDirectory)
 	let fileURL = temporaryDirectoryURL.appendingPathComponent(UUID().uuidString).appendingPathExtension("jpg")
-	
+
 	try? photoData?.write(to: fileURL, options: [.atomic])
-	
+
 	return fileURL
 }
 ```
@@ -578,12 +583,12 @@ When you finish this part, the app will support syncing photos, posts, and comme
 
 Build functionality into your `CloudKitManager` that can be used to manage subscriptions and push notifications. Add support for adding a subscription, fetching a single subscription, fetching all subscriptions, and deleting a subscription.
 
-1. Add the following properties and function signatures that perform basic CloudKit subscription management functionality. 
+1. Add the following properties and function signatures that perform basic CloudKit subscription management functionality.
 
 ```swift
 
     // MARK: - Subscriptions
-    
+
     func subscribe(_ type: String,
                     predicate: NSPredicate,
                     subscriptionID: String,
@@ -593,7 +598,7 @@ Build functionality into your `CloudKitManager` that can be used to manage subsc
                     options: CKQuerySubscriptionOptions,
                     completion: ((_ subscription: CKSubscription?, _ error: Error?) -> Void)?)
 
-    func unsubscribe(_ subscriptionID: String, completion: ((_ subscriptionID: String?, _ error: Error?) -> Void)?) 
+    func unsubscribe(_ subscriptionID: String, completion: ((_ subscriptionID: String?, _ error: Error?) -> Void)?)
 
     func fetchSubscriptions(_ completion: ((_ subscriptions: [CKSubscription]?, _ error: Error?) -> Void)?)
 
