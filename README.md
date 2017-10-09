@@ -49,19 +49,15 @@ Implement the view hierarchy in Storyboards. The app will have a tab bar control
 
 The first is a navigation controller that has a PostListTableViewController that will display the list of posts, and will also use a UISearchController to display search results. Both the PostListTableViewController and the SearchResultsTableViewController (from the UISearchController) will display a list of `Post` objects and segue to a `Post` detail view.
 
-The second tab is a separate navigation controller that will hold a view controller to add new posts. We will talk about the second tab later.
+The second tab is a separate navigation controller that will hold a view controller to add new posts.
 
-
-The first navigation controller should have a Plus (+) button that presents a modal Add Post scene that will allow the user to select a photo, add a caption, and submit the photo.
-
-1. Add a `UITableViewController` Timeline scene, embed it in a `UINavigationController`, add a Plus (+) button as the right bar button.
-2. Add a `PostListTableViewController` subclass of `UITableViewController` and assign it to the Timeline scene
-3. Add a `UITableViewController` Post Detail scene, add a segue to it from the Timeline scene
-4. Add a `PostDetailTableViewController` subclass of `UITableViewController` and assign it to the Post Detail scene
-5. Add a `UITableViewController` Add Post scene, embed it into a `UINavigationController`, and add a modal presentation segue to it from the Plus (+) button on the Timeline scene
-    * note: Because this scene will use a modal presentation, it will not inherit the `UINavigationBar` from the Timeline scene
-6. Add a `AddPostTableViewController` subclass of `UITableViewcontroller` and assign it to the Add Post scene.
-7. Add a `UITableViewcontroller` Search Results scene. It does not need a relationship to any other view controller.
+1. Add a `UITableViewController` Timeline scene, embed it in a `UINavigationController`, Make the navigation controller your first tab in the tab bar controller. (hint: control + drag from the tab bar controller to the navigation controller and select "view controllers" under the "Relationship Segue" section in the contextual menu)
+2. Make the `UITableViewController` from step 1 a `PostListTableViewController` Cocoa Touch file subclass of `UITableViewController` and assign it to the Timeline scene
+3. Add a `UITableViewController` Post Detail scene, add a segue to it from the `PostListTableViewController` scene
+4. Add a `PostDetailTableViewController` subclass of `UITableViewController` and assign it to the Post Detail scene from step 3.
+5. Add a `UITableViewController` Add Post scene, embed it into a `UINavigationController`. Make this navigation controller your second tab in the tab bar controller.
+6. Add a `AddPostTableViewController` subclass of `UITableViewController` and assign it to the Add Post scene from step 5.
+7. Add a `UITableViewcontroller` Search Results scene. It does not need a segue to any other view controller.
     * note: You will implement this scene in Part 2 when setting up the `UISearchController` on the Search scene
 8. Add a `SearchResultsTableViewController` subclass of `UITableViewController` and assign it to the Search Results scene.
 
