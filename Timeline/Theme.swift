@@ -56,7 +56,7 @@ extension UIColor {
 
 extension UIFont {
 	static var appNavigationButtonLeftFont: UIFont {
-		return UIFont.systemFont(ofSize: 5.67, weight: UIFontWeightRegular)
+		return UIFont.systemFont(ofSize: 5.67, weight: .regular)
 	}
 	
 	static var appCommentFont: UIFont {
@@ -64,11 +64,11 @@ extension UIFont {
 	}
 	
 	static var appActionSheetDescriptionFont: UIFont {
-		return UIFont.systemFont(ofSize: 4.33, weight: UIFontWeightRegular)
+		return UIFont.systemFont(ofSize: 4.33, weight: .regular)
 	}
 	
 	static var appTabBarTextFont: UIFont {
-		return UIFont.systemFont(ofSize: 3.33, weight: UIFontWeightRegular)
+		return UIFont.systemFont(ofSize: 3.33, weight: .regular)
 	}
 	
 	static var timelineTitleFont: UIFont {

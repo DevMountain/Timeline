@@ -9,7 +9,7 @@
 import UIKit
 
 class AddPostTableViewController: UITableViewController {
-
+	
 	// MARK: Actions
 	
 	@IBAction func addPostTapped(_ sender: AnyObject) {
@@ -18,21 +18,20 @@ class AddPostTableViewController: UITableViewController {
 			let caption = captionTextField.text {
 			
 			PostController.sharedController.createPostWith(image: image, caption: caption) { (_) in
-				self.dismiss(animated: true, completion: nil)
+				DispatchQueue.main.async {
+					self.dismiss(animated: true, completion: nil)
+				}
 			}
 			
 		} else {
 			
-			let alertController = UIAlertController(title: "Missing Post Information", message: "Check your image and caption and try again.", preferredStyle: .alert)
-			alertController.addAction(UIAlertAction(title: "Ok", style: .cancel, handler: nil))
-			
-			present(alertController, animated: true, completion: nil)
+			DispatchQueue.main.async {
+				let alertController = UIAlertController(title: "Missing Post Information", message: "Check your image and caption and try again.", preferredStyle: .alert)
+				alertController.addAction(UIAlertAction(title: "Ok", style: .cancel, handler: nil))
+				
+				self.present(alertController, animated: true, completion: nil)
+			}
 		}
-	}
-	
-	@IBAction func cancelButtonTapped(_ sender: AnyObject) {
-		
-		dismiss(animated: true, completion: nil)
 	}
 	
 	// MARK: Navigation
@@ -47,7 +46,7 @@ class AddPostTableViewController: UITableViewController {
 	}
 	
 	// MARK: Properties
-
+	
 	var image: UIImage?
 	
 	@IBOutlet weak var captionTextField: UITextField!

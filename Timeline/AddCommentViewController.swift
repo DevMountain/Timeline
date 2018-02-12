@@ -91,7 +91,7 @@ class AddCommentViewController: UIViewController, UITableViewDataSource, UITable
     
     // Notifications
     
-    func keyboardWillShow(_ notification: Notification) {
+    @objc func keyboardWillShow(_ notification: Notification) {
         guard let userInfo = notification.userInfo,
             let keyboardFrame = userInfo[UIKeyboardFrameEndUserInfoKey] as? CGRect,
             let animationDuration = userInfo[UIKeyboardAnimationDurationUserInfoKey] as? Double,
@@ -113,7 +113,7 @@ class AddCommentViewController: UIViewController, UITableViewDataSource, UITable
         UIView.commitAnimations()
     }
     
-    func keyboardWillHide(_ notification: Notification) {
+    @objc func keyboardWillHide(_ notification: Notification) {
         guard let userInfo = notification.userInfo,
             let animationDuration = userInfo[UIKeyboardAnimationDurationUserInfoKey] as? Double,
             let animationCurveRaw = userInfo[UIKeyboardAnimationCurveUserInfoKey] as? Int,

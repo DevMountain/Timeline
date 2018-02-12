@@ -28,10 +28,10 @@ class PostCellView: UIView {
     
     private func createSubviews() {
         
-        postImageView.setContentCompressionResistancePriority(UILayoutPriorityDefaultHigh, for: .vertical)
+        postImageView.setContentCompressionResistancePriority(.defaultHigh, for: .vertical)
         let heightConstraint = postImageView.heightAnchor.constraint(lessThanOrEqualToConstant: 450.0)
         heightConstraint.isActive = true
-        heightConstraint.priority = UILayoutPriorityRequired
+        heightConstraint.priority = .required
         postImageView.contentMode = .scaleAspectFill
         postImageView.clipsToBounds = true
         
@@ -52,8 +52,8 @@ class PostCellView: UIView {
         // Timestamp label
         timestampLabel.font = .appTimestampFont
         timestampLabel.textColor = .appPurpleyGrey
-        timestampLabel.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .vertical)
-        timestampLabel.setContentHuggingPriority(UILayoutPriorityDefaultLow+1, for: .horizontal)
+        timestampLabel.setContentCompressionResistancePriority(.required, for: .vertical)
+        timestampLabel.setContentHuggingPriority(UILayoutPriority(UILayoutPriority.defaultLow.rawValue + 1.0), for: .horizontal)
         let clockImageView = UIImageView(image: #imageLiteral(resourceName: "clock"))
         let timestampStackView = UIStackView(arrangedSubviews: [clockImageView, timestampLabel])
         timestampStackView.axis = .horizontal
@@ -62,8 +62,8 @@ class PostCellView: UIView {
         timestampStackView.spacing = 4.0
         
         let spacingView = UIView()
-        spacingView.setContentHuggingPriority(UILayoutPriorityDefaultLow, for: .horizontal)
-        spacingView.setContentCompressionResistancePriority(UILayoutPriorityDefaultLow, for: .horizontal)
+        spacingView.setContentHuggingPriority(.defaultLow, for: .horizontal)
+        spacingView.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
         
         let bottomStackView = UIStackView(arrangedSubviews: [buttonsStackView, spacingView, timestampStackView])
         bottomStackView.axis = .horizontal
@@ -72,8 +72,8 @@ class PostCellView: UIView {
         bottomStackView.layoutMargins = UIEdgeInsets(top: 0.0, left: 12.0, bottom: 0.0, right: 12.0)
         bottomStackView.isLayoutMarginsRelativeArrangement = true
         
-        captionLabel.setContentCompressionResistancePriority(UILayoutPriorityRequired, for: .vertical)
-        captionLabel.setContentHuggingPriority(UILayoutPriorityDefaultLow, for: .horizontal)
+        captionLabel.setContentCompressionResistancePriority(.required, for: .vertical)
+        captionLabel.setContentHuggingPriority(.defaultLow, for: .horizontal)
         captionLabel.font = .appCommentFont
         captionLabel.textColor = .appSlateGrey
         

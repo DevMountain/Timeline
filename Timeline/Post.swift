@@ -31,7 +31,7 @@ class Post: NSObject, CloudKitSyncable {
 		return UIImage(data: photoData)
 	}
 	var comments: [Comment]
-	dynamic var isFavorite = false
+	@objc dynamic var isFavorite = false
 	var hasCheckedFavoriteStatus = false
 
 	// MARK: CloudKitSyncable

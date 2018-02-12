@@ -19,8 +19,8 @@ enum Appearance {
 		
 		// Navigation bar title text
 		UINavigationBar.appearance().titleTextAttributes = [
-			NSForegroundColorAttributeName : UIColor.appWhite,
-			NSFontAttributeName : UIFont.timelineTitleFont
+			.foregroundColor : UIColor.appWhite,
+			.font : UIFont.timelineTitleFont
 		]
 		
 		UILabel.appearance().textColor = .appSlateGrey

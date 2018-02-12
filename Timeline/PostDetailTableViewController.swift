@@ -160,7 +160,7 @@ class PostDetailTableViewController: UITableViewController, PostActionHandler, P
     
     // MARK: Notifications
     
-    func postCommentsChanged(_ notification: Notification) {
+	@objc func postCommentsChanged(_ notification: Notification) {
         guard let notificationPost = notification.object as? Post,
             let post = post, notificationPost === post else { return } // Not our post
         tableView?.reloadData()

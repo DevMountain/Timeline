@@ -117,7 +117,7 @@ class PostController {
 	
 	// MARK: - Sync
 	
-	func performFullSync(completion: @escaping (() -> Void) = { _ in }) {
+    func performFullSync(completion: @escaping (() -> Void) = {  }) {
 		
 		guard !isSyncing else {
 			completion()
@@ -126,7 +126,7 @@ class PostController {
 		
 		isSyncing = true
 		
-		pushChangesToCloudKit { (success) in
+        pushChangesToCloudKit { (success, error)  in
 			
 			self.fetchNewRecordsOf(type: Post.typeKey) {
 				
@@ -141,7 +141,7 @@ class PostController {
 		
 	}
 	
-	func fetchNewRecordsOf(type: String, completion: @escaping (() -> Void) = { _ in }) {
+    func fetchNewRecordsOf(type: String, completion: @escaping (() -> Void) = {  }) {
 		
 		var referencesToExclude = [CKReference]()
 		var predicate: NSPredicate!

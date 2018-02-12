@@ -174,7 +174,7 @@ class PostListTableViewController: UITableViewController, UISearchResultsUpdatin
 	
 	// MARK: Notifications
 	
-	func postsChanged(_ notification: Notification) {
+	@objc func postsChanged(_ notification: Notification) {
 		tableView.reloadData()
 	}
 	
