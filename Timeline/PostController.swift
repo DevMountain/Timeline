@@ -103,9 +103,22 @@ class PostController {
             guard let records = records else { return }
             
             let posts = records.flatMap { Post(record: $0) }
-            self.posts = posts
             
-            completion()
+            let group = DispatchGroup()
+            
+            for post in posts {
+                group.enter()
+                self.fetchCommentsFor(post: post, completion: {
+                    group.leave()
+                })
+            }
+            
+            
+            group.notify(queue: DispatchQueue.main, execute: {
+                self.posts = posts
+                completion()
+            })
+            
         }
         
     }
@@ -113,7 +126,7 @@ class PostController {
     func fetchCommentsFor(post: Post, completion: @escaping (() -> Void) = { }) {
         let sortDescriptor = NSSortDescriptor(key: Comment.timestampKey, ascending: false)
         
-        let postReference = CKReference(recordID: post.cloudKitRecord.recordID, action: .deleteSelf)
+        let postReference = CKReference(record: post.cloudKitRecord, action: .deleteSelf)
         
         let predicate = NSPredicate(format: "%K == %@", Comment.postKey, postReference)
         
