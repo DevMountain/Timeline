@@ -20,6 +20,10 @@ class PostDetailTableViewController: UITableViewController {
 		
 		let nc = NotificationCenter.default
 		nc.addObserver(self, selector: #selector(postCommentsChanged(_:)), name: PostController.PostCommentsChangedNotification, object: nil)
+        
+        guard let post = post else { return }
+        
+        PostController.sharedController.fetchCommentsFor(post: post)
 	}
 	
 	// MARK: Actions

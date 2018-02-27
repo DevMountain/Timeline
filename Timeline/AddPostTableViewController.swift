@@ -18,9 +18,14 @@ class AddPostTableViewController: UITableViewController {
 			let caption = captionTextField.text {
 			
 			PostController.sharedController.createPostWith(image: image, caption: caption) { (_) in
-				self.dismiss(animated: true, completion: nil)
+				
+                // See view heirarchy in storyboard
+                guard let tabBarController = self.navigationController?.parent as? UITabBarController else { return }
+                
+                DispatchQueue.main.async {
+                    tabBarController.selectedIndex = 0
+                }
 			}
-			
 		} else {
 			
 			let alertController = UIAlertController(title: "Missing Post Information", message: "Check your image and caption and try again.", preferredStyle: .alert)

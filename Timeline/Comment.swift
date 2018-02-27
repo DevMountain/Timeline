@@ -11,7 +11,7 @@ import CoreData
 import CloudKit
 
 
-class Comment: CloudKitSyncable {
+class Comment {
 
     static let typeKey = "Comment"
     static let textKey = "text"
@@ -23,29 +23,43 @@ class Comment: CloudKitSyncable {
         self.timestamp = timestamp
         self.post = post
     }
-	
-	let timestamp: Date
-	let text: String
-	var post: Post?
-
-	// MARK: CloudKitSyncable
-	
-	convenience required init?(record: CKRecord) {
-		
-		guard let timestamp = record.creationDate,
-			let text = record[Comment.textKey] as? String else {
+    
+    convenience required init?(record: CKRecord) {
+        
+        guard let timestamp = record.creationDate,
+            let text = record[Comment.textKey] as? String else {
                 return nil
         }
-		
-		self.init(post: nil, text: text, timestamp: timestamp)
-		cloudKitRecordID = record.recordID
-	}
+        
+        self.init(post: nil, text: text, timestamp: timestamp)
+        cloudKitRecordID = record.recordID
+    }
+	
+    var cloudKitRecord: CKRecord {
+    
+        guard let post = post else { fatalError("Comment does not have a Post relationship") }
+        
+        let postRecordID = post.cloudKitRecordID ?? post.cloudKitRecord.recordID
+        let recordID = cloudKitRecordID ?? CKRecordID(recordName: UUID().uuidString)
+        
+        let record = CKRecord(recordType: recordType, recordID: recordID)
+        
+        record[Comment.timestampKey] = timestamp as CKRecordValue?
+        record[Comment.textKey] = text as CKRecordValue?
+        record[Comment.postKey] = CKReference(recordID: postRecordID, action: .deleteSelf)
+        
+        return record
+    }
 
+    let timestamp: Date
+    let text: String
+    var post: Post?
+    
 	var cloudKitRecordID: CKRecordID?
 	var recordType: String { return Comment.typeKey }
 }
 
-// MARK: -
+// MARK: - SearchableRecord
 
 extension Comment: SearchableRecord {
 	func matches(searchTerm: String) -> Bool {
@@ -53,18 +67,3 @@ extension Comment: SearchableRecord {
 	}
 }
 
-// MARK: -
-
-extension CKRecord {
-	convenience init(_ comment: Comment) {
-		guard let post = comment.post else { fatalError("Comment does not have a Post relationship") }
-		let postRecordID = post.cloudKitRecordID ?? CKRecord(post).recordID
-		let recordID = CKRecordID(recordName: UUID().uuidString)
-		
-		self.init(recordType: comment.recordType, recordID: recordID)
-		
-		self[Comment.timestampKey] = comment.timestamp as CKRecordValue?
-		self[Comment.textKey] = comment.text as CKRecordValue?
-		self[Comment.postKey] = CKReference(recordID: postRecordID, action: .deleteSelf)
-	}
-}

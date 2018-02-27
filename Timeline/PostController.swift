@@ -21,10 +21,6 @@ class PostController {
     
     init() {
         
-        self.cloudKitManager = CloudKitManager()
-        
-        performFullSync()
-        
         subscribeToNewPosts { (success, error) in
             
             if success {
@@ -37,10 +33,12 @@ class PostController {
         guard let data = UIImageJPEGRepresentation(image, 0.8) else { return }
         
         let post = Post(photoData: data)
-        posts.append(post)
+        
+        posts.insert(post, at: 0)
+        
         let captionComment = addComment(toPost: post, commentText: caption)
         
-        cloudKitManager.saveRecord(CKRecord(post)) { (record, error) in
+        CloudKitManager.shared.saveRecord(post.cloudKitRecord, database: publicDatabase) { (record, error) in
             guard let record = record else {
                 if let error = error {
                     NSLog("Error saving new post to CloudKit: \(error)")
@@ -52,7 +50,7 @@ class PostController {
             post.cloudKitRecordID = record.recordID
             
             // Save comment record
-            self.cloudKitManager.saveRecord(CKRecord(captionComment)) { (record, error) in
+            CloudKitManager.shared.saveRecord(captionComment.cloudKitRecord, database: self.publicDatabase) { (record, error) in
                 if let error = error {
                     NSLog("Error saving new comment to CloudKit: \(error)")
                     return
@@ -74,160 +72,74 @@ class PostController {
                                        completion: @escaping ((Comment) -> Void) = { _ in }) -> Comment {
         
         let comment = Comment(post: post, text: commentText)
-        post.comments.append(comment)
         
-        cloudKitManager.saveRecord(CKRecord(comment)) { (record, error) in
+        CloudKitManager.shared.saveRecord(comment.cloudKitRecord, database: publicDatabase) { (record, error) in
             if let error = error {
                 NSLog("Error saving new comment to CloudKit: \(error)")
                 return
             }
+            
             comment.cloudKitRecordID = record?.recordID
+            post.comments.insert(comment, at: 0)
+            
             completion(comment)
         }
         
-        DispatchQueue.main.async {
-            let nc = NotificationCenter.default
-            nc.post(name: PostController.PostCommentsChangedNotification, object: post)
-        }
         
         return comment
     }
     
-    
-    // MARK: - Helper Fetches
-    
-    private func recordsOf(type: String) -> [CloudKitSyncable] {
-        switch type {
-        case "Post":
-            return posts.flatMap { $0 as CloudKitSyncable }
-        case "Comment":
-            return comments.flatMap { $0 as CloudKitSyncable }
-        default:
-            return []
-        }
-    }
-    
-    func syncedRecordsOf(type: String) -> [CloudKitSyncable] {
-        return recordsOf(type: type).filter { $0.isSynced }
-    }
-    
-    func unsyncedRecordsOf(type: String) -> [CloudKitSyncable] {
-        return recordsOf(type: type).filter { !$0.isSynced }
-    }
-    
-    // MARK: - Sync
-    
-    func performFullSync(completion: @escaping (() -> Void) = {  }) {
+    func fetchPosts(completion: @escaping (() -> Void) = { }) {
         
-        guard !isSyncing else {
-            completion()
-            return
-        }
+        let sortDescriptor = NSSortDescriptor(key: Post.timestampKey, ascending: false)
         
-        isSyncing = true
-        
-        pushChangesToCloudKit { (success, error)  in
+        CloudKitManager.shared.fetchRecordsOfType(Post.typeKey, database: publicDatabase, sortDescriptors: [sortDescriptor]) { (records, error) in
             
-            self.fetchNewRecordsOf(type: Post.typeKey) {
-                
-                self.fetchNewRecordsOf(type: Comment.typeKey) {
-                    
-                    self.isSyncing = false
-                    
-                    completion()
-                }
-            }
-        }
-        
-    }
-    
-    func fetchNewRecordsOf(type: String, completion: @escaping (() -> Void) = {  }) {
-        
-        var referencesToExclude = [CKReference]()
-        var predicate: NSPredicate!
-        referencesToExclude = self.syncedRecordsOf(type: type).flatMap { $0.cloudKitReference }
-        predicate = NSPredicate(format: "NOT(recordID IN %@)", argumentArray: [referencesToExclude])
-        
-        if referencesToExclude.isEmpty {
-            predicate = NSPredicate(value: true)
-        }
-
-        let sortDescriptors: [NSSortDescriptor]?
-        switch type {
-        case Post.typeKey:
-            let sortDescriptor = NSSortDescriptor(key: "timestamp", ascending: false)
-            sortDescriptors = [sortDescriptor]
-        case Comment.typeKey:
-            let sortDescriptor = NSSortDescriptor(key: "timestamp", ascending: true)
-            sortDescriptors = [sortDescriptor]
-        default:
-            sortDescriptors = nil
-        }
-        
-        cloudKitManager.fetchRecordsWithType(type, predicate: predicate, sortDescriptors: sortDescriptors) { (records, error) in
-            
-            defer { completion() }
             if let error = error {
-                NSLog("Error fetching CloudKit records of type \(type): \(error)")
+                NSLog("Error fetching Post records: \(error)")
                 return
             }
+            
             guard let records = records else { return }
             
-            switch type {
-            case Post.typeKey:
-                let posts = records.flatMap { Post(record: $0) }
-                self.posts.append(contentsOf: posts)
-            case Comment.typeKey:
-                for record in records {
-                    guard let postReference = record[Comment.postKey] as? CKReference,
-                        let postIndex = self.posts.index(where: { $0.cloudKitRecordID == postReference.recordID }),
-                        let comment = Comment(record: record) else { continue }
-                    let post = self.posts[postIndex]
-                    post.comments.append(comment)
-                    comment.post = post
-                }
-            default:
+            let posts = records.flatMap { Post(record: $0) }
+            self.posts = posts
+            
+            completion()
+        }
+        
+    }
+    
+    func fetchCommentsFor(post: Post, completion: @escaping (() -> Void) = { }) {
+        let sortDescriptor = NSSortDescriptor(key: Comment.timestampKey, ascending: false)
+        
+        let postReference = CKReference(recordID: post.cloudKitRecord.recordID, action: .deleteSelf)
+        
+        let predicate = NSPredicate(format: "%K == %@", Comment.postKey, postReference)
+        
+        CloudKitManager.shared.fetchRecordsOfType(Comment.typeKey, predicate: predicate, database: publicDatabase, sortDescriptors: [sortDescriptor]) { (records, error) in
+            
+            if let error = error {
+                NSLog("Error fetching Post records: \(error)")
                 return
             }
+            
+            guard let records = records else { return }
+            
+            let comments = records.flatMap { Comment(record: $0) }
+            post.comments = comments
+            
+            completion()
         }
     }
-    
-    func pushChangesToCloudKit(completion: @escaping ((_ success: Bool, _ error: Error?) -> Void) = { _,_ in }) {
-        
-        let unsavedPosts = unsyncedRecordsOf(type: Post.typeKey) as? [Post] ?? []
-        let unsavedComments = unsyncedRecordsOf(type: Comment.typeKey) as? [Comment] ?? []
-        var unsavedObjectsByRecord = [CKRecord: CloudKitSyncable]()
-        for post in unsavedPosts {
-            let record = CKRecord(post)
-            unsavedObjectsByRecord[record] = post
-        }
-        for comment in unsavedComments {
-            let record = CKRecord(comment)
-            unsavedObjectsByRecord[record] = comment
-        }
-        
-        let unsavedRecords = Array(unsavedObjectsByRecord.keys)
-        
-        cloudKitManager.saveRecords(unsavedRecords, perRecordCompletion: { (record, error) in
-            
-            guard let record = record else { return }
-            unsavedObjectsByRecord[record]?.cloudKitRecordID = record.recordID
-            
-        }) { (records, error) in
-            
-            let success = records != nil
-            completion(success, error)
-        }
-    }
-    
-    
+
     // MARK: - Subscriptions
     
     func subscribeToNewPosts(completion: @escaping ((_ success: Bool, _ error: Error?) -> Void) = { _,_ in }) {
         
         let predicate = NSPredicate(value: true)
         
-        cloudKitManager.subscribe(Post.typeKey, predicate: predicate, subscriptionID: "allPosts", contentAvailable: true, options: .firesOnRecordCreation) { (subscription, error) in
+        CloudKitManager.shared.subscribe(Post.typeKey, predicate: predicate, database: publicDatabase, subscriptionID: "allPosts", contentAvailable: true, options: .firesOnRecordCreation) { (subscription, error) in
             
             let success = subscription != nil
             completion(success, error)
@@ -241,7 +153,7 @@ class PostController {
             return
         }
         
-        cloudKitManager.fetchSubscription(subscriptionID) { (subscription, error) in
+        CloudKitManager.shared.fetchSubscription(subscriptionID, database: publicDatabase) { (subscription, error) in
             let subscribed = subscription != nil
             completion(subscribed)
         }
@@ -255,7 +167,7 @@ class PostController {
         
         let predicate = NSPredicate(format: "post == %@", argumentArray: [recordID])
         
-        cloudKitManager.subscribe(Comment.typeKey, predicate: predicate, subscriptionID: recordID.recordName, contentAvailable: true, alertBody: alertBody, desiredKeys: [Comment.textKey, Comment.postKey], options: .firesOnRecordCreation) { (subscription, error) in
+        CloudKitManager.shared.subscribe(Comment.typeKey, predicate: predicate, database: publicDatabase, subscriptionID: recordID.recordName, contentAvailable: true, alertBody: alertBody, desiredKeys: [Comment.textKey, Comment.postKey], options: .firesOnRecordCreation) { (subscription, error) in
             
             let success = subscription != nil
             completion(success, error)
@@ -270,7 +182,7 @@ class PostController {
             return
         }
         
-        cloudKitManager.unsubscribe(subscriptionID) { (subscriptionID, error) in
+        CloudKitManager.shared.unsubscribe(subscriptionID, database: publicDatabase) { (subscriptionID, error) in
             let success = subscriptionID != nil && error == nil
             completion(success, error)
         }
@@ -284,7 +196,7 @@ class PostController {
             return
         }
         
-        cloudKitManager.fetchSubscription(subscriptionID) { (subscription, error) in
+        CloudKitManager.shared.fetchSubscription(subscriptionID, database: publicDatabase) { (subscription, error) in
             
             if subscription != nil {
                 self.removeSubscriptionTo(commentsForPost: post) { (success, error) in
@@ -300,9 +212,7 @@ class PostController {
     
     // MARK: - Properties
     
-    let cloudKitManager: CloudKitManager
-    
-    var isSyncing: Bool = false
+    let publicDatabase = CKContainer.default().publicCloudDatabase
     
     var posts = [Post]() {
         didSet {
@@ -312,11 +222,8 @@ class PostController {
             }
         }
     }
+    
     var sortedPosts: [Post] {
         return posts.sorted { return $0.timestamp.compare($1.timestamp as Date) == .orderedAscending }
     }
-    var comments: [Comment] {
-        return posts.flatMap { $0.comments }
-    }
-    
 }

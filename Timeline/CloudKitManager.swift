@@ -17,6 +17,8 @@ private let ModificationDateKey = "modificationDate"
 
 class CloudKitManager {
 	
+    static let shared = CloudKitManager()
+    
 	let publicDatabase = CKContainer.default().publicCloudDatabase
 	let privateDatabase = CKContainer.default().privateCloudDatabase
 	
@@ -37,8 +39,9 @@ class CloudKitManager {
 			
 			if let recordID = recordID,
 				let completion = completion {
-				
-				self.fetchRecord(withID: recordID, completion: completion)
+                
+				// Apple `Users` records can only exist on the Public Database
+				self.fetchRecord(withID: recordID, database: self.publicDatabase, completion: completion)
 			}
 		}
 	}
@@ -89,16 +92,17 @@ class CloudKitManager {
 	
 	// MARK: - Fetch Records
 	
-	func fetchRecord(withID recordID: CKRecordID, completion: ((_ record: CKRecord?, _ error: Error?) -> Void)?) {
+	func fetchRecord(withID recordID: CKRecordID, database: CKDatabase, completion: ((_ record: CKRecord?, _ error: Error?) -> Void)?) {
 		
-		publicDatabase.fetch(withRecordID: recordID) { (record, error) in
+		database.fetch(withRecordID: recordID) { (record, error) in
 			
 			completion?(record, error)
 		}
 	}
 	
-	func fetchRecordsWithType(_ type: String,
+	func fetchRecordsOfType(_ type: String,
 	                          predicate: NSPredicate = NSPredicate(value: true),
+                              database: CKDatabase,
 	                          sortDescriptors: [NSSortDescriptor]? = nil,
 	                          recordFetchedBlock: @escaping (_ record: CKRecord) -> Void = { _ in },
 	                          completion: ((_ records: [CKRecord]?, _ error: Error?) -> Void)?) {
@@ -126,7 +130,7 @@ class CloudKitManager {
 				continuedQueryOperation.recordFetchedBlock = perRecordBlock
 				continuedQueryOperation.queryCompletionBlock = queryCompletionBlock
 				
-				self.publicDatabase.add(continuedQueryOperation)
+				database.add(continuedQueryOperation)
 				
 			} else {
 				completion?(fetchedRecords, error)
@@ -134,10 +138,10 @@ class CloudKitManager {
 		}
 		queryOperation.queryCompletionBlock = queryCompletionBlock
 		
-		self.publicDatabase.add(queryOperation)
+		database.add(queryOperation)
 	}
 	
-	func fetchCurrentUserRecords(_ type: String, completion: ((_ records: [CKRecord]?, _ error: Error?) -> Void)?) {
+    func fetchCurrentUserRecords(_ type: String, database: CKDatabase, completion: ((_ records: [CKRecord]?, _ error: Error?) -> Void)?) {
 		
 		fetchLoggedInUserRecord { (record, error) in
 			
@@ -145,19 +149,19 @@ class CloudKitManager {
 				
 				let predicate = NSPredicate(format: "%K == %@", argumentArray: [CreatorUserRecordIDKey, record.recordID])
 				
-				self.fetchRecordsWithType(type, predicate: predicate, completion: completion)
+                self.fetchRecordsOfType(type, predicate: predicate, database: database, completion: completion)
 			}
 		}
 	}
 	
-	func fetchRecordsFromDateRange(_ type: String, recordType: String, fromDate: Date, toDate: Date, completion: ((_ records: [CKRecord]?, _ error: Error?) -> Void)?) {
+    func fetchRecordsFromDateRange(_ type: String, database: CKDatabase, fromDate: Date, toDate: Date, completion: ((_ records: [CKRecord]?, _ error: Error?) -> Void)?) {
 		
 		let startDatePredicate = NSPredicate(format: "%K > %@", argumentArray: [CreationDateKey, fromDate])
 		let endDatePredicate = NSPredicate(format: "%K < %@", argumentArray: [CreationDateKey, toDate])
 		let predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [startDatePredicate, endDatePredicate])
 		
 		
-		self.fetchRecordsWithType(type, predicate: predicate) { (records, error) in
+        self.fetchRecordsOfType(type, predicate: predicate, database: database) { (records, error) in
 			
 			completion?(records, error)
 		}
@@ -166,40 +170,37 @@ class CloudKitManager {
 	
 	// MARK: - Delete
 	
-	func deleteRecordWithID(_ recordID: CKRecordID, completion: ((_ recordID: CKRecordID?, _ error: Error?) -> Void)?) {
+    func deleteRecordWithID(_ recordID: CKRecordID, database: CKDatabase, completion: ((_ recordID: CKRecordID?, _ error: Error?) -> Void)?) {
 		
-		publicDatabase.delete(withRecordID: recordID) { (recordID, error) in
+		database.delete(withRecordID: recordID) { (recordID, error) in
 			completion?(recordID, error)
 		}
 	}
 	
-	func deleteRecordsWithID(_ recordIDs: [CKRecordID], completion: ((_ records: [CKRecord]?, _ recordIDs: [CKRecordID]?, _ error: Error?) -> Void)?) {
+	func deleteRecordsWithID(_ recordIDs: [CKRecordID], database: CKDatabase, completion: ((_ records: [CKRecord]?, _ recordIDs: [CKRecordID]?, _ error: Error?) -> Void)?) {
 		
 		let operation = CKModifyRecordsOperation(recordsToSave: nil, recordIDsToDelete: recordIDs)
 		operation.savePolicy = .ifServerRecordUnchanged
 		
 		operation.modifyRecordsCompletionBlock = completion
 		
-		publicDatabase.add(operation)
+		database.add(operation)
 	}
 	
 	
 	// MARK: - Save and Modify
 	
-	func saveRecords(_ records: [CKRecord], perRecordCompletion: ((_ record: CKRecord?, _ error: Error?) -> Void)?, completion: ((_ records: [CKRecord]?, _ error: Error?) -> Void)?) {
+    func saveRecords(_ records: [CKRecord], database: CKDatabase, perRecordCompletion: ((_ record: CKRecord?, _ error: Error?) -> Void)?, completion: ((_ records: [CKRecord]?, _ error: Error?) -> Void)?) {
 		
-		modifyRecords(records, perRecordCompletion: perRecordCompletion, completion: completion)
+        modifyRecords(records, database: database, perRecordCompletion: perRecordCompletion, completion: completion)
 	}
 	
-	func saveRecord(_ record: CKRecord, completion: ((_ record: CKRecord?, _ error: Error?) -> Void)?) {
+    func saveRecord(_ record: CKRecord, database: CKDatabase, completion: ((_ record: CKRecord?, _ error: Error?) -> Void)?) {
 		
-		publicDatabase.save(record, completionHandler: { (record, error) in
-			
-			completion?(record, error)
-		})
+		modifyRecords([record], database: database, perRecordCompletion: completion, completion: nil)
 	}
 	
-	func modifyRecords(_ records: [CKRecord], perRecordCompletion: ((_ record: CKRecord?, _ error: Error?) -> Void)?, completion: ((_ records: [CKRecord]?, _ error: Error?) -> Void)?) {
+    func modifyRecords(_ records: [CKRecord], database: CKDatabase, perRecordCompletion: ((_ record: CKRecord?, _ error: Error?) -> Void)?, completion: ((_ records: [CKRecord]?, _ error: Error?) -> Void)?) {
 		
 		let operation = CKModifyRecordsOperation(recordsToSave: records, recordIDsToDelete: nil)
 		operation.savePolicy = .changedKeys
@@ -209,10 +210,10 @@ class CloudKitManager {
 		operation.perRecordCompletionBlock = perRecordCompletion
 		
 		operation.modifyRecordsCompletionBlock = { (records, recordIDs, error) -> Void in
-			(completion?(records, error))!
+			completion?(records, error)
 		}
 		
-		publicDatabase.add(operation)
+		database.add(operation)
 	}
 	
 	
@@ -220,6 +221,7 @@ class CloudKitManager {
 	
 	func subscribe(_ type: String,
 	               predicate: NSPredicate,
+                   database: CKDatabase,
 	               subscriptionID: String,
 	               contentAvailable: Bool,
 	               alertBody: String? = nil,
@@ -236,31 +238,31 @@ class CloudKitManager {
 		
 		subscription.notificationInfo = notificationInfo
 		
-		publicDatabase.save(subscription, completionHandler: { (subscription, error) in
+		database.save(subscription, completionHandler: { (subscription, error) in
 			
 			completion?(subscription, error)
 		})
 	}
 	
-	func unsubscribe(_ subscriptionID: String, completion: ((_ subscriptionID: String?, _ error: Error?) -> Void)?) {
+	func unsubscribe(_ subscriptionID: String, database: CKDatabase, completion: ((_ subscriptionID: String?, _ error: Error?) -> Void)?) {
 		
-		publicDatabase.delete(withSubscriptionID: subscriptionID) { (subscriptionID, error) in
+		database.delete(withSubscriptionID: subscriptionID) { (subscriptionID, error) in
 			
 			completion?(subscriptionID, error)
 		}
 	}
 	
-	func fetchSubscriptions(_ completion: ((_ subscriptions: [CKSubscription]?, _ error: Error?) -> Void)?) {
+	func fetchSubscriptions(database: CKDatabase, completion: ((_ subscriptions: [CKSubscription]?, _ error: Error?) -> Void)?) {
 		
-		publicDatabase.fetchAllSubscriptions { (subscriptions, error) in
+		database.fetchAllSubscriptions { (subscriptions, error) in
 			
 			completion?(subscriptions, error)
 		}
 	}
 	
-	func fetchSubscription(_ subscriptionID: String, completion: ((_ subscription: CKSubscription?, _ error: Error?) -> Void)?) {
+	func fetchSubscription(_ subscriptionID: String, database: CKDatabase, completion: ((_ subscription: CKSubscription?, _ error: Error?) -> Void)?) {
 		
-		publicDatabase.fetch(withSubscriptionID: subscriptionID) { (subscription, error) in
+		database.fetch(withSubscriptionID: subscriptionID) { (subscription, error) in
 			
 			completion?(subscription, error)
 		}

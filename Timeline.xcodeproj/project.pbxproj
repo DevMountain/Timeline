@@ -22,7 +22,6 @@
 		68AA932B1CF68ECD0006A751 /* PhotoSelectViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68AA932A1CF68ECD0006A751 /* PhotoSelectViewController.swift */; };
 		68B4B04C1D05BD7A00EE2D88 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 68B4B04B1D05BD7A00EE2D88 /* CloudKit.framework */; };
 		9D3CACAE1D4FB2DC00ED537B /* Post.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68658B5B1CF8AC4B0016C5CD /* Post.swift */; };
-		9D3CACB01D4FB60C00ED537B /* CloudKitSyncable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D3CACAF1D4FB60C00ED537B /* CloudKitSyncable.swift */; };
 		9D3CACB11D4FB8DF00ED537B /* Comment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 68658B5D1CF8AC4B0016C5CD /* Comment.swift */; };
 /* End PBXBuildFile section */
 
@@ -46,7 +45,6 @@
 		68AA93241CF68A1A0006A751 /* AddPostTableViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AddPostTableViewController.swift; sourceTree = "<group>"; };
 		68AA932A1CF68ECD0006A751 /* PhotoSelectViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PhotoSelectViewController.swift; sourceTree = "<group>"; };
 		68B4B04B1D05BD7A00EE2D88 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
-		9D3CACAF1D4FB60C00ED537B /* CloudKitSyncable.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CloudKitSyncable.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -118,7 +116,6 @@
 			isa = PBXGroup;
 			children = (
 				68658B691CF8F3820016C5CD /* SearchableRecord.swift */,
-				9D3CACAF1D4FB60C00ED537B /* CloudKitSyncable.swift */,
 			);
 			name = Protocols;
 			sourceTree = "<group>";
@@ -209,7 +206,7 @@
 				TargetAttributes = {
 					682FA4D21CF5427500B81932 = {
 						CreatedOnToolsVersion = 7.3.1;
-						DevelopmentTeam = 357NQPN89X;
+                        DevelopmentTeam = 357NQPN89X;
 						LastSwiftMigration = 0900;
 						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
@@ -256,7 +253,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9D3CACB01D4FB60C00ED537B /* CloudKitSyncable.swift in Sources */,
 				68658B681CF8F3280016C5CD /* SearchResultsTableViewController.swift in Sources */,
 				68AA932B1CF68ECD0006A751 /* PhotoSelectViewController.swift in Sources */,
 				68AA93231CF68A020006A751 /* PostDetailTableViewController.swift in Sources */,
@@ -403,10 +399,10 @@
 				CODE_SIGN_ENTITLEMENTS = Timeline/Timeline.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				DEVELOPMENT_TEAM = 357NQPN89X;
+                DEVELOPMENT_TEAM = 357NQPN89X;
 				INFOPLIST_FILE = Timeline/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.devmountain.Timeline;
+                PRODUCT_BUNDLE_IDENTIFIER = com.devmountain.Timeline;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
@@ -421,10 +417,10 @@
 				CODE_SIGN_ENTITLEMENTS = Timeline/Timeline.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				DEVELOPMENT_TEAM = 357NQPN89X;
+                DEVELOPMENT_TEAM = 357NQPN89X;
 				INFOPLIST_FILE = Timeline/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.devmountain.Timeline;
+                PRODUCT_BUNDLE_IDENTIFIER = com.devmountain.Timeline;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;

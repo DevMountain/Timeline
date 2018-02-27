@@ -33,8 +33,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable: Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
 		
-		let postController = PostController.sharedController
-		postController.performFullSync()
+		PostController.sharedController.fetchPosts()
 		
         completionHandler(UIBackgroundFetchResult.newData)
     }
