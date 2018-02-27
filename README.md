@@ -201,9 +201,9 @@ Understanding Search Controllers requires you to understand that the main view c
 3. Implement the `UITableViewDataSource` functions to display the search results.   
     * note: For now you will only display `Post` objects as a result of a search. Use the `PostTableViewCell` to do so.
 
-#### Update Timeline Scene
+#### Update PostListTableViewController
 
-1. Add a function `setUpSearchController` that captures the `resultsController` from the Storyboard, instantiates the `UISearchController`, sets the `searchResultsUpdater` to self, and adds the `searchController`'s `searchBar` as the table's header view.
+1. In the PostListTableViewController.swift, add a function `setUpSearchController` that captures the `resultsController` from the Storyboard, instantiates the `UISearchController`, sets the `searchResultsUpdater` to self, and adds the `searchController`'s `searchBar` as the table's header view.
 2. Implement the `UISearchResultsUpdating` protocol `updateSearchResults(for searchController: UISearchController)` function. The function should capture the `resultsViewController` and the search text from the `searchController`'s `searchBar`, filter the local `posts` array for posts that match, assign the filtered results to the `resultsViewController`'s `resultsArray`, and reload the `resultsViewController`'s `tableView`.
     * note: Consider the communication that is happening here between two separate view controllers. Be sure that you understand this relationship.
 
